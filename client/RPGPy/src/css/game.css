@@ -1,0 +1,298 @@
+/*game.css*/
+
+.gameContainer{
+    padding: 1rem;
+    max-width: 56rem;
+    margin-inline:auto;
+}
+
+.gameContainer h1{
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+.InnerGameContainer{
+    margin-top: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    justify-items: center;
+    align-items: center;
+}
+
+.InnerGame-SecondContainer{
+    margin-top: 1rem;
+}
+
+.InnerGame-SecondContainer button{
+    padding-inline: 1rem ;
+    border-radius: 4px;
+    background-color: #155dfc;
+    color:#ffffff;
+
+    &:disabled{
+        opacity: 50%;
+        cursor: not-allowed;
+    }
+}
+
+.EventCard{
+    margin-top:1.25rem;
+    border: 0.8px solid #000000 ;
+    border-radius: 8px;
+    box-shadow: inset;
+}
+
+.EventCard h3{
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.McqCard{
+    margin-top: 1.25rem;
+    border: #000000 0.8px solid;
+    border-radius: 4px;
+    padding:1rem;
+}
+
+.McqCard h4 {
+    font-weight: 600;
+}
+
+.McqCard p {
+    margin-top: 0.5rem;
+}
+
+.McqInnerCard{
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.McqInnerCard button {
+    border: solid #000000 0.4px;
+    border-radius: 4px;
+    padding-inline: 0.75rem;
+    padding-block: 0.5rem;
+    background-color: aqua;
+
+    &:hover{
+        background-color: #f9fafb;
+    }
+    &:disabled{
+        opacity: 80%;
+        cursor: not-allowed;
+    }
+}
+
+.none-h{
+    text-align: center;
+    font-weight: bold;
+}
+
+.codeCard{
+    margin-top: 1.25rem;
+    border: #000000 solid 4px;
+    border-radius: 4px;
+    padding:1rem;
+}
+
+.codeCard h4{
+    font-weight: 600;
+}
+
+.preCode {
+    white-space: pre-warp;
+    font-size: 0.875rem;
+    line-height: calc(1.25/0.875);
+}
+
+.EditorClass{
+    width: 100%;
+    border:#000000 solid 0.8px;
+    border-radius: 4px;
+    padding:0.875rem;
+    margin-top: 0.875rem;
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, 'Liberation Mono', Menlo, monospace;
+     font-size: 0.875rem;
+    line-height: calc(1.25/0.875);
+}
+
+.codeCard button{
+    margin-top: 0.5rem;
+    padding-inline: 0.75rem;
+    border-radius: 4px;
+    padding-block: 0,5rem;
+    border-radius: 4px;
+    background-color: oklch(56.9% 0.145 163.225);
+    color: #ffffff;
+
+    &:disabled{
+        opacity: 50%;
+        cursor: not-allowed;
+    }
+}
+
+.codeResult{
+    margin-top:1rem ;
+
+    &p{
+        font-weight: 600;
+    }
+
+   
+}
+
+ .prefirst{
+        background-color: #000000;
+        color:white;
+        border-radius: 4px;
+         font-size: 0.875rem;
+        line-height: calc(1.25/0.875);
+    }
+
+.fontP{
+    font-weight: 600;
+    margin-top:0.625rem;
+}
+
+.preSec{
+    background-color: #ffe2e2;
+    color: oklch(50.5% 0.213 27.518);
+    padding: 0.625rem;
+    border-radius: 4px;
+     font-size: 0.875rem;
+    line-height: calc(1.25/0.875);
+}
+
+.backWarpper{
+    margin-top: 1.25rem;
+    border: #000000 solid 0.8px;
+    border-radius: 4px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    &h4{
+        font-weight: 600;
+    
+    }
+
+    &ul{
+        list-style-type: disc;
+        margin-left: 1.25rem;
+    }
+
+}
+
+.backInner{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+ 
+}
+
+.inv-warp{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap:1rem;
+}
+
+
+.useBack{
+    border: #000000 solid 0.5px;
+    border-radius: 4px;
+    padding: 0.625rem;
+    background-color: #155dfc;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: clamp(0.65rem, 4vh, 0.7rem);
+    margin-left: auto;
+
+    &:hover{
+        color:#000000;
+        background-color: grey;
+    }
+}
+
+.equipmentWarpper{
+    display: flex;
+    flex-direction: row;
+
+}
+
+.equipmentWarpper ul{
+    list-style-type: disc;
+    margin-left: 1.25rem;
+    list-style: none;
+    gap: 0.75rem;
+    display: flex;
+}
+
+.equipmentWarpper li{
+    border: #000000 solid 0.5px;
+    border-radius: 4px;
+    padding: 0.625rem;
+    color:#a5a5a5;    
+    cursor: pointer;
+}
+
+.Inner-InvBack{
+    display: flex;
+    flex-direction: row;
+    gap:0.5rem;
+    align-items: center;    
+    white-space: nowrap;
+    justify-content: space-between;
+}
+
+.Inner-InvBack > *{
+    flex-shrink: 0;
+}
+
+.badge-inv{
+    border-radius: 10px;
+    padding: 0.5rem;
+    font-size: 10px;
+    font-weight: bold;
+    height: 30px;
+    justify-content: center;
+
+}
+
+.badge-inv.Weapon{
+    background-color: #155dfc;
+     color: #ffffff;   
+}
+
+.badge-inv.Restock{
+    background-color: #FFE2FE;
+    color: #000000;
+}
+
+.badge-inv.Armor{
+    background-color: #FFC53A;
+    color: #000000;
+}
+
+.badge-inv.Loot{
+    background-color: #161032;
+    color: #ffffff;
+}
+
+@media (max-width: 480px) {
+    .preCode{
+    white-space: pre-warp;
+    font-size: 0.875rem;
+    line-height: calc(1.25/0.875);
+    width: fit-content;
+
+    }
+
+   
+}

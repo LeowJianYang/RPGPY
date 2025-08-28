@@ -1,0 +1,127 @@
+.btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn.primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn.primary:hover{
+  opacity: 0.5;
+}
+
+.btn.danger {
+  background: #dc3545;
+  color: white;
+}
+
+.btn.dashed {
+  border: 1px dashed gray;
+  background: transparent;
+  color: black;
+}
+
+.btn.secondary{
+    border: 1px solid gray;
+    background: transparent;
+    color: black;
+    transition: border 0.2s all;
+}
+
+.btn.secondary:hover{
+    border: 1px #007bff solid;
+}
+
+
+.ModalOverlay {
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  background: rgba(0, 0, 0, 0.5); 
+  z-index: 1000;
+}
+
+.fade-in{
+  animation: fadeIn 0.3s forwards;
+}
+.fade-out { animation: fadeOut 0.3s forwards;}
+
+@keyframes fadeIn {
+  from {opacity: 0;} to {opacity: 1;}
+}
+
+@keyframes fadeOut {
+  from {opacity: 1;} to {opacity: 0;}
+}
+
+
+.ModalForm {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+    background-color: #ffffff;
+    width: 30rem;
+    height: 10rem;
+    border-radius: 10px;
+    margin: 1rem;
+    padding: 1rem;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+
+.pop-in{
+  transform: scale(1);
+  opacity: 1;
+}
+
+.pop-out{
+  transform: scale(0.8);
+  opacity: 0;
+}
+
+
+
+.ModalTitle{
+    color:black;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.ModalTitle h1 {
+    color:black;
+    text-align: left;
+    font-weight: bold;
+}
+
+.ModalTitle :nth-child{
+    text-align: left;
+    font-size: 18px;
+}
+
+.ModalFooter{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap:0.7rem;
+}
+
+@media (max-width: 480px) {
+  .ModalForm {
+     width: 20rem;
+     height: 10rem;
+  }
+}

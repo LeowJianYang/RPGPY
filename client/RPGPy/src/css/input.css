@@ -1,0 +1,165 @@
+
+.home {
+  min-height: 100vh;
+  background-image: url(/wave.svg);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  flex-direction: row;
+  gap: 2rem;
+  padding: 1rem;
+  flex-wrap: wrap; /* Enable to Change Line */
+}
+
+.home-cont {
+  text-align: center;
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.home-cont-Text {
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 1rem;
+  text-align: left;
+}
+
+.home-cont-title {
+  font-size: clamp(1.5rem, 5vw, 3rem); /* Flw the Screen Size */
+  font-weight: bold;
+  text-align: left;
+  background: linear-gradient(
+    2000deg,
+    #ff7e5f,
+    #feb47b,
+    #86a8e7,
+    #91eae4
+  );
+  background-size: 800% 800%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textMove 8s ease infinite;
+}
+
+@keyframes textMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.getStart {
+  display: flex;
+  flex-direction: row;
+  gap: 1.25rem;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-wrap: wrap; /* Change Line while small */
+  padding: 1rem;
+}
+
+.pyLogo {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+}
+
+.home-title {
+  color: #ffffff;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: bold;
+  text-align: left;
+}
+
+.home-text {
+  color: #1c0f13;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  text-align: left;
+  font-weight: 400;
+}
+
+.contain-blw {
+  background-color: #0066ff;
+  padding: 1rem;
+}
+
+.getStartBtn {
+  display: inline-block;
+  position: relative;
+  border: 2px solid #feea00;
+  border-radius: 10px;
+  width: 200px;
+  max-width: 80%;
+  font-size: 1.25rem;
+  padding: 0.5rem;
+  overflow: hidden;
+  transition: color 0.3s ease;
+  z-index: 0;
+  text-align: center;
+}
+
+.getStartBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: #f9a620;
+  transition: left 0.4s ease;
+  z-index: -1;
+}
+
+.getStartBtn:hover {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.getStartBtn:hover::before {
+  left: 0;
+}
+
+.lastStep {
+  background-image: url(/wave02.svg);
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}
+
+/* ----------- Responsive- Tablet ----------- */
+@media (max-width: 768px) {
+  .home {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  .getStart {
+    flex-direction: column;
+    text-align: center;
+  }
+  .home-cont-title,
+  .home-title {
+    text-align: center;
+  }
+}
+
+/* ----------- Responsive- Mobile ----------- */
+@media (max-width: 480px) {
+  .home-cont-Text {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  .home-text {
+    font-size: 1rem;
+    text-align: center;
+  }
+}

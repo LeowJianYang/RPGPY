@@ -1,0 +1,141 @@
+
+
+.outer{
+    background-color:#000000;
+    height: 100vh;
+    width: 100%;
+    position: absolute;
+}
+
+
+
+
+.LoginContainer{
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    width: 300px;
+    justify-items: center;
+    justify-self: center;
+    padding-top: 1.25rem;
+    background-color: rgba(255,255,255,0.2);
+    border: 0.7px solid #ffffff;
+    margin-top: 3.125rem;
+    border-radius: 15px;
+    gap:1.25rem;
+    flex-wrap: wrap;
+
+}
+
+.LoginInner{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 450px;
+    width: 200px;
+    gap:1.25rem;
+}
+
+.GoogleA{
+    display: inline-block;
+    border-radius: 10px;
+    background-color: purple;
+    cursor: pointer;
+    color: #ffffff;
+    font-weight: bold;
+    width: 100px;
+    text-align: center;
+    
+}
+
+.LoginBtn{
+    border-radius: 10px;
+    background-color: gray;
+    cursor: pointer;
+    color:#ffffff;
+    margin-right: 10px;
+}
+
+.LoginBtn:hover{
+    opacity: 0.8;
+}
+
+.ItemBlw{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.SignUpHerf{
+    display: inline-block;
+    color:blue;
+    cursor: pointer;
+}
+
+.SignUpHerf:hover{
+    opacity: 0.8;
+    color:aquamarine;
+}
+
+.LoginTitle{
+    color:#ffffff;
+    font-size: 20px;
+    font-weight: bold
+}
+
+.LoginCont{
+    color:#ffffff;
+    font-size: clamp(0.625,4vh,0.813rem);
+    margin-top: 0.625rem;
+    margin-bottom: 0.625rem;
+}
+
+.loading-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    position: absolute;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap:1.25rem;
+}
+
+
+.spinner{
+    border: 4px solid #FF4D80;
+    border-left-color:#09f ;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    animation: spin 1.0s linear infinite;
+    display: flex;
+}
+
+@keyframes spin{
+    to{transform: rotate(360deg);}
+}
+
+.overlay{
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+}
+
+
+@media(max-width: 480px){
+    .LoginContainer{
+        padding-top:1.875rem;
+        padding-right:0.625rem ;
+    }
+}

@@ -1,0 +1,93 @@
+{
+  "mapId": "MAP001",
+  "name": "Dungeon of Logic",
+
+  "legend": {
+    "S": "Start",
+    "E": "Enemy",
+    "C": "Chest",
+    "Q": "Quiz",
+    "B": "Boss",
+    "X": "Empty",
+    "M" : "MCQ",
+    "R" : "Branch"
+  },
+  "tiles": {
+    "01": { "type": "S", "description": "Starting Point, Adventure Start !" },
+    "02": { "type": "Q", "quizPool": "python_code_questions" },
+    "03": { "type": "E", "enemyId": "slime_001" ,"quizPool":"python_control_flow"},
+    "04": { "type": "X" },
+    "05": { "type": "C", "lootTable": "treasure_mid","branchExpected":"R10" },
+    "06": { "type": "M", "quizPool": "python_basics" },
+    "07": { "type": "E", "enemyId": "bat_002" , "quizPool": "python_control_flow" },
+    "08": { "type": "M", "quizPool": "python_loops" },
+    "09": { "type": "C", "lootTable": "treasure_low" },
+    "10": { "type": "E", "enemyId": "goblin_003" },
+    "11": { "type": "Q", "quizPool": "python_functions" },
+    "12": { "type": "X" },
+    "13": { "type": "C", "lootTable": "treasure_rare" },
+    "14": { "type": "E", "enemyId": "orc_004" },
+    "15": { "type": "Q", "quizPool": "python_oop" },
+    "16": { "type": "X" },
+    "17": { "type": "E", "enemyId": "skeleton_005" },
+    "18": { "type": "Q", "quizPool": "python_advanced" },
+    "19": { "type": "C", "lootTable": "treasure_rare" },
+    "20": { "type": "B", "enemyId": "dragon_001", "quizPool":"python_code_questions" },
+    "40":{ "type": "B", "enemyId": "dragon_001", "quizPool":"python_code_questions" },
+    "R10":{"type": "R", "enemyId":"dragon_001", "quizPool": "python_basics"},
+    "R11":{"type": "R", "enemyId":"skeleton_005", "quizPool": "python_code_questions", "branchQuit": 10}
+  },
+  "quizPools": {
+    "python_basics": [
+      { "q": "What is the output of print(2+3)?", "a": ["23", "5", "Error"], "correct": 1, "expectedResult": "5" },
+      { "q": "Which keyword defines a function in Python?", "a": ["def", "func", "lambda"], "correct": 0 ,"expectedResult":"def" }
+    ],
+     "python_control_flow": [
+      { "q": "Which statement is used for decision making?", "a": ["if", "for", "while"], "correct": 0 , "expectedResult": "if"},
+      { "q": "Which loop is used when the number of iterations is known?", "a": ["while loop", "for loop", "if statement"], "correct": 1, "expectedResult": "for loop"},
+      { "q": "Which keyword is used to exit a loop immediately?", "a": ["continue", "pass", "break"], "correct": 2, "expectedResult": "break"},
+      { "q": "What is the purpose of the 'else' block in an 'if-elif-else' statement?", "a": ["To execute code if all preceding conditions are false", "To create an infinite loop", "To skip the current iteration"], "correct": 0, "expectedResult": "To execute code if all preceding conditions are false"},
+      { "q": "Which statement is used to skip the rest of the code inside a loop for the current iteration and move to the next iteration?", "a": ["break", "pass", "continue"], "correct": 2, "expectedResult": "continue"}
+    ],
+
+    "python_loops":[
+      {"q": "What is the output for While(true)\n\tprint('Loops')?", "a":["Infinite", "Loops", "Loops\tLoops\t for 10times"], "correct": 0, "expectedResult": "Infinite"}
+    ],
+
+  "python_code_questions":[
+    {"q": "Using Control Flow Method, print out 5 times of Ok with the next line", "expectedResult": "Ok\nOk\nOk\nOk\nOk\n"},
+    {"q": "Using a `for` loop, print the numbers from 1 to 3, with each number on a new line.", "expectedResult": "1\n2\n3\n"},
+    {"q": "Given `x = 10`, use an `if-else` statement to print 'Positive' if `x` is greater than 0, otherwise print 'Negative'.", "expectedResult": "Positive\n"},
+    {"q": "Using a `while` loop, print the numbers from 5 down to 1, with each number on a new line.", "expectedResult": "5\n4\n3\n2\n1\n"}
+   ]
+  },
+  "lootTables": { 
+    "treasure_low": ["Potion"],
+    "treasure_mid": ["Iron Sword"],
+    "treasure_high": ["Magic Staff"],
+    "treasure_rare": ["Special Bow"]
+  },
+
+  "lootEffects":{
+    "Potion":{"type":"Restock","description": "Add 5 HP", "HP":5},
+    "Iron Sword": {"type":"Weapon","description": "Add 2 ATK", "ATK":2},
+    "Magic Staff": {"type":"Weapon","description": "Add 3 ATK", "ATK":3},
+    "Dragon Armor": {"type":"Amour","description": "Add 10 HP", "HP":10},
+    "Gold":{"type":"Loot","description": "Useless GOLD"},
+    "Special Bow": {"type":"Weapon","description": "Add 10 ATK", "ATK":10}
+  },
+
+  "Player":{
+    "ATK": 5,
+    "HP": 50
+  },
+
+  "enemies": {
+    "slime_001": { "name": "Slime", "hp": 10, "attack": 2 },
+    "bat_002": { "name": "Bat", "hp": 15, "attack": 3 },
+    "goblin_003": { "name": "Goblin", "hp": 20, "attack": 4 },
+    "orc_004": { "name": "Orc", "hp": 30, "attack": 6 },
+    "skeleton_005": { "name": "Skeleton", "hp": 25, "attack": 5 },
+    "dragon_001": { "name": "Dragon Boss", "hp": 100, "attack": 15 }
+  }
+}

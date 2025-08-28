@@ -1,0 +1,80 @@
+/* Dark Theme Dashboard Styles */
+
+.dashboard-container-dark {
+  padding: 24px;
+  background: #001529; /* Dark background consistent with Ant Design dark theme */
+  min-height: 100vh;
+}
+
+.dashboard-header-dark {
+  margin-bottom: 24px;
+}
+
+.welcome-title-dark {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.welcome-subtitle-dark {
+  font-size: 1rem;
+  color: #a0a0a0;
+}
+
+.dashboard-card-dark {
+  background: #141414; /* Dark card background */
+  border: 1px solid #303030;
+}
+
+.dashboard-card-dark .ant-card-head {
+  border-bottom: 1px solid #303030;
+  color: #fff;
+}
+
+.dashboard-card-dark .ant-card-body {
+  color: #a0a0a0;
+}
+
+.adventure-item-dark {
+  margin-bottom: 16px;
+}
+
+.adventure-item-dark p {
+  color: #fff;
+}
+
+.leaderboard-list-dark,
+.announcements-list-dark {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.leaderboard-list-dark li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #303030;
+}
+
+.leaderboard-list-dark li:last-child {
+  border-bottom: none;
+}
+
+.leaderboard-user-dark {
+  font-weight: bold;
+  color: #1890ff; /* Ant Design primary color */
+}
+
+.announcements-list-dark li {
+  padding: 8px 0;
+}
+
+@media (min-width: 600px) {
+  .dashboard-container-dark{
+    width: 87.8rem;
+    margin:0;
+    padding: auto;
+  }
+  
+}
