@@ -33,7 +33,7 @@ export default function Lobby(){
 
     const handleRefList= async ()=>{
            
-        await axios.get(`http://localhost:3000/join/RoomParticipant?roomCode=${roomCode}` ,{withCredentials:true}).then((res)=>{
+        await axios.get(`https://rpgpyapi.onrender.com/join/RoomParticipant?roomCode=${roomCode}` ,{withCredentials:true}).then((res)=>{
            const {participants}= res.data
            setRoomParticipants(participants);
 

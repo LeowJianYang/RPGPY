@@ -18,9 +18,18 @@ router.post("/login", async (req, res)=>{
     console.log(req.body);
 
 
-    db.query("SELECT * FROM UserData WHERE Email=?", [email], async (err, result)=>{
+    db.query("SELECT * FROM userdata WHERE Email=?", [email], async (err, result)=>{
 
-        if(result.length!==0){
+        if(err){
+             console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error-E01" });
+        }
+
+        if(!result || result.length===0){
+            return res.status(401).json({ success: false, message: "Invalid Password or Username !" });
+        }
+
+            try{
             //console.log(result);
             const user = result[0];
             //Compare the Hashed Password
@@ -41,9 +50,10 @@ router.post("/login", async (req, res)=>{
             } else{
                 return res.status(401).json({success:false, message:"Invalid Password or Username !"})
             }
-        }else{
-            return res.status(401).json({success:false,message:"Invalid Password or Username !"});
+        } catch(err){
+            return res.status(500).json({ success: false, message: "Internal Server Error-E02" });
         }
+    
 
 
     })

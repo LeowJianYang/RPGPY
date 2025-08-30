@@ -89,7 +89,7 @@ export default function DashboardPage(){
                   try{
 
                    
-                    const res= await axios.post('http://localhost:3000/auth/logout',{},{withCredentials:true});
+                    const res= await axios.post('https://rpgpyapi.onrender.com/auth/logout',{},{withCredentials:true});
 
                     if(res.status===200){
                         setUser(null);
