@@ -2,7 +2,7 @@
 
 .multiplayer-hall {
   width: 100%;
-  min-height: 100vh; /* To fill Screen use Min Height */
+  min-height: 90vh  ; /* To fill Screen use Min Height */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10,6 +10,8 @@
   padding: 20px;
   box-sizing: border-box;
   flex-direction: column;
+
+
 }
 
 .hall-content {
@@ -60,7 +62,7 @@
   width: 100%;
 }
 
-.btn {
+.btn-multi {
   width: 100%;
   padding: 0.8rem 1rem; 
   border-radius: 8px;
@@ -71,7 +73,7 @@
   border: none;
 }
 
-.btn:hover {
+.btn-multi:hover {
   transform: translateY(-2px);
 }
 
@@ -95,6 +97,14 @@
 
 /* Responsive Design- Enhance for Desktop Screen */
 @media (min-width: 600px) {
+
+  .multiplayer-hall{
+    margin: 0;
+    padding: 0;
+    width: 90vw;  
+  }
+
+
   .button-group {
     flex-direction: row; 
   }
@@ -109,7 +119,7 @@
     font-size: 1.2rem;
   }
 
-  .btn {
+  .btn-multi {
     padding: 1rem;
     font-size: 1.2rem;
   }

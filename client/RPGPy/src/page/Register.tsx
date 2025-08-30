@@ -11,7 +11,7 @@ import { Button, Form, Input } from 'antd';
 
 export default function RegisterPage(){
 
-    const [create] = Form.useForm<{Regusername:string, Regpassword:string}>();
+    const [create] = Form.useForm<{Regemail:string, Regusername:string, Regpassword:string}>();
     const {isLogin, setIsLogin} = useLoginCheck();
     const [loading, setLoading] = useState(false);
     // const [isSignUp, setIsSignUp] = useState(false);
@@ -30,13 +30,14 @@ export default function RegisterPage(){
 
         const handleCreateAccount = async (values:any)=>{
         console.log(values);
-        const {Regusername, Regpassword} = values;
-        console.log(Regusername, Regpassword);
+        const {Regemail, Regusername, Regpassword} = values;
+        console.log(Regemail, Regpassword);
         setLoading(true);
         try{
             const res = await axios.post('http://localhost:3000/auth/register',{
                 newusername: Regusername,
                 newpassword: Regpassword,
+                newemail: Regemail
             })
             
             const {message}= res.data;
@@ -75,8 +76,15 @@ export default function RegisterPage(){
                                 <p className="LoginTitle">Create Account</p>
                             </div>
                         <Form.Item
+                        name="Regemail"
+                        rules={[{required: true, message:"Please enter your Email !", type:"email"}]}
+                        >
+                            <Input prefix={<UserOutlined/>} placeholder="Email"></Input>
+                        </Form.Item>
+
+                         <Form.Item
                         name="Regusername"
-                        rules={[{required: true, message:"Please enter your username !"}]}
+                        rules={[{required: true, message:"Please enter your Username !"}]}
                         >
                             <Input prefix={<UserOutlined/>} placeholder="Username"></Input>
                         </Form.Item>

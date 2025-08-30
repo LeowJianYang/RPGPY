@@ -1,0 +1,51 @@
+
+.loadContainerOverlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    flex-direction: column;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.loading-containerLoad{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    position: absolute;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap:1.25rem;
+}
+
+.SpinnerObject{
+    width: 100px;
+    height: 100px;
+    border: 10px solid #f3f3f3;
+    border-top: 10px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: flex;
+    flex-wrap: wrap;
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+}
+
+.loading-containerLoad p{
+    color: #000000;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+}

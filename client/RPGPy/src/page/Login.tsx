@@ -14,7 +14,7 @@ import {useUserStore} from "../../components/UserStore";
 
 export default function LoginPage(){
    
-    const [loginform] = Form.useForm<{username:string, password:string}>();
+    const [loginform] = Form.useForm<{email:string, password:string}>();
     const {isLogin, setIsLogin} = useLoginCheck();
     const [loading, setLoading] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
@@ -26,7 +26,7 @@ export default function LoginPage(){
     useEffect(()=>{
         setLoading(true);
         axios.get("http://localhost:3000/authCookie", {withCredentials:true}).then((res)=>{
-            setUser(res.data.user);
+            setUser(res.data.Username);
             setIsLogin(true);
             console.log(res.data.user);
             setLoading(false);
@@ -45,13 +45,13 @@ export default function LoginPage(){
 
    
     const handleLogin = async (values:any)=>{
-        const {username, password, remember} = values;
+        const {email, password, remember} = values;
 
                 setLoading(true);
                 try{
 
                     const res= await axios.post("http://localhost:3000/auth/login", {
-                        username: username,
+                        email: email,
                         password: password,
                         remember: remember,
                     },{
@@ -104,10 +104,10 @@ export default function LoginPage(){
                                     <p className="LoginTitle">Welcome Back !</p>
                                 </div>
                                 <Form.Item
-                                name="username"
-                                rules={[{required: true, message:"Please enter your username !"}]}
+                                name="email"
+                                rules={[{required: true, message:"Please enter your email !", type:"email"}]}
                                  >
-                                    <Input prefix={<UserOutlined/>} placeholder="Username">
+                                    <Input prefix={<UserOutlined/>} placeholder="Email Address">
                                     </Input>
                                 </Form.Item>
 

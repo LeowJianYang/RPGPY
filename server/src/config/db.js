@@ -4,10 +4,10 @@ const db = require("mysql2");
 
 
 const connection=db.createPool({
-    host: "localhost",
-    user: "leow",
-    password: "leow2208",
-    database: "rpgpy",
+    host: process.env.DB_INFF_HN,
+    user: process.env.DB_INFF_UN,
+    password: process.env.DB_INFF_PW,
+    database: process.env.DB_INFF_DBN,
     waitForConnections:true
 })
 

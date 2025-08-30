@@ -48,10 +48,15 @@
     -webkit-text-decoration: underline dotted;
     text-decoration: underline dotted;
   }
-  h1, h2, h3, h4, h5, h6 {
+  /* h1, h2, h3, h4, h5, h6 {
     font-size: inherit;
     font-weight: inherit;
-  }
+    &:where([class*="ModalTitle"]) {
+      margin: 0;
+      padding: 0;
+      all:unset;
+    }
+  } */
   a {
     color: inherit;
     -webkit-text-decoration: inherit;

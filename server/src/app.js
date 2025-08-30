@@ -4,6 +4,9 @@ const express = require('express');
 const cors = require('cors');
 const parser = require('cookie-parser');
 const authMiddleWare = require("./middleware/authToken");
+const dotenv = require('dotenv');
+dotenv.config();
+
 
 
 
@@ -36,13 +39,15 @@ app.use(cors({
 
 const authRoutes= require("./routes/auth");
 const mapRoutes = require("./routes/mapVer");
+const roomRoutes = require("./routes/room");
 
 app.use("/auth", authRoutes);
 app.use("/map", mapRoutes);
+app.use("/join", roomRoutes);
 
 
 app.get("/authCookie", authMiddleWare, (req, res)=>{
-    res.json({user: req.user.username});
+    res.json({user: req.user.Email, Username: req.user.Username});
 })
 
 

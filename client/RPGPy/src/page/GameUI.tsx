@@ -7,16 +7,9 @@ import "../css/game.css";
 import { Button, Modal } from 'antd';
 import { useUserStore } from '../../components/UserStore';
 import  { ModalForm,SelfButton } from '../components/ErrorModal';
-import type { ButtonType } from '../components/ButtonCompo';
+import type { ModalPropsType } from '../components/ButtonCompo';
 
 
-type ButtonContent={
-  buttonContent?:string,
-  buttonType?:ButtonType,
-  onClick?:()=>void,
-}
-
-type ModalPropsType ={title:string, content?:string, buttonContent?:ButtonContent[]}
 
 
 type QuizState =
@@ -55,7 +48,7 @@ export default function Game() {
   useEffect(() => {
 
       axios.get("http://localhost:3000/authCookie", {withCredentials:true}).then((res)=>{
-        setUser(res.data.user);
+        setUser(res.data.Username);
         console.log(res.data.user);
     })
     .catch((err)=>{
@@ -595,6 +588,7 @@ export default function Game() {
         <input type='text' placeholder='Please Enter Number'
         value={dice ?? ""}
         onChange={(e)=> setDice(e.target.value)}
+        className='positionInput'
         
         ></input>
         

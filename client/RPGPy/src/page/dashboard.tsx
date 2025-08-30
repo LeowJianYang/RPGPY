@@ -34,7 +34,7 @@ export default function DashboardPage(){
     useEffect(()=>{
 
         axios.get("http://localhost:3000/authCookie", {withCredentials:true}).then((res)=>{
-            setUser(res.data.user);
+            setUser(res.data.Username);
             console.log(res.data.user);
         })
         .catch((err)=>{

@@ -15,6 +15,7 @@ export const SelfButton: React.FC<ButtonProps> = ({type= "primary",onClick, chil
 }
 
 
+
 export const ModalForm: React.FC<ModalFormProps> = ({title,onOk,onCancel,children,footer, open})=>{
     const [visible, setVisible] = useState(false);
     
