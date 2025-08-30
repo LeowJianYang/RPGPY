@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(parser());
 
 
-const allowedOrigin = "https://rpgpy.vercel.app/";  
+const allowedOrigin = "https://rpgpy.vercel.app";  
 
 const corsOptions={
     origin:allowedOrigin,
