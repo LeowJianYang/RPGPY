@@ -77,7 +77,7 @@ router.post('/register', async (req, res)=>{
     const hashedPassword =  await encrypt.hash(newpassword, salt);
 
 
-    db.query("INSERT INTO UserData (Email,Username, Passwords) VALUES (?,?,?)",[newemail,newusername, hashedPassword], (err,result)=>{
+    db.query("INSERT INTO userdata (Email,Username, Passwords) VALUES (?,?,?)",[newemail,newusername, hashedPassword], (err,result)=>{
 
         if(err){
             console.error("Error executing query: ", err);
@@ -125,8 +125,8 @@ router.post("/validateRoom", async (req,res)=>{
         
 
         db.query(`Select RP.*, UD.* 
-            from RoomParticipant RP
-            Inner Join UserData UD on RP.UserId = UD.UserId
+            from roomparticipant RP
+            Inner Join userdata UD on RP.UserId = UD.UserId
             Where RP.RoomId =? AND RP.Roles='Owner' AND UD.Username=?`,[roomCode,decryptUsername], async (error,result)=>{
             if(error){
                 return res.status(500).json({success:false, message:"Database error while validating room.", roomCoded: error.sqlState });
@@ -140,7 +140,7 @@ router.post("/validateRoom", async (req,res)=>{
         })
     } else if (participant !=="NONE_AVAILABLE".trim()){
 
-        db.query('Select Roles from RoomParticipant where RoomId=? And Roles="Player"',[roomCode] ,async(error,result)=>{
+        db.query('Select Roles from roomparticipant where RoomId=? And Roles="Player"',[roomCode] ,async(error,result)=>{
 
             if(error || result.length===0){
                 return res.status(404).json({success:false,message:"Validate Failed"});
