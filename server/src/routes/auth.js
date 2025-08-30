@@ -41,7 +41,7 @@ router.post("/login", async (req, res)=>{
                     req.body.remember ? "7h" : "1h"
                 });
 
-                res.cookie("jwtAuthToken", token, {httpOnly:true, maxAge: 3600000, secure:false});
+                res.cookie("jwtAuthToken", token, {httpOnly:true, maxAge: 3600000, secure:true, sameSite:'none'});
                 return res.status(200).json({success:true, message:"Successfully Login !"})
 
 
