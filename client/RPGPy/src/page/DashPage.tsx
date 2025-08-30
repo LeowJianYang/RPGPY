@@ -1,8 +1,7 @@
-import React from 'react';
+
 import { useUserStore } from '../../components/UserStore';
 import '../css/Dashboard.css';
 import { Row, Col, Card, Progress, Button } from 'antd';
-import { BookOutlined, TrophyOutlined, GiftOutlined, SoundOutlined } from '@ant-design/icons';
 
 // Sample data for the dashboard
 const adventures = [

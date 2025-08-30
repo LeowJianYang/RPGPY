@@ -34,7 +34,7 @@ export default function RegisterPage(){
         console.log(Regemail, Regpassword);
         setLoading(true);
         try{
-            const res = await axios.post('http://localhost:3000/auth/register',{
+            const res = await axios.post('https://rpgpyapi.onrender.com/auth/register',{
                 newusername: Regusername,
                 newpassword: Regpassword,
                 newemail: Regemail

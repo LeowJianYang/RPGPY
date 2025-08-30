@@ -19,7 +19,7 @@ export default function Lobby(){
 
     useEffect(()=>{
        
-        axios.post("http://localhost:3000/auth/validateRoom", {roomCode, Owner, participant}, {withCredentials:true}).then((res)=>{
+        axios.post("https://rpgpyapi.onrender.com/auth/validateRoom", {roomCode, Owner, participant}, {withCredentials:true}).then((res)=>{
             console.log("Room validated: ", res.data);
             setCurrentUser(res.data.owner);
             setIsError(false);

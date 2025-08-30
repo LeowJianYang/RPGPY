@@ -39,7 +39,7 @@ export default function Game() {
   const [enemyHp,setEnemyHp] = useState<number>(0);
 
     const http = axios.create({
-        baseURL: 'http://localhost:3000',
+        baseURL: 'https://rpgpyapi.onrender.com',
         withCredentials:true
     })
 
@@ -47,7 +47,7 @@ export default function Game() {
   // Run MAP001 with QR code
   useEffect(() => {
 
-      axios.get("http://localhost:3000/authCookie", {withCredentials:true}).then((res)=>{
+      axios.get("https://rpgpyapi.onrender.com/authCookie", {withCredentials:true}).then((res)=>{
         setUser(res.data.Username);
         console.log(res.data.user);
     })

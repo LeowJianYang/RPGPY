@@ -25,7 +25,7 @@ export default function LoginPage(){
 
     useEffect(()=>{
         setLoading(true);
-        axios.get("http://localhost:3000/authCookie", {withCredentials:true}).then((res)=>{
+        axios.get("https://rpgpyapi.onrender.com/authCookie", {withCredentials:true}).then((res)=>{
             setUser(res.data.Username);
             setIsLogin(true);
             console.log(res.data.user);
@@ -50,7 +50,7 @@ export default function LoginPage(){
                 setLoading(true);
                 try{
 
-                    const res= await axios.post("http://localhost:3000/auth/login", {
+                    const res= await axios.post("https://rpgpyapi.onrender.com/auth/login", {
                         email: email,
                         password: password,
                         remember: remember,

@@ -24,7 +24,7 @@ export default function MultiPage() {
     setRoomCode(code);
     console.log("Room Created with code: ", code);
     
-    axios.post('http://localhost:3000/join/createRoom', {roomCode: code, Owner:user}, {withCredentials:true}).then((res)=>{
+    axios.post('https://rpgpyapi.onrender.com/join/createRoom', {roomCode: code, Owner:user}, {withCredentials:true}).then((res)=>{
       
       const {encryptUsername}= res.data;
        setModalProp({title:"Room Created", content:`Room created successfully! Share the room code: ${code} with your friends to join.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false),window.location.href = `/Lobby?roomCode=${code}&Owner=${encryptUsername}`}}]})
@@ -41,7 +41,7 @@ export default function MultiPage() {
   }
 
   const handleJoinRoom = async () =>{
-    axios.post('http://localhost:3000/join/joinRoom', {username:user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
+    axios.post('https://rpgpyapi.onrender.com/join/joinRoom', {username:user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
 
       setModalProp({title:"Joined Room", content:`Successfully joined room: ${roomCode}.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false), window.location.href = `/Lobby?roomCode=${roomCode}&participant=${res.data.encryptUsername}`}}]})
       setLoading(false);

@@ -5,7 +5,7 @@ import { useUserStore } from "../../components/UserStore"
 import React,{ useEffect, type Key, type ReactNode, useState } from "react"
 import { UserOutlined, TeamOutlined,DesktopOutlined,LogoutOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Breadcrumb, Menu, theme,Button,Layout,Modal } from "antd";
+import { Menu, theme,Button,Layout,Modal } from "antd";
 import DashPage from "./DashPage";
 import MultiPage from "./MultiPage";
 import ProfilePage from "./ProfilePage";
@@ -33,7 +33,7 @@ export default function DashboardPage(){
 
     useEffect(()=>{
 
-        axios.get("http://localhost:3000/authCookie", {withCredentials:true}).then((res)=>{
+        axios.get("https://rpgpyapi.onrender.com/authCookie", {withCredentials:true}).then((res)=>{
             setUser(res.data.Username);
             console.log(res.data.user);
         })
