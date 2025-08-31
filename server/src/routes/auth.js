@@ -140,7 +140,7 @@ router.post("/validateRoom", async (req,res)=>{
         })
     } else if (participant !=="NONE_AVAILABLE".trim()){
 
-        db.query('Select Roles from roomparticipant where RoomId=? And Roles="Player"',[roomCode] ,async(error,result)=>{
+        db.query('Select Roles from roomparticipant where RoomId=? And Roles=?',[roomCode,'Player'] ,async(error,result)=>{
 
             if(error || result.length===0){
                 return res.status(404).json({success:false,message:"Validate Failed"});
@@ -157,5 +157,30 @@ router.post("/validateRoom", async (req,res)=>{
 
 
 });
+
+
+router.post ('/authMap', async(req,res)=>{
+    const {mapDet} = req.body;
+    if (!mapDet){
+        return res.status(400).json({success:false, message:"Map details are required."});
+    }
+
+    const decryptedMap= IdecryptUsername(mapDet);
+
+    db.query('Select * from maps where MapId = ?', [decryptedMap], (err,result)=>{
+        if(err){
+            return res.status(500).json({success:false, message:"Map Error !"});
+        }
+
+        if(result.length === 0){
+            return res.status(404).json({success:false, message:"Map not found."});
+        }
+
+        return res.status(200).json({success:true, message:"Authenticated", SelectedMap:result})
+
+    })
+})
+
+
 
 module.exports = router;

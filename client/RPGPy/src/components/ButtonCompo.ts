@@ -31,6 +31,7 @@ export interface ButtonProps {
     type?:ButtonType;
     onClick?: ()=>void;
     children: React.ReactNode;
+    disabled?: boolean;
 }
 
 
@@ -43,5 +44,6 @@ export interface ModalFormProps {
     close?:boolean;
     footer?: ReactNode | ReactNode[];
     children: React.ReactNode;
+    multi?:boolean;
     width?: number | string | undefined;
 }

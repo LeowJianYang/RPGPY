@@ -5,10 +5,10 @@ import "../css/SelfBtn.css"
 import {useState, useEffect} from "react";
 
 
-export const SelfButton: React.FC<ButtonProps> = ({type= "primary",onClick, children})=>{
+export const SelfButton: React.FC<ButtonProps> = ({type= "primary",onClick, children, disabled=false})=>{
 
     return (
-        <button className={`btn ${type}`} onClick={onClick}>
+        <button className={`btn ${type}`} onClick={onClick} disabled={disabled}>
             {children}
         </button>
     )
@@ -16,12 +16,14 @@ export const SelfButton: React.FC<ButtonProps> = ({type= "primary",onClick, chil
 
 
 
-export const ModalForm: React.FC<ModalFormProps> = ({title,onOk,onCancel,children,footer, open})=>{
+export const ModalForm: React.FC<ModalFormProps> &{Page: React.FC<{children : React.ReactNode}>}= ({title,onOk,onCancel,children,footer, open,multi})=>{
     const [visible, setVisible] = useState(false);
-    
+    const [page, setPage] = useState<number>(0);
+
     useEffect(()=>{
         if (open){
             setVisible(true)
+            setPage(0)
         } 
         else{
             const timer= setTimeout(()=> setVisible(false),300)
@@ -30,6 +32,7 @@ export const ModalForm: React.FC<ModalFormProps> = ({title,onOk,onCancel,childre
     },[open])
 
     if (!visible) return null;
+        const pages =React.Children.toArray(children);
     
     return (
             <div className={`ModalOverlay ${open? "fade-in" : "fade-out"}`} >
@@ -37,12 +40,22 @@ export const ModalForm: React.FC<ModalFormProps> = ({title,onOk,onCancel,childre
                     
                     <div>
                         <h1>{title}</h1> 
-                        {children}
+                        <div> {pages[page]}</div>
                     </div>
                     <div className="ModalFooter">
                         {footer || footer ==="".trim() ?(
                             React.Children.toArray(footer).map((it, idx)=>(
-                            <span key={idx}>{it}</span>
+                            <>
+                                <span key={idx}>{it}</span>
+                                {multi && (
+                                    page>0 ? <>
+                                        <SelfButton onClick={()=>setPage(page-1)} type="secondary"> Previous </SelfButton>
+                                        
+                                    </>: page < pages.length -1 ? (
+                                        <SelfButton onClick={()=>setPage(page+1)} type="secondary"> Next </SelfButton>
+                                    ):null
+                                )}
+                            </>
                             ))  
                         ):(
                             <>
@@ -58,3 +71,4 @@ export const ModalForm: React.FC<ModalFormProps> = ({title,onOk,onCancel,childre
 }
 
 
+ModalForm.Page = ({ children }) => <>{children}</>;

@@ -12,12 +12,12 @@ const IV = Buffer.from(process.env.IV, 'hex');
 
 //Create Room
 
-function InsertRoom(roomCode, userId,role) {
+function InsertRoom(roomCode, userId,role,MapId) {
     return new Promise((resolve, reject) => {
 
-            // TODO: Assign a QRCODE for MAP ID
+    // TODO: Assign a QRCODE for MAP ID
     
-    db.query("INSERT INTO room (RoomId, MapId) VALUE (?, ?)", [roomCode, 'Map001'], (error2) => {
+    db.query("INSERT INTO room (RoomId, MapId) VALUE (?, ?)", [roomCode, MapId], (error2) => {
         if (error2) {
             return reject({ success: false, message: "Database error while creating room.", roomCoded: error2.sqlState });
         }
@@ -43,7 +43,7 @@ function InsertRoom(roomCode, userId,role) {
 
 
 roomRoutes.post("/createRoom", async (req,res)=>{
-    const {roomCode, Owner} = req.body;
+    const {roomCode, Owner,MapDetails} = req.body;
     
     //Encrypt Owner Username
     const cipher = crypto.createCipheriv(Algorithm, AES_KEY, IV);
@@ -60,7 +60,7 @@ roomRoutes.post("/createRoom", async (req,res)=>{
         const userId = result[0].UserId;
         
         try{
-             const {success, message, roomCoded} = await InsertRoom(roomCode, userId,'Owner');
+             const {success, message, roomCoded} = await InsertRoom(roomCode, userId,'Owner',MapDetails);
             if(success){
             return res.status(200).json({success:success, message:message, roomCode:roomCoded, encryptUsername: encryptUsername});
                 } 

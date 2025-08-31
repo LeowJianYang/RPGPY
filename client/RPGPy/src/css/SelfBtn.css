@@ -4,6 +4,11 @@
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
+
+  &:disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 .btn.primary {
