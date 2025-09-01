@@ -7,7 +7,6 @@ import { Menu, theme,Button,Layout,Modal } from "antd";
 import DashPage from "./DashPage";
 import MultiPage from "./MultiPage";
 import ProfilePage from "./ProfilePage";
-import Documentation from "./Documentation";
 import "../css/LoginDe.css";
 import { useNavigate } from "react-router-dom"
 
