@@ -10,6 +10,7 @@ import Game from './page/GameUI.tsx';
 import Lobby from './page/Lobby.tsx';
 import NotFoundPage from './page/NotFound.tsx';
 import MultiPage from './page/MultiPage.tsx';
+import DocumentationPage from './page/Documentation.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -22,7 +23,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path='/Lobby' element={<Lobby/>} />
         <Route path="*" element={<NotFoundPage/>} />
         <Route path="/Multi" element={<MultiPage/>} />
-        
+        <Route path='/Documentation' element={<DocumentationPage/>} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,  

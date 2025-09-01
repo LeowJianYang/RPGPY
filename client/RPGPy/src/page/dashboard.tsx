@@ -9,7 +9,7 @@ import MultiPage from "./MultiPage";
 import ProfilePage from "./ProfilePage";
 import Documentation from "./Documentation";
 import "../css/LoginDe.css";
-
+import { useNavigate } from "react-router-dom"
 
 
 
@@ -20,6 +20,7 @@ export default function DashboardPage(){
     const [collapsed, setCollapsed] = useState(false);
     const [selectedKey, setSelectedKey] = useState<string[]>(['1']);
     const [page, setPage]= useState<React.ReactNode>(<DashPage/>);
+    const navigate = useNavigate();
 
     const {confirm} =Modal;
     const URL= import.meta.env.VITE_API_URL;
@@ -62,7 +63,7 @@ export default function DashboardPage(){
                 break;
             
             case "5":
-                setPage(<Documentation/>);
+               navigate(`/documentation`, {replace:true});
                 break;
 
             case "4":
