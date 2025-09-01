@@ -18,7 +18,7 @@ export default function MultiPage() {
   const [openForm, setOpenForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [MapSelector, setMapSelector] = useState(false);
-  const [MapDet, setMapDet] = useState('');
+  const [setMapDet] = useState('');
   const [isScanning,setIsScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
   const {MapDetails, setMapDetails} = useMapDetailsStore();
