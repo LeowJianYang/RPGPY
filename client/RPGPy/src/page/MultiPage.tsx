@@ -11,6 +11,7 @@ import { socket } from '../socket';
 
 
 
+
 export default function MultiPage() {
   const [roomCode, setRoomCode] = useState("");
   const {user} = useUserStore();
@@ -18,7 +19,7 @@ export default function MultiPage() {
   const [openForm, setOpenForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [MapSelector, setMapSelector] = useState(false);
-  const [setMapDet] = useState('');
+  const [MapDet, setMapDet] = useState('');
   const [isScanning,setIsScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
   const {MapDetails, setMapDetails} = useMapDetailsStore();
@@ -172,6 +173,7 @@ export default function MultiPage() {
                         console.log("MapDet: ", MapData);
                         return MapData;
                       });
+                      console.log(MapDet);
                     setIsScanning(false);
                     setScanSuccess(true);
                     handleAuthMap(MapData);
