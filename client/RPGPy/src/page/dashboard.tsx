@@ -1,14 +1,13 @@
-
-
 import axios from "axios"
 import { useUserStore } from "../../components/UserStore"
 import React,{ useEffect, type Key, type ReactNode, useState } from "react"
-import { UserOutlined, TeamOutlined,DesktopOutlined,LogoutOutlined, MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons";
+import { UserOutlined, TeamOutlined,DesktopOutlined,LogoutOutlined, MenuUnfoldOutlined, MenuFoldOutlined, FileTextOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Menu, theme,Button,Layout,Modal } from "antd";
 import DashPage from "./DashPage";
 import MultiPage from "./MultiPage";
 import ProfilePage from "./ProfilePage";
+import Documentation from "./Documentation";
 import "../css/LoginDe.css";
 
 
@@ -23,6 +22,7 @@ export default function DashboardPage(){
     const [page, setPage]= useState<React.ReactNode>(<DashPage/>);
 
     const {confirm} =Modal;
+    const URL= import.meta.env.VITE_API_URL;
 
     
     const {
@@ -33,7 +33,7 @@ export default function DashboardPage(){
 
     useEffect(()=>{
 
-        axios.get("https://rpgpyapi.onrender.com/authCookie", {withCredentials:true}).then((res)=>{
+        axios.get(`${URL}/authCookie`, {withCredentials:true}).then((res)=>{
             setUser(res.data.Username);
             console.log(res.data.user);
         })
@@ -59,6 +59,10 @@ export default function DashboardPage(){
                 break;
             case "3":
                 setPage(<ProfilePage/>);
+                break;
+            
+            case "5":
+                setPage(<Documentation/>);
                 break;
 
             case "4":
@@ -88,8 +92,7 @@ export default function DashboardPage(){
 
                   try{
 
-                   
-                    const res= await axios.post('https://rpgpyapi.onrender.com/auth/logout',{},{withCredentials:true});
+                    const res= await axios.post(`${URL}/auth/logout`,{},{withCredentials:true});
 
                     if(res.status===200){
                         setUser(null);
@@ -145,7 +148,7 @@ export default function DashboardPage(){
             GetItems('Profile','3'),
             GetItems('Logout','4', <LogoutOutlined/>, undefined, true)
         ]),
-
+        GetItems("Documentation", "5", <FileTextOutlined/>),
     ];
     
     const toggleCollapsed= ()=>{
@@ -160,7 +163,7 @@ export default function DashboardPage(){
 
     return(
         //Container Flex Direction Column
-        <div className='container'> 
+        <div className='container-dashboard'> 
             <Sider trigger={null} collapsible collapsed={collapsed}>
                 <Button type="primary" onClick={toggleCollapsed} style={{margin:16}}>
                     {collapsed ? <MenuUnfoldOutlined/>:<MenuFoldOutlined/>}
@@ -183,7 +186,7 @@ export default function DashboardPage(){
 
             </Sider>
 
-            <div className="Content">
+            <div className="Content-dashboard">
                 {/* <div className="Header">
                     
                 </div> */}

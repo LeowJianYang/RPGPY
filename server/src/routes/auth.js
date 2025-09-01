@@ -1,12 +1,13 @@
+//routes/auth.js
 const express = require('express');
-const cors = require('cors');
 const db = require('../config/db');
 const encrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const router = express.Router();
-const Algorithm = 'aes-256-cbc';
 const crypto = require('crypto');
 
+const router = express.Router();
+//AES Encryption Key
+const Algorithm = 'aes-256-cbc';
 const AES_KEY = Buffer.from(process.env.AES_KEY, 'hex'); 
 const IV = Buffer.from(process.env.IV, 'hex');
 
@@ -41,7 +42,12 @@ router.post("/login", async (req, res)=>{
                     req.body.remember ? "7h" : "1h"
                 });
 
-                res.cookie("jwtAuthToken", token, {httpOnly:true, maxAge: 3600000, secure:true, sameSite:'none'});
+                res.cookie("jwtAuthToken", token, {
+                    httpOnly:true, 
+                    maxAge: 36000000, 
+                    secure:false,
+                    sameSite:'lax' // Changed from 'none' to 'lax' for localhost
+                });
                 return res.status(200).json({success:true, message:"Successfully Login !"})
 
 
@@ -100,7 +106,8 @@ router.post('/register', async (req, res)=>{
 router.post("/logout", async (req,res)=>{
     res.clearCookie("jwtAuthToken",{
         httpOnly:true,
-        secure:false
+        secure:false,
+        sameSite:'lax'
     })
 
     return res.status(200).json({success:true, message:"Successfully Logged Out !"})
@@ -112,6 +119,7 @@ function IdecryptUsername(encryptedUsername){
     decrypted += decipher.final('utf8');
     return decrypted;
 }
+
 
 
 
@@ -160,14 +168,14 @@ router.post("/validateRoom", async (req,res)=>{
 
 
 router.post ('/authMap', async(req,res)=>{
-    const {mapDet} = req.body;
+    const {mapDet} = req.query;
     if (!mapDet){
         return res.status(400).json({success:false, message:"Map details are required."});
     }
 
     const decryptedMap= IdecryptUsername(mapDet);
 
-    db.query('Select * from maps where MapId = ?', [decryptedMap], (err,result)=>{
+    db.query('Select * from map where MapId = ?', [decryptedMap], (err,result)=>{
         if(err){
             return res.status(500).json({success:false, message:"Map Error !"});
         }

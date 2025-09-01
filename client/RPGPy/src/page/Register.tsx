@@ -15,7 +15,7 @@ export default function RegisterPage(){
     const {isLogin, setIsLogin} = useLoginCheck();
     const [loading, setLoading] = useState(false);
     // const [isSignUp, setIsSignUp] = useState(false);
-
+    const URL= import.meta.env.VITE_API_URL;
 
 
 
@@ -34,7 +34,7 @@ export default function RegisterPage(){
         console.log(Regemail, Regpassword);
         setLoading(true);
         try{
-            const res = await axios.post('https://rpgpyapi.onrender.com/auth/register',{
+            const res = await axios.post(`${URL}/auth/register`,{
                 newusername: Regusername,
                 newpassword: Regpassword,
                 newemail: Regemail

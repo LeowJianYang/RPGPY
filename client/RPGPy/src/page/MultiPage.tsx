@@ -6,8 +6,8 @@ import { ModalForm,SelfButton } from "../components/ErrorModal";
 import type { ModalPropsType } from '../components/ButtonCompo';
 import LoadingObject from "../components/LoadingObject"; 
 import {Scanner} from '@yudiel/react-qr-scanner';
-
-
+import {useMapDetailsStore} from '../../components/MapDetailsStore';
+import { socket } from '../socket';
 
 
 
@@ -21,8 +21,9 @@ export default function MultiPage() {
   const [MapDet, setMapDet] = useState('');
   const [isScanning,setIsScanning] = useState(false);
   const [scanSuccess, setScanSuccess] = useState(false);
-  const [MapDetails, setMapDetails] = useState<{MapId:string, MapName:string, MapDetails:string}[]>([]);
-
+  const {MapDetails, setMapDetails} = useMapDetailsStore();
+  // const [MapDetails, setMapDetails] = useState<{MapId:string, MapName:string, MapDetails:string}[]>([]);
+  const URL= import.meta.env.VITE_API_URL;
 
 
   const handleCreateRoom = async () =>{
@@ -41,22 +42,17 @@ export default function MultiPage() {
   }
 
 
-  const handleAuthMap = async ()=>{
+  const handleAuthMap = async (MapData:string)=>{
 
-    await axios.post('https://rpgpyapi.onrender.com/auth/authMap', {mapDet: MapDet}, {withCredentials:true}).then((res)=>{
+    await axios.post(`${URL}/auth/authMap?mapDet=${MapData}`, {withCredentials:true}).then((res)=>{
 
       const {success, SelectedMap} = res.data;
 
       if (success) {
-        setMapDetails(()=>{
-          return SelectedMap.map((map:any)=>{
-            return{
-              MapId: map.MapId,
-              MapName: map.MapName,
-              MapDetails: map.MapDetails ?? "NO DETAILS AVAILABLE"
-            }
-          })
-        })
+        setMapDetails( 
+          SelectedMap
+        );
+
         console.log("Map authenticated successfully:", SelectedMap[0].MapId, SelectedMap[0].MapName);
       } else {
         console.error("Failed to authenticate map:", res.data.message);
@@ -70,15 +66,16 @@ export default function MultiPage() {
 
 
   const handleAfterJoin = async ()=>{
-      
-    await axios.post('https://rpgpyapi.onrender.com/join/createRoom', {roomCode: roomCode, Owner:user, MapDetails:MapDetails[0].MapId}, {withCredentials:true}).then((res)=>{
-      
-      const {encryptUsername}= res.data;
-       setModalProp({title:"Room Created", content:`Room created successfully! Share the room code: ${roomCode} with your friends to join.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false),window.location.href = `/Lobby?roomCode=${roomCode}&Owner=${encryptUsername}`}}]})
+
+    await axios.post(`${URL}/room/createRoom`, {roomCode: roomCode, Owner:user, MapDetails:MapDetails[0].MapId}, {withCredentials:true}).then((res)=>{
+
+      const {encryptUsername,userId}= res.data;
+       setModalProp({title:"Room Created", content:`Room created successfully! Share the room code: ${roomCode} with your friends to join.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false),window.location.href = `/Lobby?roomCode=${roomCode}&Owner=${encryptUsername}&Map=${MapDetails[0].MapId}&userId=${userId}`}}]})
        setLoading(false);
        setOpenForm(true);
-     
-      
+       socket.connect();
+       socket.emit('join-room',roomCode);
+       
     }). catch((err)=>{
       setModalProp({title:"Error", content: err.response?.data?.message || "Failed to create room. Please try again.", buttonContent:[{buttonContent:"OK", buttonType:"primary", onClick:()=> setOpenForm(false)}]})
       setLoading(false);
@@ -89,11 +86,14 @@ export default function MultiPage() {
 
 
   const handleJoinRoom = async () =>{
-    axios.post('https://rpgpyapi.onrender.com/join/joinRoom', {username:user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
-
-      setModalProp({title:"Joined Room", content:`Successfully joined room: ${roomCode}.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false), window.location.href = `/Lobby?roomCode=${roomCode}&participant=${res.data.encryptUsername}`}}]})
+    axios.post(`${URL}/room/joinRoom`, {username:user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
+      const {userId} = res.data;
+      setModalProp({title:"Joined Room", content:`Successfully joined room: ${roomCode}.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false), window.location.href = `/Lobby?roomCode=${roomCode}&participant=${res.data.encryptUsername}&userId=${userId}`}}]})
       setLoading(false);
       setOpenForm(true);
+      socket.connect();
+      socket.emit('join-room',roomCode);
+      
     }). catch ((err)=>{
       setModalProp({title:"Error", content: err.response?.data?.message || "Failed to join room. Please check the room code and try again.", buttonContent:[{buttonContent:"OK", buttonType:"primary", onClick:()=> {setOpenForm(false)}}]})
       setLoading(false);
@@ -174,21 +174,24 @@ export default function MultiPage() {
                       });
                     setIsScanning(false);
                     setScanSuccess(true);
-                    handleAuthMap();
+                    handleAuthMap(MapData);
                   }}}></Scanner>}
 
 
 
                   {!isScanning &&(
-                    <button onClick={()=>{
+                    <SelfButton onClick={()=>{
                       setIsScanning(true);
                       setScanSuccess(false);
-                    }}>
+                    }}
+                     type="primary"
+                   
+                    >
                       Scan QR Code
-                    </button>
+                    </SelfButton>
                   )}
                   {scanSuccess && (
-                    <div>
+                    <div className="scan-success">
                       <h4>Scanned Success !</h4>
                     </div>
                   )}
@@ -209,8 +212,10 @@ export default function MultiPage() {
                       <ul>
                         {MapDetails.map((item, idx) => (
                           <li key={idx} className="map-display mapdet">
+                            <h4>Selected Map</h4>
                             <p className="mapid">{item.MapId}</p>
                             <p className="mapname">{item.MapName}</p>
+                            <p>Click Finish to Create Room !</p>
                           </li>
                         ))}
                       </ul>
@@ -219,7 +224,7 @@ export default function MultiPage() {
                   </div>
 
                   <div>
-                      <SelfButton onClick={() => {handleAfterJoin} } disabled={scanSuccess===false}>Finished</SelfButton>
+                      <SelfButton onClick={() => {handleAfterJoin(), setMapSelector(false)} } disabled={scanSuccess===false}>Finished</SelfButton>
                   </div>
             </ModalForm.Page>
 

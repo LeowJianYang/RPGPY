@@ -19,13 +19,14 @@ export default function LoginPage(){
     const [loading, setLoading] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
     const {setUser} = useUserStore();
+    const URL= import.meta.env.VITE_API_URL;
 
 
 
 
     useEffect(()=>{
         setLoading(true);
-        axios.get("https://rpgpyapi.onrender.com/authCookie", {withCredentials:true}).then((res)=>{
+        axios.get(`${URL}/authCookie`, {withCredentials:true}).then((res)=>{
             setUser(res.data.Username);
             setIsLogin(true);
             console.log(res.data.user);
@@ -50,7 +51,7 @@ export default function LoginPage(){
                 setLoading(true);
                 try{
 
-                    const res= await axios.post("https://rpgpyapi.onrender.com/auth/login", {
+                    const res= await axios.post(`${URL}/auth/login`, {
                         email: email,
                         password: password,
                         remember: remember,

@@ -4,7 +4,6 @@ const db = require("mysql2");
 
 const url = new URL(process.env.SERVICE_URI);
 
-
 const connection=db.createPool({
     host: process.env.DB_INFF_HN,
     user: process.env.DB_INFF_UN,
@@ -13,7 +12,6 @@ const connection=db.createPool({
     port:process.env.DB_INFF_PR,
     waitForConnections:true,
 })
-
 
 
 // db.getConnection((err, connection)=>{

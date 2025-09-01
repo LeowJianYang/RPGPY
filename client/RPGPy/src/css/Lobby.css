@@ -50,6 +50,8 @@
 
 
 
+
+
 .LobbyTitle {
     text-align: center;
     margin-bottom: 2rem;
@@ -99,6 +101,23 @@
     }
 }
 
+.RoomBxHeader{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.ReloadIcon{
+    align-self: center;
+   
+    
+
+    &:hover{
+        color:#4338ca;
+        transition: transform 0.4s ease-in-out;
+        transform: scale(2);
+    }
+}
+
 #RoomHead {
     font-weight: 700;
     font-size: clamp(1.25rem, 3vw, 1.5rem);
@@ -137,6 +156,31 @@
     }
 }
 
+.startGameButton{
+    background-color: #DC965A;
+    width: 10rem;
+    border-radius: 8px;
+    height: 3rem;
+    align-self: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #1a1a1a;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in;
+    transition: transform 0.3s ease-in;
+
+    &:hover{
+       background-color: #D28543;
+       transform: translateY(-2px);
+    }
+
+    &:disabled{
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+
 .ParticipantList {
     padding: 0.5rem;
 }
@@ -170,6 +214,38 @@
     color: #1f2937;
     margin: 0;
     flex: 1;
+}
+
+.ParticipantInfoBox.skeleton .skeleton-text{
+    background: linear-gradient(90deg,#eee 25%, #ddd 50%, #eee 75%);
+    background-size: 200% 100%;
+    animation: loadingSke 1.5s infinite;
+    border-radius: 4px;
+}
+
+.skeleton-text{
+    width: 100px;
+    height: 100px;
+}
+
+@keyframes loadingSke {
+    0%{
+        background-position: 200% 0;
+    }
+
+    100%{
+        background-position: -200% 0;
+    }
+}
+
+.DisabledDetails{
+    text-align: center;
+    border: #ff0000 solid 0.8px;
+    background-color: #fee2e2;
+    color: #ff0000;
+    align-self: center;
+    padding: 1.25rem;
+    border-radius: 4px;
 }
 
 .RoleBadge {
@@ -213,3 +289,5 @@
     cursor: not-allowed;
     opacity: 0.5;
 }
+
+

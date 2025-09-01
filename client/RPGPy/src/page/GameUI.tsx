@@ -8,6 +8,7 @@ import { Button, Modal } from 'antd';
 import { useUserStore } from '../../components/UserStore';
 import  { ModalForm,SelfButton } from '../components/ErrorModal';
 import type { ModalPropsType } from '../components/ButtonCompo';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 
 
@@ -37,17 +38,32 @@ export default function Game() {
   const [ModalCont, setModalCont] = useState<ModalPropsType>();
   const [isSucced, setisSucced] = useState<number>(0);
   const [enemyHp,setEnemyHp] = useState<number>(0);
+  const [Score, setScore] = useState<number>(0);
+  const URL= import.meta.env.VITE_API_URL;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const roomCode = searchParams.get("roomCode") ?? "NONE_AVAILABLE";
+  const mapid= searchParams.get("mapid") ?? "NONE_AVAILABLE";
+  const userid= searchParams.get("userid") ?? "NONE_AVAILABLE";
 
     const http = axios.create({
-        baseURL: 'https://rpgpyapi.onrender.com',
+        baseURL: URL,
         withCredentials:true
     })
+
+
+    if(!roomCode || !mapid || !userid){
+      console.error("[DEBUG] MISSING PARAMETERS");
+      navigate('*',{replace:true});
+    }
+
 
 
   // Run MAP001 with QR code
   useEffect(() => {
 
-      axios.get("https://rpgpyapi.onrender.com/authCookie", {withCredentials:true}).then((res)=>{
+      http.get("/authCookie").then((res)=>{
         setUser(res.data.Username);
         console.log(res.data.user);
     })
@@ -56,8 +72,8 @@ export default function Game() {
         window.location.href = "/login";
       })
 
-      
-        http.get('/map/Map001').then(res => {
+
+        http.get(`/map/${mapid}`).then(res => {
         setMap(res.data);
         }).catch(console.error);
     
@@ -65,7 +81,12 @@ export default function Game() {
   
  
   }, []);
-  
+
+  // useEffect(()=>{
+  //    http.post('/room/roomParticipant', { roomCode }).then(res => {
+  //      console.log('Room participants:', res.data);
+  //    }).catch(console.error);
+  // }, [roomCode]);
 
   useEffect(()=>{
     if(map?.Player){
@@ -126,7 +147,7 @@ export default function Game() {
           setQuiz({ kind: 'none' });
           return;
         }
-        // 50% Prompt to MCQ or Code Questions
+   
         const pick = pool[Math.floor(Math.random() * pool.length)];
           setQuiz({
             kind: 'code',
@@ -140,7 +161,7 @@ export default function Game() {
       }
       case 'E': {
         const enemy = map.enemies[currentTile.enemyId!];
-        // Enemy Encouter
+        // Enemy 
         const pool= map.quizPools[currentTile.quizPool||""]|| [];
         setEnemyHp(enemy.hp);
          // 0 succed >0 not succeed
@@ -229,7 +250,9 @@ export default function Game() {
         throw new Error ("Invalid Tiles")
       } else{
         setPosition(next);
-        await http.post('/map/progress', { mapId: map.mapId, position: next }).catch(() => {});
+        await http.post('/map/progress-update', { mapId:mapid, userId: Number(userid), score:Score }).catch(() => {
+          console.error("[DEBUG] ERROR IN ROLL POSITION-NORM");
+        });
         console.log("[DEBUG] ROLL POSITION", currentTile?.type); 
       }
 
@@ -251,8 +274,10 @@ export default function Game() {
         } else{
           
         setPosition(next);
-        console.log("[DEBUG] ELSE IN ROLL POSITION", next);
-        await http.post('/map/progress', { mapId: map.mapId, position: next }).catch(() => {});
+        console.log("[DEBUG] ELSE IN ROLL POSITION", next); //roomid userid score
+        await http.post('/map/progress-update', { mapId: mapid, userId: Number(userid), score:Score }).catch(() => {
+          console.error("[DEBUG] ERROR IN ROLL POSITION- SPECIAL");
+        });
         }
 
     }
@@ -325,8 +350,8 @@ export default function Game() {
     if (quiz.kind !== 'mcq') return;
     const correct = idx === quiz.correct;
     if (correct) {
-      alert('✅ Correct!');
-      
+      alert(' Correct!');
+      setScore(prev => prev + 20);
       if(currentTile?.type==="E")
       {
         setEnemyHp(h=>{
@@ -352,14 +377,16 @@ export default function Game() {
 
               case 1:{
                 
-                setModalCont({title:"Incorrect", content:"❌ Answer not correct yet",buttonContent:[{buttonContent:"Ok",buttonType:'primary',onClick:()=>{SetisError(false)}}] });
+                setModalCont({title:"Incorrect", content:" Answer not correct yet",buttonContent:[{buttonContent:"Ok",buttonType:'primary',onClick:()=>{SetisError(false)}}] });
              
                 if(currentTile?.type==="E")
                   {
                     const enemy =map?.enemies[currentTile?.enemyId!];
                     setHp(h => Math.max(0, h - (enemy?.attack)!));
+                    setScore(prev => prev-15);
                   } else{
                       setHp(h => Math.max(0, h - 5));
+                      setScore(prev => prev-15);
                   }
                 handleErrorModal();
                 break;
@@ -539,8 +566,9 @@ export default function Game() {
     if (quiz.kind === 'code') {
       // If output is match with the expected return result
       if (ok && output.trim().length > 0 && output===(quiz.expected)) {
-        alert('✅ Code challenge passed!');
+        alert(' Code challenge passed!');
          setisSucced(0);
+          setScore(prev => prev + 25);
         // setQuiz({ kind: 'none' });
       } else {
           
@@ -552,8 +580,9 @@ export default function Game() {
 
               case 1:{
                
-                setModalCont({title:"Incorrect", content:"❌ Code not correct yet",buttonContent:[{buttonContent:"Ok",buttonType:'primary',onClick:()=>{SetisError(false)}}] });
+                setModalCont({title:"Incorrect", content:" Code not correct yet",buttonContent:[{buttonContent:"Ok",buttonType:'primary',onClick:()=>{SetisError(false)}}] });
                 setHp(h => Math.max(0, h - 5));
+                setScore(prev => prev-15);
                 handleErrorModal();
                 break;
               }
@@ -578,6 +607,7 @@ export default function Game() {
         <div>Player: <b>{user}</b></div>
         <div>HP: <b>{hp}</b></div>
         <div>ATK: <b>{Atk}</b></div>
+        <div>Score: <b>{Score}</b></div>
       </div>
 
 
@@ -599,6 +629,12 @@ export default function Game() {
           Roll Dice
         </button>
         {dice !== null && <span style={{marginLeft:'1.2rem'}}>You rolled: <b>{dice}</b></span>}
+        <div>
+           <p>Time Line:</p>
+           <div>
+             
+           </div>
+        </div>
       </div>
 
       {/* EventCard */}
@@ -614,6 +650,7 @@ export default function Game() {
               <div style={{marginTop:'0.5rem'}}>
                 <p>Enemy: <b>{map.enemies[currentTile.enemyId].name}</b></p>
                 <p>HP: {enemyHp} | ATK: {map.enemies[currentTile.enemyId].attack}</p>
+               
               </div>
             )}
 
