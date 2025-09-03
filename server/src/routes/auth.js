@@ -46,7 +46,7 @@ router.post("/login", async (req, res)=>{
                     httpOnly:true, 
                     maxAge: 36000000, 
                     secure:true,
-                    sameSite:'none'
+                    sameSite:'none' //none for deploy~
                 });
                 return res.status(200).json({success:true, message:"Successfully Login !"})
 

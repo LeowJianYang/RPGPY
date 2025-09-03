@@ -3,11 +3,13 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const db = require('../config/db');
+let turn =0;
+const {roomState,shuffle} = require('../config/roomState'); 
 
 const mapRouter = express.Router();
 
 
-// 读取地图
+// read map data
 mapRouter.get('/:mapid', (req, res) => {
   const file = path.join(__dirname, '../maps', `${req.params.mapid}.json`);
   if (!fs.existsSync(file)) return res.status(404).json({ message: 'Map not found' });
@@ -18,7 +20,14 @@ mapRouter.get('/:mapid', (req, res) => {
 
 //const progress = new Map(); // key: userId(or session), val: { mapId, position }
 mapRouter.post('/progress-update', (req, res) => {
-  const { userId , mapId, score } = req.body;
+  const { userId , mapId, score, roomCode } = req.body;
+
+  if (turn >=3){
+    turn = 0;
+    roomState[roomCode].turnOrder = shuffle([...roomState[roomCode].players]);
+    req.io.to(roomCode).emit('progress-update', {roomCode, turnOrder: roomState[roomCode].turnOrder, currentTurn: turn});
+    turn++;
+  }
 
   db.query('UPDATE progress SET Score=? WHERE UserId=?', [score, userId], async(error,result)=>{
 
@@ -36,7 +45,5 @@ mapRouter.post('/progress-update', (req, res) => {
   // progress.set(userid, { mapId: mapid, score, updatedAt: Date.now() });
   // res.json({ ok: true });
 });
-
-
 
 module.exports = mapRouter;

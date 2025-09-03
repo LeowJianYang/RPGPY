@@ -9,6 +9,7 @@ import type { ModalPropsType } from '../components/ButtonCompo';
 import { socket } from '../socket';
 import { useNavigate } from "react-router-dom"
 import  { ReloadOutlined } from "@ant-design/icons"
+import { useUserStore } from "../../components/UserStore"
 
 
 
@@ -22,6 +23,7 @@ export default function Lobby(){
     const [isError, setIsError] = useState<boolean>(false)
     const [RoomParticipants, setRoomParticipants] = useState<{Username:string, Roles:string}[]>([]);
     const [CurrentUser, setCurrentUser] = useState("");
+    const {user} = useUserStore();
     const URL= import.meta.env.VITE_API_URL;
     const [userListLoading, setUserlistLoading] = useState<boolean>(true);
     const {MapDetails} = useMapDetailsStore();
@@ -35,41 +37,47 @@ export default function Lobby(){
 
         console.log(JSON.stringify(MapDetails));
         
-        
-        // Wait for socket to connect before joining room
-        socket.on('connect', () => {
-            console.log('Socket connected, joining room:', roomCode);
-            socket.emit('join-room', roomCode);
-        });
-        
-        
-        // Listen for room joined confirmation
-        socket.on('room-joined', (data) => {
-            console.log('Room joined confirmation:', data);
-        });
-
-        
-        // If already connected, join immediately
-        if (socket.connected) {
-            console.log('Socket already connected, joining room:', roomCode);
-            socket.emit('join-room', roomCode);
-        }
-        
+        // First validate room and get user info
         axios.post(`${URL}/auth/validateRoom`, {roomCode, Owner, participant}, {withCredentials:true}).then((res)=>{
             console.log("Room validated: ", res.data);
-            setCurrentUser(res.data.owner);
+            const userName = res.data.owner;
+            setCurrentUser(userName);
             setIsError(false);
+            
+            // Now join room with user info
+            const joinRoom = () => {
+                console.log('Joining room with user:', user, 'roomCode:', roomCode);
+                socket.emit('join-room', {roomCode, user: user});
+            };
+            
+            // Wait for socket to connect before joining room
+            socket.on('connect', () => {
+                console.log('Socket connected, joining room:', roomCode);
+                joinRoom();
+            });
+            
+            // If already connected, join immediately
+            if (socket.connected) {
+                console.log('Socket already connected, joining room:', roomCode);
+                joinRoom();
+            }
+            
             handleRefList();
         }).catch((err)=>{
             console.error("Error validating room: ", err, "\n", err.response?.data?.message);
             setIsError(true);
         })
         
+        // Listen for room joined confirmation
+        socket.on('room-joined', (data) => {
+            console.log('Room joined confirmation:', data);
+        });
+        
         // Cleanup function
         return () => {
             socket.off('connect');
             socket.off('room-joined');
-            socket.disconnect();
+            // Don't disconnect socket to preserve connection when navigating to game page
         };
     },[])    
 

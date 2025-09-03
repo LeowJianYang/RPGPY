@@ -3,7 +3,7 @@ import { useUserStore } from "../../components/UserStore"
 import React,{ useEffect, type Key, type ReactNode, useState } from "react"
 import { UserOutlined, TeamOutlined,DesktopOutlined,LogoutOutlined, MenuUnfoldOutlined, MenuFoldOutlined, FileTextOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Menu, theme,Button,Layout,Modal } from "antd";
+import { Menu, theme,Layout,Modal } from "antd";
 import DashPage from "./DashPage";
 import MultiPage from "./MultiPage";
 import ProfilePage from "./ProfilePage";
@@ -16,7 +16,7 @@ export default function DashboardPage(){
     const {Sider} = Layout;
 
     const {setUser} = useUserStore();
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed] = useState(false);
     const [selectedKey, setSelectedKey] = useState<string[]>(['1']);
     const [page, setPage]= useState<React.ReactNode>(<DashPage/>);
     const navigate = useNavigate();
@@ -27,7 +27,7 @@ export default function DashboardPage(){
     
     const {
         // @ts-ignore
-    token: { darkDangerItemColor, darkDangerItemActiveBg},
+    token: { darkDangerItemColor, darkDangerItemActiveBg}
     } = theme.useToken();
 
 
@@ -151,9 +151,7 @@ export default function DashboardPage(){
         GetItems("Documentation", "5", <FileTextOutlined/>),
     ];
     
-    const toggleCollapsed= ()=>{
-        setCollapsed(!collapsed);
-    }
+
 
     const handleOnClick= (e:any)=>{
         setSelectedKey([e.key]);
@@ -164,27 +162,35 @@ export default function DashboardPage(){
     return(
         //Container Flex Direction Column
         <div className='container-dashboard'> 
-            <Sider trigger={null} collapsible collapsed={collapsed}>
-                <Button type="primary" onClick={toggleCollapsed} style={{margin:16}}>
-                    {collapsed ? <MenuUnfoldOutlined/>:<MenuFoldOutlined/>}
-                </Button>
-                <Menu
-                    defaultSelectedKeys={['1']}
-                    defaultOpenKeys={['sub1']}
-                    mode="inline"
-                    items={items}
-                    theme="dark"
-                    inlineCollapsed={collapsed}
-                    selectedKeys={selectedKey}
-                    onClick={handleOnClick}
-                    className="menu"
-                    style={{borderRadius:"10px", color:darkDangerItemColor, backgroundColor:darkDangerItemActiveBg}}
-                    
-                >
+       
+                
 
-                </Menu>
+                    <Sider 
+                        breakpoint="lg"
+                        collapsedWidth={0}
+                        className="custom-sider"
+                    >
+                        <Menu
+                            defaultSelectedKeys={['1']}
+                        defaultOpenKeys={['sub1']}
+                        mode="inline"
+                        items={items}
+                        theme="dark"
+                        inlineCollapsed={collapsed}
+                        selectedKeys={selectedKey}
+                        onClick={handleOnClick}
+                        className="menu"
+                        style={{borderRadius:"10px", color:darkDangerItemColor, backgroundColor:darkDangerItemActiveBg,marginTop:'1.2rem',}}
+                        
+                    >
 
-            </Sider>
+                    </Menu>
+
+                    </Sider>
+               
+
+
+           
 
             <div className="Content-dashboard">
                 {/* <div className="Header">

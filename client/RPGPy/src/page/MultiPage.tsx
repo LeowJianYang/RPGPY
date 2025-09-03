@@ -28,7 +28,7 @@ export default function MultiPage() {
 
 
   const handleCreateRoom = async () =>{
-
+   setMapDetails([]);
     const chars= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let code ="";
     console.log(user);
@@ -75,7 +75,7 @@ export default function MultiPage() {
        setLoading(false);
        setOpenForm(true);
        socket.connect();
-       socket.emit('join-room',roomCode);
+       socket.emit('join-room', {roomCode, user});
        
     }). catch((err)=>{
       setModalProp({title:"Error", content: err.response?.data?.message || "Failed to create room. Please try again.", buttonContent:[{buttonContent:"OK", buttonType:"primary", onClick:()=> setOpenForm(false)}]})
@@ -93,7 +93,7 @@ export default function MultiPage() {
       setLoading(false);
       setOpenForm(true);
       socket.connect();
-      socket.emit('join-room',roomCode);
+      socket.emit('join-room', {roomCode, user});
       
     }). catch ((err)=>{
       setModalProp({title:"Error", content: err.response?.data?.message || "Failed to join room. Please check the room code and try again.", buttonContent:[{buttonContent:"OK", buttonType:"primary", onClick:()=> {setOpenForm(false)}}]})

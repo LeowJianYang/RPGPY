@@ -9,6 +9,7 @@ import { useUserStore } from '../../components/UserStore';
 import  { ModalForm,SelfButton } from '../components/ErrorModal';
 import type { ModalPropsType } from '../components/ButtonCompo';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { socket } from '../socket';
 
 
 
@@ -39,6 +40,8 @@ export default function Game() {
   const [isSucced, setisSucced] = useState<number>(0);
   const [enemyHp,setEnemyHp] = useState<number>(0);
   const [Score, setScore] = useState<number>(0);
+  const [isClicked, setIsClick] = useState<number>(0);
+  const [CurrentTurn, setCurrentTurn] = useState<{roomCode: string, players: string[], turnOrder: string[], currentTurn: number, currentPlayer: string, round: number, playersName: string[]}>();
   const URL= import.meta.env.VITE_API_URL;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -47,33 +50,38 @@ export default function Game() {
   const mapid= searchParams.get("mapid") ?? "NONE_AVAILABLE";
   const userid= searchParams.get("userid") ?? "NONE_AVAILABLE";
 
+  console.log("[DEBUG] URL Parameters:", {roomCode, mapid, userid});
+
     const http = axios.create({
         baseURL: URL,
         withCredentials:true
     })
 
 
-    if(!roomCode || !mapid || !userid){
-      console.error("[DEBUG] MISSING PARAMETERS");
+    if(!roomCode || roomCode === "NONE_AVAILABLE" || !mapid || mapid === "NONE_AVAILABLE" || !userid || userid === "NONE_AVAILABLE"){
+      console.error("[DEBUG] MISSING PARAMETERS:", {roomCode, mapid, userid});
       navigate('*',{replace:true});
+      return;
     }
 
-
-
+  
   // Run MAP001 with QR code
-  useEffect(() => {
+  useEffect( () => {
 
-      http.get("/authCookie").then((res)=>{
+    const fetchAuthCookie = async () => {
+      try{
+        const res = await http.get("/authCookie");
         setUser(res.data.Username);
-        console.log(res.data.user);
-    })
-    .catch((err)=>{
+        console.log('AUTH ',res.data.user); 
+      }catch(err){
         console.log(err);
         window.location.href = "/login";
-      })
+      }
+    };
 
+    fetchAuthCookie();
 
-        http.get(`/map/${mapid}`).then(res => {
+    http.get(`/map/${mapid}`).then(res => {
         setMap(res.data);
         }).catch(console.error);
     
@@ -82,11 +90,42 @@ export default function Game() {
  
   }, []);
 
-  // useEffect(()=>{
-  //    http.post('/room/roomParticipant', { roomCode }).then(res => {
-  //      console.log('Room participants:', res.data);
-  //    }).catch(console.error);
-  // }, [roomCode]);
+  useEffect(()=>{
+
+    socket.connect();
+
+    socket.on('connect', () => {
+      console.log('Socket connected', user);
+      socket.emit('join-room', {roomCode, user});
+    });
+
+    if (socket.connected) {
+        console.log('Socket already connected, joining room:', roomCode, user);
+        socket.emit('join-room', {roomCode, user});
+    }
+
+    //receive data
+    socket.on('turn-order',(data)=>{
+      setCurrentTurn(data);
+      console.log("Current Turn:", data);
+      // If include reshuffled info，show modal
+      if (data.reshuffled) {
+        setModalCont({
+          title: "Turn Order Reshuffled!", 
+          content: `After 3 rounds, the turn order has been reshuffled for round ${data.round}!`,
+          buttonContent:[{buttonContent:"OK", buttonType:"primary", onClick:()=>{SetisError(false)}}]
+        });
+        handleErrorModal();
+      }
+    })
+
+    return () => {
+      socket.off('connect');
+      socket.off('room-joined');
+      socket.off('turn-order');
+      socket.disconnect();
+    }
+  },[socket])
 
   useEffect(()=>{
     if(map?.Player){
@@ -109,6 +148,10 @@ export default function Game() {
     };
   }
 
+  const ClickDice = () =>{
+    setIsClick(prev=> prev+1);
+  }
+
   async function safeCall<T>(fn: () => Promise<T>): Promise<T | undefined> {
   try {
     return await fn();
@@ -121,6 +164,29 @@ export default function Game() {
     return undefined;
   }
 }
+
+  
+  const nextTurn = async () => {
+    try {
+      const response = await http.post('/game/next-turn', { roomCode });
+      setIsClick(0);
+      console.log("Turn advanced:", response.data);
+    } catch (err) {
+      console.error("Error advancing turn:", err);
+      setModalCont({
+        title: "Error", 
+        content: "Failed to advance turn",
+        buttonContent:[{buttonContent:"OK", buttonType:"primary", onClick:()=>{SetisError(false)}}]
+      });
+      handleErrorModal();
+    }
+  };
+
+  // check is turn or not
+  const isMyTurn = () => {
+    if (!CurrentTurn || !user) return false;
+    return CurrentTurn.currentPlayer === socket.id;
+  };
 
 
 
@@ -250,7 +316,7 @@ export default function Game() {
         throw new Error ("Invalid Tiles")
       } else{
         setPosition(next);
-        await http.post('/map/progress-update', { mapId:mapid, userId: Number(userid), score:Score }).catch(() => {
+        await http.post('/map/progress-update', { mapId:mapid, userId: Number(userid), score:Score, roomCode:roomCode }).catch(() => {
           console.error("[DEBUG] ERROR IN ROLL POSITION-NORM");
         });
         console.log("[DEBUG] ROLL POSITION", currentTile?.type); 
@@ -275,7 +341,7 @@ export default function Game() {
           
         setPosition(next);
         console.log("[DEBUG] ELSE IN ROLL POSITION", next); //roomid userid score
-        await http.post('/map/progress-update', { mapId: mapid, userId: Number(userid), score:Score }).catch(() => {
+        await http.post('/map/progress-update', { mapId: mapid, userId: Number(userid), score:Score, roomCode:roomCode }).catch(() => {
           console.error("[DEBUG] ERROR IN ROLL POSITION- SPECIAL");
         });
         }
@@ -622,18 +688,64 @@ export default function Game() {
         
         ></input>
         
-        <button
-          onClick={rollPosition}
-          disabled={isDisable()}
-        >
-          Roll Dice
-        </button>
-        {dice !== null && <span style={{marginLeft:'1.2rem'}}>You rolled: <b>{dice}</b></span>}
-        <div>
-           <p>Time Line:</p>
-           <div>
-             
-           </div>
+
+
+        {/* Turn-based Game Timeline */}
+        <div className="timeline-container">
+          <h4>Game Timeline</h4>
+          <div className="current-turn-info">
+            <p><strong>Round:</strong> {CurrentTurn?.round || 1}</p>
+            <p><strong>Current Turn:</strong> {
+              CurrentTurn?.turnOrder && CurrentTurn?.playersName && CurrentTurn?.currentTurn !== undefined
+                ? (() => {
+                    const currentSocketId = CurrentTurn.turnOrder[CurrentTurn.currentTurn];
+                    const playerIndex = CurrentTurn.players?.indexOf(currentSocketId) ?? -1;
+                    return playerIndex !== -1 ? CurrentTurn.playersName[playerIndex] : 'Unknown';
+                  })()
+                : 'Unknown'
+            }</p>
+            <p><strong>Is Your Turn:</strong> {isMyTurn() ? '✅ Yes' : '❌ No'}</p>
+          </div>
+          
+          <div className="player-order">
+            <h5>Player Order:</h5>
+            <div className="players-list">
+              {CurrentTurn?.turnOrder.map((socketId, idx) => {
+                const playerIndex = CurrentTurn.players?.indexOf(socketId) ?? -1;
+                const playerName = playerIndex !== -1 ? CurrentTurn.playersName?.[playerIndex] : 'Unknown';
+                return (
+                  <div 
+                    key={idx} 
+                    className={`player-item ${idx === CurrentTurn?.currentTurn ? 'active-player' : ''}`}
+                  >
+                    <span className="player-number">{idx + 1}</span>
+                    <span className="player-name">{playerName}</span>
+                    {idx === CurrentTurn?.currentTurn && <span className="current-indicator">👑</span>}
+                  </div>
+                );
+              }) || []}
+            </div>
+          </div>
+
+          {isMyTurn() && (
+            <div className="turn-actions">
+              <button 
+                className="next-turn-btn"
+                onClick={nextTurn}
+                // disabled={isDisable()}
+              >
+                End Turn
+              </button>
+              
+              <button
+            onClick={()=>{rollPosition(),ClickDice()}}
+            disabled={isDisable() && isClicked>=1}
+            >
+            Roll Dice
+            </button>
+          {dice !== null && <span style={{marginLeft:'1.2rem'}}>You rolled: <b>{dice}</b></span>}
+            </div>
+            )}
         </div>
       </div>
 

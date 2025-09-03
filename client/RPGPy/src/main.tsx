@@ -11,20 +11,24 @@ import Lobby from './page/Lobby.tsx';
 import NotFoundPage from './page/NotFound.tsx';
 import MultiPage from './page/MultiPage.tsx';
 import DocumentationPage from './page/Documentation.tsx';
+import { Toast } from './components/Toast.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App/>} />
-        <Route path="/Login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<DashboardPage/>} />
-        <Route path='/Game' element={<Game/>} />
+      <Toast>
+         <Routes>
+          <Route path="/" element={<App/>} />
+          <Route path="/Login" element={<LoginPage />} />
+          <Route path="/dashboard" element={<DashboardPage/>} />
+          <Route path='/Game' element={<Game/>} />
         <Route path='/Lobby' element={<Lobby/>} />
         <Route path="*" element={<NotFoundPage/>} />
         <Route path="/Multi" element={<MultiPage/>} />
         <Route path='/Documentation' element={<DocumentationPage/>} />
-      </Routes>
+        </Routes>
+      </Toast>
+       
     </BrowserRouter>
   </StrictMode>,  
 )
