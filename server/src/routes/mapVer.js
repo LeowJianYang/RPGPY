@@ -46,4 +46,8 @@ mapRouter.post('/progress-update', (req, res) => {
   // res.json({ ok: true });
 });
 
+mapRouter.get("/v1/download", (req,res)=>{
+  res.sendFile(path.join(__dirname,'../maps/MAP001.pdf'));
+})
+
 module.exports = mapRouter;

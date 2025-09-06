@@ -8,7 +8,8 @@ import LoadingObject from "../components/LoadingObject";
 import {Scanner} from '@yudiel/react-qr-scanner';
 import {useMapDetailsStore} from '../../components/MapDetailsStore';
 import { socket } from '../socket';
-
+import { ScanOutlined } from '@ant-design/icons';
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -24,7 +25,9 @@ export default function MultiPage() {
   const [scanSuccess, setScanSuccess] = useState(false);
   const {MapDetails, setMapDetails} = useMapDetailsStore();
   // const [MapDetails, setMapDetails] = useState<{MapId:string, MapName:string, MapDetails:string}[]>([]);
+  const [openScanToJoin, setOpenScanToJoin] = useState(false);
   const URL= import.meta.env.VITE_API_URL;
+  const navigate = useNavigate();
 
 
   const handleCreateRoom = async () =>{
@@ -85,6 +88,12 @@ export default function MultiPage() {
     })
   }
 
+  const RedirectRoom = ()=>{
+    
+    navigate(MapDet, {replace:true});
+  }
+  
+
 
   const handleJoinRoom = async () =>{
     axios.post(`${URL}/room/joinRoom`, {username:user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
@@ -123,8 +132,37 @@ export default function MultiPage() {
         <div className="button-group">
           <button className="btn-multi create-room-btn" onClick={()=>{handleCreateRoom(), setLoading(true)}}>Create Room</button>
           <button className="btn-multi join-room-btn" onClick={()=>{handleJoinRoom(), setLoading(true)}}>Join Room</button>
+          <ScanOutlined onClick={()=>{setOpenScanToJoin(true), setScanSuccess(false),setIsScanning(true)}}/>
         </div>
       </div>
+
+            <ModalForm
+              title={'Scan QR to Join Room'}
+              open={openScanToJoin}
+              onOk={() => { setOpenScanToJoin(false) }}
+              onCancel={() => { setOpenScanToJoin(false), setIsScanning(false),setScanSuccess(false)}}
+              footer={[<SelfButton  onClick={() => { setOpenScanToJoin(false), setIsScanning(false),setScanSuccess(false),RedirectRoom() }} type="primary" disabled={!scanSuccess}>Finished</SelfButton>,
+                        <SelfButton  onClick={() => { setOpenScanToJoin(false), setIsScanning(false),setScanSuccess(false) }} type="danger">Close</SelfButton>
+              ]}
+            >
+
+              <div className="map-selector">
+
+                {isScanning && <Scanner onScan={async (result)=>{
+                  {
+                    const scannedUrl= result[0].rawValue;
+                    setMapDet(()=>{
+                      return scannedUrl;
+                    });
+                    setIsScanning(false);
+                    setScanSuccess(true);
+                  }
+                }}></Scanner>}
+
+              </div>
+
+            </ModalForm>
+
    
           
           <ModalForm 

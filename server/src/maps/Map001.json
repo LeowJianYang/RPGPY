@@ -2,53 +2,108 @@
   "mapId": "MAP001",
   "name": "Dungeon of Logic",
 
-  "legend": {
+"legend": {
     "S": "Start",
     "E": "Enemy",
-    "C": "Chest",
+    "C": "Chest / Skill",
     "Q": "Quiz",
+    "M": "MCQ (was Lock)",
+    "R": "Branch",
     "B": "Boss",
-    "X": "Empty",
-    "M" : "MCQ",
-    "R" : "Branch"
+    "X": "Empty"
   },
-  "tiles": {
-    "01": { "type": "S", "description": "Starting Point, Adventure Start !" },
-    "02": { "type": "Q", "quizPool": "python_code_questions" },
-    "03": { "type": "E", "enemyId": "slime_001" ,"quizPool":"python_control_flow"},
-    "04": { "type": "X" },
-    "05": { "type": "C", "lootTable": "treasure_mid","branchExpected":"R10" },
-    "06": { "type": "M", "quizPool": "python_basics" },
-    "07": { "type": "E", "enemyId": "bat_002" , "quizPool": "python_control_flow" },
-    "08": { "type": "M", "quizPool": "python_loops" },
-    "09": { "type": "C", "lootTable": "treasure_low" },
-    "10": { "type": "E", "enemyId": "goblin_003" },
-    "11": { "type": "Q", "quizPool": "python_functions" },
+ "tiles": {
+    "01": { "type": "X", "description": "START" },
+    "02": { "type": "C", "lootTable": "treasure_skill" },
+    "03": { "type": "Q", "quizPool": "python_code_questions" },
+    "04": { "type": "X"},
+    "05": { "type": "C", "lootTable": "treasure_skill" },
+    "06": { "type": "E", "enemyId": "slime_001", "quizPool": "python_basics" },
+    "07": { "type": "M", "quizPool": "python_control_flow" },
+    "08": { "type": "X" },
+    "09": { "type": "X" },
+
+    "10": { "type": "R", "branchExpected": "L10" },
+    "11": { "type": "C", "lootTable": "treasure_skill" },
     "12": { "type": "X" },
-    "13": { "type": "C", "lootTable": "treasure_rare" },
-    "14": { "type": "E", "enemyId": "orc_004" },
-    "15": { "type": "Q", "quizPool": "python_oop" },
-    "16": { "type": "X" },
-    "17": { "type": "E", "enemyId": "skeleton_005" },
-    "18": { "type": "Q", "quizPool": "python_advanced" },
-    "19": { "type": "C", "lootTable": "treasure_rare" },
-    "20": { "type": "B", "enemyId": "dragon_001", "quizPool":"python_code_questions" },
-    "40":{ "type": "B", "enemyId": "dragon_001", "quizPool":"python_code_questions" },
-    "R10":{"type": "R", "enemyId":"dragon_001", "quizPool": "python_basics"},
-    "R11":{"type": "R", "enemyId":"skeleton_005", "quizPool": "python_code_questions", "branchQuit": 10}
+    "13": { "type": "X" },
+    "14": { "type": "C", "lootTable": "treasure_mid" },
+    "15": { "type": "X" },
+    "16": { "type": "C", "lootTable": "treasure_skill" },
+    "17": { "type": "Q", "quizPool": "python_code_questions" },
+    "18": { "type": "E", "enemyId": "bat_002", "quizPool": "python_code_questions" },
+    "19": { "type": "X" },
+    "20": { "type": "C", "lootTable": "treasure_skill" },
+    "21": { "type": "Q", "quizPool": "python_code_questions" },
+    "22": { "type": "C", "lootTable": "treasure_mid" },
+    "23": { "type": "E", "enemyId": "goblin_003", "quizPool": "python_control_flow" },
+    "24": { "type": "X" },
+    "25": { "type": "C" ,"lootTable": "treasure_rare"},
+    "26": { "type": "C", "lootTable": "treasure_skill" },
+    "27": { "type": "X" },
+    "28": { "type": "R", "branchExpected": "R28" },
+
+    "29": { "type": "E", "enemyId": "orc_004", "quizPool": "python_control_flow" },
+    "30": { "type": "C", "lootTable": "treasure_mid" },
+    "31": { "type": "Q", "quizPool": "python_code_questions" },
+    "32": { "type": "C", "lootTable": "treasure_skill" },
+    "33": { "type": "E", "enemyId": "skeleton_005", "quizPool": "python_code_questions" },
+    "34": { "type": "Q", "quizPool": "python_code_questions" },
+    "35": { "type": "M", "quizPool": "python_control_flow" },
+    "36": { "type": "E", "enemyId": "wolf_006", "quizPool": "python_control_flow" },
+    "37": { "type": "X" },
+    "38": { "type": "E", "enemyId": "mage_007", "quizPool": "python_code_questions" },
+    "39": { "type": "X" },
+    "40": { "type": "B", "enemyId": "dragon_001", "quizPool": "python_code_questions", "description": "END - Boss Fight" },
+
+    "L10": { "type": "X" },
+    "L11": { "type": "Q", "quizPool": "python_code_questions" },
+    "L12": { "type": "C", "lootTable": "treasure_mid" },
+    "L13": { "type": "E", "enemyId": "necromancer_014", "quizPool": "python_control_flow" },
+    "L14": { "type": "E", "enemyId": "zombie_015", "quizPool": "python_control_flow" },
+    "L15": { "type": "C", "lootTable": "treasure_skill" },
+    "L16": { "type": "E", "enemyId": "giant_013", "quizPool": "python_control_flow", "branchQuit": "40" },
+
+    "R28": { "type": "E", "enemyId": "bandit_008", "quizPool": "python_control_flow" },
+    "R29": { "type": "C", "lootTable": "treasure_mid" },
+    "R30": { "type": "C", "lootTable": "treasure_mid" },
+    "R31": { "type": "Q", "quizPool": "python_code_questions" },
+    "R32": { "type": "E", "enemyId": "knight_009", "quizPool": "python_control_flow" },
+    "R33": { "type": "X", "branchQuit": "40" }
   },
   "quizPools": {
     "python_basics": [
       { "q": "What is the output of print(2+3)?", "a": ["23", "5", "Error"], "correct": 1, "expectedResult": "5" },
       { "q": "Which keyword defines a function in Python?", "a": ["def", "func", "lambda"], "correct": 0 ,"expectedResult":"def" }
     ],
-     "python_control_flow": [
-      { "q": "Which statement is used for decision making?", "a": ["if", "for", "while"], "correct": 0 , "expectedResult": "if"},
+  "python_control_flow": [
+      { "q": "Which statement is used for decision making?", "a": ["if", "for", "while"], "correct": 0, "expectedResult": "if"},
       { "q": "Which loop is used when the number of iterations is known?", "a": ["while loop", "for loop", "if statement"], "correct": 1, "expectedResult": "for loop"},
       { "q": "Which keyword is used to exit a loop immediately?", "a": ["continue", "pass", "break"], "correct": 2, "expectedResult": "break"},
       { "q": "What is the purpose of the 'else' block in an 'if-elif-else' statement?", "a": ["To execute code if all preceding conditions are false", "To create an infinite loop", "To skip the current iteration"], "correct": 0, "expectedResult": "To execute code if all preceding conditions are false"},
-      { "q": "Which statement is used to skip the rest of the code inside a loop for the current iteration and move to the next iteration?", "a": ["break", "pass", "continue"], "correct": 2, "expectedResult": "continue"}
-    ],
+      { "q": "Which statement is used to skip the rest of the code inside a loop for the current iteration and move to the next iteration?", "a": ["break", "pass", "continue"], "correct": 2, "expectedResult": "continue"},
+      { "q": "What is the primary use of the 'pass' statement in a control flow block?", "a": ["To create an infinite loop", "As a placeholder for future code", "To exit a function"], "correct": 1, "expectedResult": "As a placeholder for future code"},
+      { "q": "Which loop is best for iterating over a sequence (like a list or tuple)?", "a": ["while loop", "do-while loop", "for loop"], "correct": 2, "expectedResult": "for loop"},
+      { "q": "When does the 'else' block of a 'for' loop execute?", "a": ["When a break statement is used", "When the loop completes without a break", "After every iteration"], "correct": 1, "expectedResult": "When the loop completes without a break"},
+      { "q": "In a `while` loop, what is a common pitfall if the condition is never met?", "a": ["The loop runs infinitely", "The loop doesn't run at all", "It causes a syntax error"], "correct": 1, "expectedResult": "The loop doesn't run at all"},
+      { "q": "What will `for i in range(5):` do?", "a": ["Iterate from 1 to 5", "Iterate from 0 to 4", "Iterate 5 times, from 0 to 5"], "correct": 1, "expectedResult": "Iterate from 0 to 4"},
+      { "q": "Which keyword can be used with both `for` and `while` loops?", "a": ["return", "break", "print"], "correct": 1, "expectedResult": "break"},
+       { "q": "What does a nested loop mean?", "a": ["A loop inside an if statement", "A loop inside another loop", "A function inside a loop"], "correct": 1, "expectedResult": "A loop inside another loop"},
+      { "q": "Which operator is used to check for equality in an `if` statement?", "a": ["=", "==", "!="], "correct": 1, "expectedResult": "=="},
+      { "q": "How can you check if a number is not equal to another?", "a": ["using `==`", "using `!=`", "using `is not`"], "correct": 1, "expectedResult": "using `!=`"},
+      { "q": "Which statement can be used to handle multiple conditions sequentially?", "a": ["if-else", "if-elif-else", "while"], "correct": 1, "expectedResult": "if-elif-else"},
+      { "q": "If you have a list and want to iterate through it while also knowing the index of each element, what function can you use?", "a": ["`range()`", "`len()`", "`enumerate()`"], "correct": 2, "expectedResult": "`enumerate()`"},
+      { "q": "What is the result of the following code: `x = 5; if x > 10: print('A'); else: print('B')`?", "a": ["A", "B", "None"], "correct": 1, "expectedResult": "B"},
+      { "q": "What is the default step value for `range()` function?", "a": ["0", "1", "2"], "correct": 1, "expectedResult": "1"},
+      { "q": "What will be the output of `for i in 'hello': print(i)`?", "a": ["hello", "h e l l o", "h\ne\nl\nl\no"], "correct": 2, "expectedResult": "h\ne\nl\nl\no"},
+      { "q": "Which of these is a correct `while` loop syntax?", "a": ["`while i > 0`", "`while (i > 0):`", "`while i > 0:`"], "correct": 2, "expectedResult": "`while i > 0:`"},
+      { "q": "What is the purpose of `elif`?", "a": ["To check an additional condition if the previous `if` statement was false", "To end the `if` statement", "To create a loop"], "correct": 0, "expectedResult": "To check an additional condition if the previous `if` statement was false"},
+      { "q": "In which case would a `while` loop be more suitable than a `for` loop?", "a": ["When iterating over a fixed-size list", "When you want to run a loop a specific number of times", "When the number of iterations is unknown"], "correct": 2, "expectedResult": "When the number of iterations is unknown"},
+      { "q": "Which statement is used to terminate the current iteration of the loop and jump to the next one?", "a": ["`exit()`", "`pass`", "`continue`"], "correct": 2, "expectedResult": "`continue`"},
+      { "q": "What does the `in` keyword do in a `for` loop?", "a": ["It specifies the condition for the loop to run", "It iterates over each element in a sequence", "It checks if an item exists in a sequence"], "correct": 1, "expectedResult": "It iterates over each element in a sequence"},
+      { "q": "What is a major risk of a `while` loop?", "a": ["Infinite loop", "Syntax error", "Slow execution"], "correct": 0, "expectedResult": "Infinite loop"}
+  ],
+
 
     "python_loops":[
       {"q": "What is the output for While(true)\n\tprint('Loops')?", "a":["Infinite", "Loops", "Loops\tLoops\t for 10times"], "correct": 0, "expectedResult": "Infinite"}
@@ -58,14 +113,37 @@
     {"q": "Using Control Flow Method, print out 5 times of Ok with the next line", "expectedResult": "Ok\nOk\nOk\nOk\nOk\n"},
     {"q": "Using a `for` loop, print the numbers from 1 to 3, with each number on a new line.", "expectedResult": "1\n2\n3\n"},
     {"q": "Given `x = 10`, use an `if-else` statement to print 'Positive' if `x` is greater than 0, otherwise print 'Negative'.", "expectedResult": "Positive\n"},
-    {"q": "Using a `while` loop, print the numbers from 5 down to 1, with each number on a new line.", "expectedResult": "5\n4\n3\n2\n1\n"}
+    {"q": "Using a `while` loop, print the numbers from 5 down to 1, with each number on a new line.", "expectedResult": "5\n4\n3\n2\n1\n"},
+    {"q": "Using a `for` loop, print the even numbers from 2 to 10, each on a new line.", "expectedResult": "2\n4\n6\n8\n10\n"},
+    {"q": "Using a `while` loop, print the numbers from 1 to 5, but skip printing 3 using `continue`.", "expectedResult": "1\n2\n4\n5\n"},
+    {"q": "Given `y = -7`, use an `if-elif-else` statement to print 'Negative' if y < 0, 'Zero' if y == 0, otherwise 'Positive'.", "expectedResult": "Negative\n"},
+    {"q": "Using a `for` loop and `break`, print numbers from 1 upwards, but stop when the number is 4.", "expectedResult": "1\n2\n3\n"},
+    {"q": "Using nested `for` loops, print a 3x3 grid of '*'.", "expectedResult": "* * *\n* * *\n* * *\n"},
+    {"q": "Using a `while` loop, print the numbers from 10 down to 6.", "expectedResult": "10\n9\n8\n7\n6\n"},
+    {"q": "Given `n = 5`, use a `for` loop to print the squares of numbers from 1 to n, each on a new line.", "expectedResult": "1\n4\n9\n16\n25\n"},
+    {"q": "Using an `if` statement inside a `for` loop, print only the odd numbers between 1 and 7.", "expectedResult": "1\n3\n5\n7\n"},
+    {"q": "Using a `while` loop, keep doubling a number starting from 1 until it reaches or exceeds 20, and print each value.", "expectedResult": "1\n2\n4\n8\n16\n"},
+    {"q": "Using a `for` loop, iterate over the string 'ABC' and print each character on a new line.", "expectedResult": "A\nB\nC\n"}
    ]
   },
+  
   "lootTables": { 
-    "treasure_low": ["Potion"],
-    "treasure_mid": ["Iron Sword"],
-    "treasure_high": ["Magic Staff"],
-    "treasure_rare": ["Special Bow"]
+    "treasure_low": ["Potion", "Gold"],
+    "treasure_mid": ["Iron Sword",  "Dragon Armor"],
+    "treasure_high": ["Magic Staff", "Laser Sword"],
+    "treasure_rare": ["Special Bow", "Potion Lvl 2", "Iron Sword Lvl 3"],
+    "treasure_skill":["Fireball Lvl 2","Laser Beam Lvl 3", "Heal Lvl 3", "Laser Beam","Heal Lvl 2"]
+  },
+
+  "RolesSet":{
+    "Warrior": {"description":"A strong melee fighter", "ATK":3, "HP":20, "Skills":["Warrior Strike"]},
+    "Mage": {"description":"A master of elemental magic", "ATK":2, "HP":15, "Skills":["Fireball"]},
+    "Healer": {"description":"Supports the team with healing", "ATK":1, "HP":18, "Skills":["Heal"]}
+  },
+  "SkillsSet":{
+    "Fireball": {"type": "Attack", "description":"Deals 10 damage to an enemy", "damage":10, "Cooldown":3},
+    "Heal": {"type": "Heal", "description":"Restores 15 HP", "heal":15, "Cooldown":5},
+    "Warrior Strike": {"type": "Attack", "description":"Deals 2 damage to an enemy", "damage":2, "Cooldown":2}
   },
 
   "lootEffects":{
@@ -74,7 +152,15 @@
     "Magic Staff": {"type":"Weapon","description": "Add 3 ATK", "ATK":3},
     "Dragon Armor": {"type":"Amour","description": "Add 10 HP", "HP":10},
     "Gold":{"type":"Loot","description": "Useless GOLD"},
-    "Special Bow": {"type":"Weapon","description": "Add 10 ATK", "ATK":10}
+    "Special Bow": {"type":"Weapon","description": "Add 10 ATK", "ATK":10},
+    "Laser Beam": {"type":"Attack","description": "Deals 12 ATK", "damage":12, "Cooldown":10},
+    "Laser Beam Lvl 3": {"type":"Attack","description": "Deals 20 ATK", "damage":20, "Cooldown":10},
+    "Heal Lvl 3": {"type":"Heal","description": "Restores 25 HP", "heal":25, "Cooldown":10},
+    "Fireball Lvl 2": {"type":"Attack","description": "Deals 15 ATK", "damage":15, "Cooldown":6},
+    "Heal Lvl 2": {"type":"Heal","description": "Restores 22 HP", "heal":22, "Cooldown":7},
+    "Potion Lvl 2":{"type":"Restock","description": "Add 12 HP", "HP":12},
+    "Iron Sword Lvl 3": {"type":"Weapon","description": "Add 14 ATK", "ATK":14},
+    "Laser Sword": {"type":"Weapon","description": "Add 8 ATK", "ATK":8}
   },
 
   "Player":{
@@ -88,6 +174,15 @@
     "goblin_003": { "name": "Goblin", "hp": 20, "attack": 4 },
     "orc_004": { "name": "Orc", "hp": 30, "attack": 6 },
     "skeleton_005": { "name": "Skeleton", "hp": 25, "attack": 5 },
+    "wolf_006": { "name": "Wolf", "hp": 18, "attack": 4 },
+    "mage_007": { "name": "Dark Mage", "hp": 22, "attack": 7 },
+    "bandit_008": { "name": "Bandit", "hp": 28, "attack": 6 },
+    "knight_009": { "name": "Corrupted Knight", "hp": 35, "attack": 8 },
+    "assassin_011": { "name": "Assassin", "hp": 26, "attack": 9 },
+    "shadowmage_012": { "name": "Shadow Mage", "hp": 32, "attack": 10 },
+    "giant_013": { "name": "Mountain Giant", "hp": 100, "attack": 3 },
+    "necromancer_014": { "name": "Necromancer", "hp": 40, "attack": 11 },
+    "zombie_015": { "name": "Zombie", "hp": 30, "attack": 20 },
     "dragon_001": { "name": "Dragon Boss", "hp": 100, "attack": 15 }
   }
 }

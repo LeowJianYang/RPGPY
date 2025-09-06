@@ -1,7 +1,32 @@
+import { SelfButton } from '../components/ErrorModal';
 import NavBar, { FooterBar } from '../components/navigation';
 import './../css/Documentation.css';
+import {useToast} from '../components/Toast';
+
+import axios from 'axios';
 
 const Documentation = () => {
+  const {notify} = useToast();
+  const URL = import.meta.env.VITE_API_URL;
+
+  const handleDownloadMap = async ()=>{
+    try{
+    const res= await axios.get(`${URL}/map/v1/download`, {responseType: 'blob', withCredentials:true});  
+    const url= window.URL.createObjectURL(new Blob([res.data]));
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download','MAP001.pdf');
+    document.body.appendChild(link);
+    link.click();
+    notify("success", "Download Started", "Your map download has started.", "bottomRight");
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+  } catch(err){
+    console.error("Error downloading map:", err);
+    notify("error", "Download Failed", "Could not download the map. Please try again later.", "top");
+  } };
+
   return (
     <div className="doc-container">
       <NavBar/>
@@ -16,6 +41,12 @@ const Documentation = () => {
           <div className="doc-card">
             <h3>Getting Started</h3>
             <p>This section is under construction. Tutorials on how to set up and play the game will be available here soon.</p>
+            <SelfButton
+              type='primary'
+              onClick={() => {
+                handleDownloadMap();
+              }}
+            >Map</SelfButton>
             {/* Placeholder for future content */}
           </div>
         </section>

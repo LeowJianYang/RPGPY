@@ -149,6 +149,69 @@ roomRoutes.get('/RoomParticipant', async (req,res)=>{
 
 })
 
+roomRoutes.post('/participantLeave' , async (req,res)=>{
+    const {roomCode, userId} = req.body;
+
+    console.log(`Participant leaving room: ${roomCode}, UserId: ${userId}`);
+    req.io.to(roomCode).emit('participant-left',{
+        roomCode,
+        message:'A participant has left the room.'
+    })
+    setTimeout(async ()=>{
+        db.query('Delete from roomparticipant WHERE RoomId=? AND UserId=?',[roomCode,userId], async(error,result)=>{
+
+        if(error){
+            return res.status(500).json({success:false, message:"Error deleting participant from room.", errorStaate: error.sqlState});
+        }
+
+        if(result.affectedRows === 0){
+            return res.status(404).json({success:false, message:"Participant not found."});
+        }
+
+        console.log(`Participant ${userId} left room ${roomCode} successfully`);
+        
+        return res.status(200).json({success:true, message:"Left the room successfully."});
+        
+    })
+    },100)
+    
+});
+
+roomRoutes.delete('/kickParticipant', async (req,res)=>{
+    const {roomCode, username} = req.body;
+
+    console.log(`Kicking participant: ${username} from room: ${roomCode}`);
+    req.io.to(roomCode).emit('participant-kicked',{
+        roomCode,
+        username,
+        message:'A participant has been kicked from the room.'
+    });
+
+    setTimeout(async ()=>{
+        db.query('Select UserId from userdata where Username=?',[username], async(error,result)=>{
+            if(error){
+                return res.status(500).json({success:false, message:"Database error while fetching user ID."});
+            }
+            if(result.length===0){
+                return res.status(404).json({success:false, message:"User not found."});
+            }
+
+            const userId= result[0].UserId;
+            db.query('Delete from roomparticipant WHERE RoomId=? AND UserId=?',[roomCode,userId], async(error2,result2)=>{
+                if(error2){
+                    return res.status(500).json({success:false, message:"Error deleting participant from room.", errorStaate: error2.sqlState});
+                }
+                if(result2.affectedRows === 0){
+                    return res.status(404).json({success:false, message:"Participant not found."});
+                }
+
+                console.log(`Participant ${username} (UserId: ${userId}) kicked from room ${roomCode} successfully`);
+                return res.status(200).json({success:true, message:`${username} has been kicked from the room.`});
+            });
+        })
+    },100)
+});
+
 roomRoutes.post('/ownerLeave', async (req,res)=>{
     const {roomCode} = req.body;
 

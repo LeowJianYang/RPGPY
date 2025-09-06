@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { MapJSON, TileType, LootTypes } from '../GameTypes'
+import type { MapJSON, TileType, LootTypes, SkillsType } from '../GameTypes'
 import PythonRunner from '../PythonRunner';
 import axios from 'axios';
 import Editor from '@monaco-editor/react';
@@ -10,6 +10,7 @@ import  { ModalForm,SelfButton } from '../components/ErrorModal';
 import type { ModalPropsType } from '../components/ButtonCompo';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { socket } from '../socket';
+import { useToast } from '../components/Toast';
 
 
 
@@ -45,7 +46,9 @@ export default function Game() {
   const URL= import.meta.env.VITE_API_URL;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
+  const [roles, setRoles]= useState<{roleName:string,description:string, ATK:number, HP:number, Skills:string[]}[]>([]);
+  const [SkillsUsed, setSkillsUsed] = useState<{Cooldown:number, duration?:number, usedSkill:string}[]>([]);
+  const {notify} = useToast();
   const roomCode = searchParams.get("roomCode") ?? "NONE_AVAILABLE";
   const mapid= searchParams.get("mapid") ?? "NONE_AVAILABLE";
   const userid= searchParams.get("userid") ?? "NONE_AVAILABLE";
@@ -127,13 +130,37 @@ export default function Game() {
     }
   },[socket])
 
+  
+
+
   useEffect(()=>{
-    if(map?.Player){
-    setHp(map?.Player.HP ?? 0);
-    setAtk(map?.Player.ATK??0);
-    setEquip(["W","A","S"])
-    console.log(hp+Atk)
-  }
+
+    if(map?.RolesSet){
+
+        const keys= Object.keys(map?.RolesSet);
+        const randomKey= keys[Math.floor(Math.random()*keys.length)];
+        const rolesArray= map?.RolesSet[randomKey];
+        setRoles([{
+          roleName: randomKey,
+          description: rolesArray.description,
+          ATK: rolesArray.ATK,
+          HP: rolesArray.HP,
+          Skills: rolesArray.Skills
+      }]);
+      setHp(rolesArray.HP);
+      setAtk(rolesArray.ATK);
+
+      setEquip(["W","A",roles[0]?.Skills[0]??"S"]);
+      setEquipDet([`Description: ${map?.SkillsSet[rolesArray.Skills[0]]?.description}`, `Type: ${map?.SkillsSet[rolesArray.Skills[0]]?.type}`,`Damage: ${map?.SkillsSet[rolesArray.Skills[0]]?.damage??0}`,`Heal: ${map?.SkillsSet[rolesArray.Skills[0]]?.heal??0}`,`HP: ${map?.SkillsSet[rolesArray.Skills[0]]?.HP??0}`,`Duration: ${map?.SkillsSet[rolesArray.Skills[0]]?.duration??0}`, `Cooldown: ${map?.SkillsSet[rolesArray.Skills[0]]?.Cooldown}`])
+      console.log("[DEBUG] EQUIP SET",EquipDet);
+      console.log("[DEBUG] ROLES", JSON.stringify(roles));
+    } else{
+       setHp(map?.Player.HP ?? 0);
+      setAtk(map?.Player.ATK??0);
+      setEquip(["W","A","S"])
+      console.log(hp+Atk)
+    }
+    
 
   },[map])
 
@@ -200,12 +227,61 @@ export default function Game() {
     return map.tiles[tileKey] || null;
   }, [map, tileKey]);
 
+  useEffect(()=>{
+
+    SkillsUsed.forEach((skills)=>{
+
+      const SkillsDet = map?.SkillsSet[skills.usedSkill];
+      if(!SkillsDet) return;
+
+      if(skills.duration !== undefined && skills.duration ===0){
+      switch(SkillsDet?.type) {
+      case "Attack":
+        break;
+      case "Heal":
+        break;
+      
+      case "Defense":{
+        setHp(h=> h- ((SkillsDet?.HP)? (SkillsDet?.HP): 0));
+        break;
+      }
+    }} else if (skills.duration!=undefined && skills.duration > 0){
+
+      switch(SkillsDet?.type) {
+      case "Attack":
+        break;
+      case "Heal":
+        break;
+      
+      case "Defense":{
+        setHp(h=> h+((SkillsDet?.HP)? (SkillsDet?.HP): 0));
+        break;
+      }
+    }
+
+    }
+  })
+
+    
+
+  },[SkillsUsed,map])
+
+  const SkillCoolDownEffect = async ()=>{
+      setSkillsUsed(prev =>prev.map((skill)=>({
+      ...skill,
+      Cooldown: Math.max(0, skill.Cooldown-1),
+      duration: skill.duration !== undefined ? Math.max(0,skill.duration-1): undefined
+    })));
+  }
+
   // Refresh event on every tiles
   useEffect(() => {
     if (!map || !currentTile) {
       setQuiz({ kind: 'none' });
       return;
-    }
+    };
+
+  SkillCoolDownEffect();
     switch (currentTile.type as TileType) {
       case 'Q': {
         const pool = map.quizPools[currentTile.quizPool || ''] || [];
@@ -244,14 +320,14 @@ export default function Game() {
         break;
       }
       case 'B': {
-        setisSucced(prev=>prev+1);
+      
         const pool= map.quizPools[currentTile.quizPool||'' ] || [];
-
+        const enemy= map.enemies[currentTile.enemyId!];
         const pick = pool[Math.floor(Math.random() * pool.length)];
-
+        setEnemyHp(enemy.hp);
         console.log("BOSS HERE !");
-
-        setQuiz({ kind: 'code', prompt: pick.q, starter: 'print("...")' , expected: pool[0].expectedResult?? ""});
+        setisSucced(0);
+        setQuiz({ kind: 'code', prompt: pick.q, starter: 'print("...")' , expected: pick.expectedResult?? ""});
         console.log("QUIZ"+quiz);
         setCodeInput('#Using backslash to complete !');
         break;
@@ -394,6 +470,17 @@ export default function Game() {
     SetisError(true);
   }
 
+  /**
+   * Switch the Question based on the type
+   * @usecase
+   * Use in the Enemy Tabs(encounter) to switch before they died
+   *
+   * @example
+   * handleSwitchQuestion(0) // MCQ
+   * handleSwitchQuestion(1) // Code
+   * @param idx - 0 means MCQ, 1 means Code
+   */
+
   const handleSwitchQuestion = (idx:number)=>{
     const pool = map?.quizPools[currentTile?.quizPool || ""]||[];
     switch(idx){
@@ -407,6 +494,15 @@ export default function Game() {
         })
         break;
       }
+      case 1:{
+        const pick = pool[Math.floor(Math.random()*pool.length)];
+        setQuiz({
+          kind:'code',
+          prompt: `Write Python to print the correct answer for:\n\n${pick.q}\n\n(Just print the final answer)`,
+          starter: `# write your Python code here\nprint("TODO")`,
+          expected: pick.expectedResult?? ""
+        });
+      }
     }
   }
 
@@ -416,7 +512,7 @@ export default function Game() {
     if (quiz.kind !== 'mcq') return;
     const correct = idx === quiz.correct;
     if (correct) {
-      alert(' Correct!');
+      notify('success',"Correct Answer !", "You answered correctly and dealt damage to the enemy.", 'top');
       setScore(prev => prev + 20);
       if(currentTile?.type==="E")
       {
@@ -487,7 +583,7 @@ export default function Game() {
     const eff= map?.lootEffects[items] ;
     
 
-    switch(eff?.type as LootTypes){
+    switch(eff?.type){
 
       case "Restock":{
         const effState= eff?.HP as number;
@@ -504,7 +600,7 @@ export default function Game() {
         );
 
         if(equip[0]!=='W'){
-          const Curr = map?.lootEffects[equip[0]].ATK as number;
+          const Curr = (map?.lootEffects[equip[0]] as Extract<LootTypes, {type: 'Weapon'}>)?.ATK;
           setAtk(
            Math.max(0,Atk-Curr)
           );
@@ -516,6 +612,16 @@ export default function Game() {
 
       case "Amour":{
         console.log("[DEBUG] AMOUR SECTION")
+        break;
+      };
+
+      case 'Heal':
+      case 'Defense':
+      case "Attack":{
+        setEquip(prev=> prev.map((val,idx)=>(
+          idx===2? items:val
+        )));
+        
         break;
       };
 
@@ -537,31 +643,52 @@ export default function Game() {
   }
 
   
-
+   /**
+    * To View the Equipment Details on Modal
+    * @example 
+    * onClickEquip("W") // Weapon Details
+    * then, setEquipDet(["Add 3 ATK","3"])
+    *
+    * @param items - Equipment Name
+    */
   const onClickEquip = (items:string)=>{
     setEModalOpen(true);
     console.log("[DEBUG] EQUIP"+items)
 
-    const eff= map?.lootEffects[items] ;
+    let eff= map?.lootEffects[items];
+    if(eff === undefined || !eff){
+      eff= map?.SkillsSet[items] as LootTypes;
+    }
+
+    console.log("[DEBUG] INEFFECT"+JSON.stringify(eff))
     const effDesc = eff?.description as string;
 
 
-    switch(eff?.type as LootTypes){
+    switch(eff?.type){
 
       case "Restock":{
         const effState= eff?.HP;
-        setEquipDet([effDesc,effState as unknown as string])
+        setEquipDet([`Description: ${effDesc}`, `Type: Restock `, `HP: ${effState}`])
         break;
       };
 
       case "Weapon":{
        const effState= eff?.ATK as number;
-       setEquipDet([effDesc,effState as unknown as string])
+       setEquipDet([`Description: ${effDesc}`, `Type: Weapon`, `ATK: ${effState}`])
         break;
       };
 
       case "Amour":{
         console.log("[DEBUG] AMOUR SECTION")
+        break;
+      };
+      
+      case 'Heal':
+      case 'Defense':
+      case 'Attack':{
+        const effState:SkillsType = eff;
+        setEquipDet([`Description: ${effDesc}`, `Type: ${effState.type}`,`Damage: ${effState.damage??0}`, `Heal: ${effState.heal??0}`, `HP: ${effState.HP??0}`, `Duration: ${effState.duration??0}`, `Cooldown: ${effState.Cooldown}`])
+        
         break;
       };
 
@@ -581,6 +708,48 @@ export default function Game() {
   const handleInventoryClick = (items:string)=>{
       setOpen(true);
       setUseInv(items);
+
+  }
+
+  const setUsingSkills = async (skills:string[])=>{
+        
+      // Description: ${effDesc}`, `Type: ${effState.SkillType} \n Damage: ${effState.damage??0} \n Heal: ${effState.heal??0} \n HP: ${effState.HP??0} \n Duration: ${effState.duration??0} \n Cooldown: ${effState.Cooldown
+      const dmgPhrase = skills.find(det=> det.startsWith('Damage:'));
+      const healPhrase = skills.find(det=> det.startsWith('Heal:'));
+      const hpPhrase = skills.find(det=> det.startsWith('HP:'));
+      const durationPhrase = skills.find(det=> det.startsWith('Duration:'));
+      const cooldownPhrase = skills.find(det=> det.startsWith('Cooldown:'));
+
+      const dmg = dmgPhrase ? parseInt(dmgPhrase.split(':')[1].trim()) : 0;
+      const heal = healPhrase ? parseInt(healPhrase.split(':')[1].trim()) : 0;
+      const hp = hpPhrase ? parseInt(hpPhrase.split(':')[1].trim()) : 0;
+      const duration = durationPhrase ? parseInt(durationPhrase.split(':')[1].trim()) : 0;
+      const cooldown = cooldownPhrase ? parseInt(cooldownPhrase.split(':')[1].trim()) : 0;
+
+      console.log("[DEBUG] SKILL USE", {dmg, heal, hp, duration, cooldown});
+      console.log("[DEBUG] EQUIP SKILL", JSON.stringify(skills));
+
+      if (duration >0 || cooldown >0){
+        setSkillsUsed(prev=> [...prev, {Cooldown:cooldown, duration:duration, usedSkill:equip[2]}]);
+      }
+
+      if(dmg >0 ){
+        setEnemyHp(h=>{
+          return (
+            Math.max(0, h-(dmg ?? 0))
+          )
+        });
+        
+      }
+
+      if (heal >0){
+        setHp(h=> h+heal);
+      };
+
+      if(hp >0){
+        setHp(h=> h+hp);
+      };
+
 
   }
 
@@ -623,7 +792,55 @@ export default function Game() {
     return false;
   }
 
-  
+  //Winner Logic
+  useEffect(()=>{
+      socket.on('game-over', (data)=>{
+       
+        type LeaderboardData={
+          username:string,
+          Score:number;
+        }
+
+        console.log("DATA WINNER", data.winner);
+        if(data.winner === user){
+          setModalCont({title:"Congratulation! You Win", content:`Player ${data.winner} has won the game!\n Leaderboard: \n ${data.results3.map((item:LeaderboardData,idx:number)=>`${idx+1}. ${item.username} - ${item.Score} Pts`).join('\n')}`, buttonContent:[{buttonContent:"Back To Homepage",buttonType:'primary', onClick:()=>{window.location.href="/dashboard"}}]});
+        } else {
+          setModalCont({title:"Game Over!", content:`Player ${data.winner} has won the game!\n Leaderboard: \n
+           ${data.results3.map((item:LeaderboardData,idx:number)=>`${idx+1}. ${item.username} - ${item.Score} Pts`).join('\n')}`
+            , buttonContent:[{buttonContent:"Back To Homepage",buttonType:'primary', onClick:()=>{window.location.href="/dashboard"}}]});
+        }
+
+        handleErrorModal();
+      })
+      return ()=>{
+        socket.off('game-over');
+      }
+  },[]);
+
+const handleWinerLogic = async () => {
+  try {
+    const newScore = Score + 25; // Add 50 points for winning
+    await http.post('/map/progress-update', { 
+      mapId: mapid, 
+      userId: Number(userid), 
+      score: newScore, 
+      roomCode: roomCode 
+    });
+
+   
+    const res = await axios.post(`${URL}/game/complete-map`, {
+      mapId: mapid, 
+      userId: Number(userid), 
+      score: newScore, 
+      roomCode: roomCode, 
+      username: user
+    }, { withCredentials: true });
+
+    console.log(res.data);
+  } catch (err) {
+    console.error("[DEBUG] Error in handleWinerLogic", err);
+  }
+};
 
   
 
@@ -632,9 +849,22 @@ export default function Game() {
     if (quiz.kind === 'code') {
       // If output is match with the expected return result
       if (ok && output.trim().length > 0 && output===(quiz.expected)) {
-        alert(' Code challenge passed!');
+        notify('success',"Correct Answer !", "You answered correctly and dealt damage to the enemy.", 'top');
          setisSucced(0);
           setScore(prev => prev + 25);
+          if(currentTile?.type==="E" || currentTile?.type==="B"){
+             setEnemyHp(h=>{
+                const newHp= Math.max(0,h-Atk);
+                if(newHp===0){
+                  setisSucced(0);
+                  setQuiz({kind:'none'});
+                  handleWinerLogic();
+                }else{
+                  handleSwitchQuestion(1);
+                };
+                return newHp;
+             })
+          }
         // setQuiz({ kind: 'none' });
       } else {
           
@@ -647,8 +877,17 @@ export default function Game() {
               case 1:{
                
                 setModalCont({title:"Incorrect", content:" Code not correct yet",buttonContent:[{buttonContent:"Ok",buttonType:'primary',onClick:()=>{SetisError(false)}}] });
-                setHp(h => Math.max(0, h - 5));
-                setScore(prev => prev-15);
+                
+                     
+                if(currentTile?.type==="B")
+                  {
+                    const enemy =map?.enemies[currentTile?.enemyId!];
+                    setHp(h => Math.max(0, h - (enemy?.attack)!));
+                    setScore(prev => prev-15);
+                  } else{
+                      setHp(h => Math.max(0, h - 5));
+                      setScore(prev => prev-15);
+                  }
                 handleErrorModal();
                 break;
               }
@@ -731,7 +970,7 @@ export default function Game() {
             <div className="turn-actions">
               <button 
                 className="next-turn-btn"
-                onClick={nextTurn}
+                onClick={()=>{nextTurn(), SkillCoolDownEffect()}}
                 // disabled={isDisable()}
               >
                 End Turn
@@ -770,7 +1009,13 @@ export default function Game() {
               <p style={{marginTop:'0.5rem'}}>🎁 You found something from <b>{currentTile.lootTable}</b>!</p>
             )}
 
-            {currentTile.type === 'B' && <p style={{fontWeight:600,marginBottom:'0.5rem'}}>Final Boss awaits…</p>}
+            {currentTile.type === 'B' && currentTile.enemyId &&(
+                <div style={{marginTop:'0.5rem'}}>
+                  <p>Final Boss awaits…</p>
+                  <p>Enemy: <b>{map.enemies[currentTile.enemyId].name}</b></p>
+                  <p>HP: {enemyHp} | ATK: {map.enemies[currentTile.enemyId].attack}</p>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -843,9 +1088,18 @@ export default function Game() {
         <h4>Equipment</h4>
         <div className='equipmentWarpper'>
           <ul>
-            {equip.map((eq,idx)=><li key={idx}
-            onClick={()=>onClickEquip(eq)}
+            {equip.map((eq,idx)=><li key={idx} style={{position:'relative'}}
+            onClick={()=>onClickEquip(eq)} className={SkillsUsed.find(skill=> skill.Cooldown!==0 && skill.usedSkill===eq)? "cooldown-box":""}
             >
+              {SkillsUsed.find(skill=> skill.Cooldown!==0 && skill.usedSkill===eq) && (
+                <>
+                 <div className='cooldown-ani'>
+                  </div>
+                  <span className='cooldown-time'>{SkillsUsed.find(skill=> skill.Cooldown!==0 && skill.usedSkill===eq)?.Cooldown}</span>
+                </>
+               
+              )}
+
               {eq}
             </li>)}
           </ul>
@@ -900,11 +1154,18 @@ export default function Game() {
             open={eModalOpen}
             onCancel={handleModalCancel}
             onOk={()=> setEModalOpen(false)}
-            footer={
+            footer={[
               <Button type='primary' onClick={()=>setEModalOpen(false)}>
                 Close
-              </Button>
+              </Button>,
+      
+              EquipDet.find(det=> det.includes('Cooldown')) &&(
+                <Button type='dashed' onClick={()=> {setUsingSkills(EquipDet), setEModalOpen(false)}}>
+                  Use Skill
+                </Button>
+              )]
             }
+
             width={{
               xs: '90%',
               sm: '80%',
@@ -914,8 +1175,14 @@ export default function Game() {
               xxl: '40%',
             }}
           >
-              <p>Description: {EquipDet[0]}</p>
-              <p>Effect: {EquipDet[1]}</p>
+             
+              <ul>
+                 {EquipDet.map((det,idx)=>(
+                <li key={idx} style={{whiteSpace:'nowrap',padding:'0.5rem'}}>{det}</li>
+               ))
+              }
+              </ul>
+              
           </Modal>
           
             <ModalForm

@@ -45,8 +45,8 @@ router.post("/login", async (req, res)=>{
                 res.cookie("jwtAuthToken", token, {
                     httpOnly:true, 
                     maxAge: 36000000, 
-                    secure:true,
-                    sameSite:'none' //none for deploy~
+                    secure:false,
+                    sameSite:'lax' //none for deploy~
                 });
                 return res.status(200).json({success:true, message:"Successfully Login !"})
 
@@ -106,8 +106,8 @@ router.post('/register', async (req, res)=>{
 router.post("/logout", async (req,res)=>{
     res.clearCookie("jwtAuthToken",{
         httpOnly:true,
-        secure:true,
-        sameSite:'none'
+        secure:false,
+        sameSite:'lax'
     })
 
     return res.status(200).json({success:true, message:"Successfully Logged Out !"})

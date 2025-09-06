@@ -3,12 +3,14 @@
 const express = require('express');
 const gameRoutes = express.Router();
 const { roomState,shuffle } = require('../config/roomState');
+const db = require('../config/db');
+const { error } = require('console');
 
 
 gameRoutes.post('/turn', async (req,res)=>{
 
 
-    const {roomCode,user} =req.body;
+    const {roomCode} =req.body;
     if(!roomState[roomCode]){
         return res.status(404).json({error: "Room not found"});
     };
@@ -16,12 +18,10 @@ gameRoutes.post('/turn', async (req,res)=>{
     roomState[roomCode].turnOrder = shuffle([...roomState[roomCode].players]);
     roomState[roomCode].turn = 0;
     roomState[roomCode].penalty = 'None';
-    roomState[roomCode].playersName = user;
     roomState[roomCode].round = 1; // Track rounds for reshuffling
 
     req.io.to(roomCode).emit('turn-order',{
         players: roomState[roomCode].players,
-        playersName: roomState[roomCode].playersName,
         turnOrder: roomState[roomCode].turnOrder,
         currentTurn: roomState[roomCode].turn,
         currentPlayer: roomState[roomCode].turnOrder[0],
@@ -61,22 +61,65 @@ gameRoutes.post('/next-turn', async (req, res) => {
     // Broadcast the info 
     req.io.to(roomCode).emit('turn-order', {
         players: room.players,
-        playersName: room.playersName,
         turnOrder: room.turnOrder,
         currentTurn: room.turn,
         currentPlayer: currentPlayer,
-        round: room.round
+        round: room.round,
+        playersName: room.playersName
     });
     
     return res.status(200).json({
         message: "Turn advanced",
         currentTurn: room.turn,
         currentPlayer: currentPlayer,
-        playersName: room.playersName,
         round: room.round,
         reshuffled: room.round === 1 && room.turn === 0
     });
 });
+
+gameRoutes.post('/complete-map', async (req,res)=>{
+    //Winner Stats
+    const {mapId,userId,score,roomCode,username} = req.body;
+    
+    if(!mapId || !userId || !roomCode){
+        return res.status(400).json({error: "Missing parameters"});
+    }
+
+    db.query("Update room set Availability = 'Closed' where RoomId =?",[roomCode],async (error,results)=>{
+
+        if(error){
+            console.log(error);
+            return res.status(500).json({error: "Database error",sqlState: error.sqlState});
+        };
+
+
+
+        db.query("Update progress set Prog_status= 'victory', Score = ? where UserId =? ",[score,userId], async(error2,results2)=>{
+            if(error2){
+                console.log(error2);
+                return res.status(500).json({error: "Database error"});
+            };
+
+            db.query(`Select u.username, p.Score from progress p
+                Inner join roomparticipant rp on p.UserId = rp.UserId
+                AND p.RoomId = rp.RoomId
+                Inner Join userdata u on rp.UserId = u.UserId
+                Inner Join room r on rp.RoomId = r.RoomId
+                where r.RoomId =? order by p.Score desc`,[roomCode], async(error,results3)=>{
+                    if(error){
+                        console.log(error);
+                        return res.status(500).json({error: "Database error"});
+                    };
+                    console.log("RESULTS3", JSON.stringify(results3));
+                    req.io.to(roomCode).emit('game-over',{results3, winner: username})
+                    return res.status(200).json({message: "Map completed", results: results3});
+                }
+                )
+
+        })
+    })
+
+})
 
 
 module.exports = gameRoutes;

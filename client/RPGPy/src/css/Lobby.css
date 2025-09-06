@@ -247,6 +247,16 @@
     padding: 1.25rem;
     border-radius: 4px;
 }
+.WarningDetails{
+    
+    text-align: center;
+    border: #ffe58f solid 0.9px;
+    background-color: #fffbe6;
+    color: #1a1a1a;
+    align-self: center;
+    padding: 1.25rem;
+    border-radius: 4px;
+}
 
 .RoleBadge {
     border-radius: 6px;
