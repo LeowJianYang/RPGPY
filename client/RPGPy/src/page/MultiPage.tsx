@@ -10,6 +10,7 @@ import {useMapDetailsStore} from '../../components/MapDetailsStore';
 import { socket } from '../socket';
 import { ScanOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
+import { useSessionStore } from "../../components/IDStore";
 
 
 
@@ -28,6 +29,7 @@ export default function MultiPage() {
   const [openScanToJoin, setOpenScanToJoin] = useState(false);
   const URL= import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
+  const {setSsid} = useSessionStore();
 
 
   const handleCreateRoom = async () =>{
@@ -73,8 +75,9 @@ export default function MultiPage() {
 
     await axios.post(`${URL}/room/createRoom`, {roomCode: roomCode, Owner:user, MapDetails:MapDetails[0].MapId}, {withCredentials:true}).then((res)=>{
 
-      const {encryptUsername,userId}= res.data;
-       setModalProp({title:"Room Created", content:`Room created successfully! Share the room code: ${roomCode} with your friends to join.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false),window.location.href = `/Lobby?roomCode=${roomCode}&Owner=${encryptUsername}&Map=${MapDetails[0].MapId}&userId=${userId}`}}]})
+      const {encryptUsername,userId,ssid}= res.data;
+      setSsid(ssid); 
+      setModalProp({title:"Room Created", content:`Room created successfully! Share the room code: ${roomCode} with your friends to join.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false),navigate(`/Lobby?roomCode=${roomCode}&Owner=${encryptUsername}&Map=${MapDetails[0].MapId}&userId=${userId}`)}}]})
        setLoading(false);
        setOpenForm(true);
        socket.connect();
@@ -98,7 +101,8 @@ export default function MultiPage() {
   const handleJoinRoom = async () =>{
     axios.post(`${URL}/room/joinRoom`, {username:user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
       const {userId} = res.data;
-      setModalProp({title:"Joined Room", content:`Successfully joined room: ${roomCode}.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false), window.location.href = `/Lobby?roomCode=${roomCode}&participant=${res.data.encryptUsername}&userId=${userId}`}}]})
+      setSsid(res.data.ssid);
+      setModalProp({title:"Joined Room", content:`Successfully joined room: ${roomCode}.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false), navigate(`/Lobby?roomCode=${roomCode}&participant=${res.data.encryptUsername}&userId=${userId}`)}}]})
       setLoading(false);
       setOpenForm(true);
       socket.connect();

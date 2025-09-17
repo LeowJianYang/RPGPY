@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import type { MapJSON, TileType, LootTypes, SkillsType } from '../GameTypes'
 import PythonRunner from '../PythonRunner';
 import axios from 'axios';
@@ -11,8 +11,10 @@ import type { ModalPropsType } from '../components/ButtonCompo';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { socket } from '../socket';
 import { useToast } from '../components/Toast';
-
-
+import {BgmManager} from '../components/BgmManager';
+import { MutedOutlined, SoundOutlined } from '@ant-design/icons';
+import HealthBar from '../components/HeathBar';
+import {useSessionStore} from '../../components/IDStore';
 
 
 type QuizState =
@@ -21,6 +23,7 @@ type QuizState =
   | { kind: 'code'; prompt: string; starter: string; expected:string };
 
 export default function Game() {
+   const bgm = useMemo(() => new BgmManager(), []);
   const [map, setMap] = useState<MapJSON | null>(null);
   const [position, setPosition] = useState<string|number>(1);
   const [hp, setHp] = useState<number>(0);
@@ -47,11 +50,53 @@ export default function Game() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [roles, setRoles]= useState<{roleName:string,description:string, ATK:number, HP:number, Skills:string[]}[]>([]);
+  const [Muted, setMuted] = useState(bgm.isBgmMuted());
   const [SkillsUsed, setSkillsUsed] = useState<{Cooldown:number, duration?:number, usedSkill:string}[]>([]);
   const {notify} = useToast();
   const roomCode = searchParams.get("roomCode") ?? "NONE_AVAILABLE";
   const mapid= searchParams.get("mapid") ?? "NONE_AVAILABLE";
   const userid= searchParams.get("userid") ?? "NONE_AVAILABLE";
+  const EnteringBranch = useRef(false);
+  const branchCodeRef = useRef<string>("");
+  const {ssid} = useSessionStore();
+ 
+  useEffect(()=>{
+
+    const checkSession = async ()=>{
+      await axios.get(`${URL}/auth/checkSession`, {params:{ssid,userid,roomId:roomCode},withCredentials:true}).then((res)=>{
+        if(res.data.success){
+          console.log("Session valid");
+        }
+      }).catch((err)=>{
+        console.error("Error checking session: ", err);
+        navigate('/v0/auth/join?roomCode=N/A', {replace:true});
+        console.log("SSID-CATCH", ssid)
+      });
+    };
+
+    if(ssid){
+      checkSession();
+    }else{
+      navigate('/v0/auth/join?roomCode=N/A', {replace:true});
+      console.log("SSID", ssid)
+    }
+
+  },[])
+
+
+
+  useEffect(()=>{
+    window.history.pushState(null, "", window.location.href);
+    const handlePopState = ()=>{
+       window.history.pushState(null, "", window.location.href);
+    };
+
+
+    window.addEventListener("popstate", handlePopState);
+    return ()=>{
+      window.removeEventListener("popstate", handlePopState);
+    };
+  },[]);
 
   console.log("[DEBUG] URL Parameters:", {roomCode, mapid, userid});
 
@@ -88,7 +133,7 @@ export default function Game() {
         setMap(res.data);
         }).catch(console.error);
     
-    
+    bgm.play('/Music/Main-flow.ogg', true);
   
  
   }, []);
@@ -127,11 +172,16 @@ export default function Game() {
       socket.off('room-joined');
       socket.off('turn-order');
       socket.disconnect();
+      
     }
   },[socket])
 
-  
-
+  // Cleanup BGM when component unmounts
+  useEffect(() => {
+    return () => {
+      bgm.stop();
+    };
+  }, [bgm]);
 
   useEffect(()=>{
 
@@ -281,6 +331,7 @@ export default function Game() {
       return;
     };
 
+   
   SkillCoolDownEffect();
     switch (currentTile.type as TileType) {
       case 'Q': {
@@ -302,6 +353,9 @@ export default function Game() {
         break;
       }
       case 'E': {
+        bgm.stop();
+        const idMusic = Math.floor(Math.random() * 2)+1;
+        bgm.play(`/Music/Battle${String(idMusic).padStart(3, '0')}.ogg`, true);
         const enemy = map.enemies[currentTile.enemyId!];
         // Enemy 
         const pool= map.quizPools[currentTile.quizPool||""]|| [];
@@ -313,6 +367,8 @@ export default function Game() {
         break;
       }
       case 'C': {
+        bgm.stop();
+        bgm.play('/Music/Chest001.ogg', true);
         const table = map.lootTables[currentTile.lootTable!];
         const drop = table[Math.floor(Math.random() * table.length)];
         setInventory(items => [...items, drop]);
@@ -320,7 +376,8 @@ export default function Game() {
         break;
       }
       case 'B': {
-      
+        bgm.stop();
+        bgm.play('/Music/Battle001.ogg', true);
         const pool= map.quizPools[currentTile.quizPool||'' ] || [];
         const enemy= map.enemies[currentTile.enemyId!];
         const pick = pool[Math.floor(Math.random() * pool.length)];
@@ -349,15 +406,20 @@ export default function Game() {
         
         const pool = map.quizPools[currentTile.quizPool || ""]|| [];
         const pick = pool[Math.floor(Math.random()*pool.length)]
-        if(currentTile.quizPool!=="python_code_questions"){
-             setQuiz({
-          kind: 'mcq',
-          q: pick.q,
-          a: pick.a,
-          correct: pick.correct as number
+        if(currentTile.quizPool!=="python_code_questions" && currentTile.quizPool){
+          const idMusic = Math.floor(Math.random() * 2)+1;
+          bgm.play(`/Music/Battle${String(idMusic).padStart(3, '0')}.ogg`, true);
+             
+          setQuiz({
+            kind: 'mcq',
+            q: pick.q,
+            a: pick.a,
+            correct: pick.correct as number
           });
-        }
-        else{
+        } 
+        
+        else if (currentTile.quizPool==="python_code_questions" && currentTile.quizPool){
+             bgm.play('/Music/Main-flow.ogg', true);
           setQuiz({
             kind:"code",
             prompt: `Write Python to print the correct answer for:\n${pick.q}\n(Just print the final answer)`,
@@ -365,6 +427,12 @@ export default function Game() {
             expected: pick.expectedResult?? ""
           })
           setCodeInput(`# write your Python code here\n`);
+        
+        }
+
+        else{
+           bgm.play('/Music/Main-flow.ogg', true);
+          setQuiz({kind:'none'})
         }
         break;
        }
@@ -379,7 +447,7 @@ export default function Game() {
   const rollPosition = async () =>{
     if (!map) return;
 
-    const {prefix} = keySplit(dice?.toString() ?? "");
+    const {prefix,suffix} = keySplit(dice?.toString() ?? "");
 
 
     // const nextStep=map.tiles[`${prefix === null ? "":prefix}${suffix??+1}`]; 
@@ -409,8 +477,13 @@ export default function Game() {
         
 
         const next= `${letter}${Math.min((num ?? 0), 40)}` 
-                   
-        if(!map.tiles[next]?.type){
+        console.log("[DEBUG] SPECIAL IN ROLL POSITION", branchCodeRef.current);
+
+        // if (letter !== branchCodeRef.current){
+        //   throw new Error ("Branch Code Not Match")
+        // }
+
+        if(!map.tiles[next]?.type || letter !== branchCodeRef.current){
           throw new Error ("Invalid Tiles")
           
         } else{
@@ -428,11 +501,26 @@ export default function Game() {
         
       if (currentTile?.branchExpected && prefix !== null && !currentTile.branchQuit) {
       // Entering Branch
+      const expected = currentTile?.branchExpected;
+      const target = `${prefix}${suffix ?? ""}`;
+      console.log("[DEBUG] EXPECTED:", expected, "TARGET:", target);
+
+      if (expected !== target) {
+        throw new Error("Invalid Branch Code");
+      }
+      
+      if(!EnteringBranch.current){
+        EnteringBranch.current=true;
+        branchCodeRef.current= prefix ?? "";
+        console.log("[DEBUG] BRANCH SET", prefix);
+      }
+
       safeCall(()=>specialTileLogic());
       console.log("[DEBUG] First T");
-
       
-      } else if (!currentTile?.branchExpected && prefix !== null && !currentTile?.branchQuit && currentTile?.type === "R") {
+
+
+      } else if (!currentTile?.branchExpected && prefix !== null && !currentTile?.branchQuit && currentTile?.isBranch===true && EnteringBranch.current) {
         // Exit Tile
 
         safeCall(()=>specialTileLogic());
@@ -441,6 +529,8 @@ export default function Game() {
 
       } else if (currentTile?.type!=="R" || Number(dice)>=Number(currentTile.branchQuit)) {
         // Normal Tile
+        EnteringBranch.current=false;
+        branchCodeRef.current="";
         safeCall(()=>NormTileLogic());
         console.log("[DEBUG] Third T");
       } else{
@@ -448,15 +538,14 @@ export default function Game() {
         console.log("ERR"+ currentTile.branchQuit);
         setModalCont({title:"Opps!", content:"Invalid Number/Steps Entered",buttonContent:[
           
-          {buttonContent:"OK", buttonType:"primary", onClick:()=>{SetisError(false)}},
-          {buttonContent:"SecButton", buttonType:"secondary", onClick:()=>{console.warn("Enter Sec")}}
+          {buttonContent:"OK", buttonType:"primary", onClick:()=>{SetisError(false)}}
         
         ]});
         handleErrorModal();
       }
     } catch (err:any){
         
-      setModalCont({title:"Opps!", content:err,buttonContent:[
+      setModalCont({title:"Opps!", content:err instanceof Error ? err.message: String(err) ,buttonContent:[
           {buttonContent:"OK", buttonType:"primary", onClick:()=>{SetisError(false)}},
         ]});
         handleErrorModal();
@@ -513,13 +602,16 @@ export default function Game() {
     const correct = idx === quiz.correct;
     if (correct) {
       notify('success',"Correct Answer !", "You answered correctly and dealt damage to the enemy.", 'top');
+
       setScore(prev => prev + 20);
       if(currentTile?.type==="E")
       {
         setEnemyHp(h=>{
           const newHp= Math.max(0,h-Atk);
           if (newHp===0){
-            setisSucced(0);
+            setisSucced(0);      
+            bgm.stop();
+            bgm.play('/Music/Main-flow.ogg', true);
             setQuiz({ kind: 'none' });
           } else{
             handleSwitchQuestion(0);
@@ -529,6 +621,7 @@ export default function Game() {
       } 
       else{
         setisSucced(0);
+
       }
     } else {
       switch (isSucced ===0 ? 0:1){
@@ -638,7 +731,10 @@ export default function Game() {
   }
 
   const handleHpZero =  ()=>{
+    bgm.stop();
+    bgm.play('/Music/Lose_sound.wav', false);
     setModalCont({title:"Opps! You Lose", content:"You HP is ZERO !!", buttonContent:[{buttonContent:"Back To Homepage",buttonType:'danger', onClick:()=>{window.location.href="/dashboard"}}]});
+
     handleErrorModal();
   }
 
@@ -774,14 +870,17 @@ export default function Game() {
 
     if (currentTile?.type === "R"){
 
-      const branchNum = Number(currentTile?.branchQuit ?? 0); // 10
+      const branchNum = Number(currentTile?.branchQuit ?? 0); // 40
       const {suffix} = keySplit(dice.toString());
       const {suffix:currSuf} = keySplit(position.toString());
       console.log("CurrS:", currSuf);
       console.log("Suff:",suffix);
       
+      // 检查移动距离是否超出范围
       if ((suffix ?? 0) > ((currSuf ?? 0)+6) ) return true //R10-cursf x R17-suff
-      if (dice ?? 0 >= branchNum  ) return false
+      
+      // 修复：使用 suffix（数字部分）而不是整个 dice 来比较
+      if ((suffix ?? 0) >= branchNum) return false
       
       
       return true;
@@ -801,6 +900,8 @@ export default function Game() {
           Score:number;
         }
 
+        bgm.stop();
+        bgm.play('/Music/goal_sound.wav', false);
         console.log("DATA WINNER", data.winner);
         if(data.winner === user){
           setModalCont({title:"Congratulation! You Win", content:`Player ${data.winner} has won the game!\n Leaderboard: \n ${data.results3.map((item:LeaderboardData,idx:number)=>`${idx+1}. ${item.username} - ${item.Score} Pts`).join('\n')}`, buttonContent:[{buttonContent:"Back To Homepage",buttonType:'primary', onClick:()=>{window.location.href="/dashboard"}}]});
@@ -842,6 +943,17 @@ const handleWinerLogic = async () => {
   }
 };
 
+const handleBgmMute = () =>{
+     const IsMuted = bgm.toggleMute();
+     setMuted(IsMuted);
+
+     if(!IsMuted){
+        bgm.play('/Music/Main-flow.ogg', true);
+     } else{
+        bgm.stop();
+     }
+}
+
   
 
   const onSkFinish = (ok: boolean, output: string, error?: string) => {
@@ -855,10 +967,13 @@ const handleWinerLogic = async () => {
           if(currentTile?.type==="E" || currentTile?.type==="B"){
              setEnemyHp(h=>{
                 const newHp= Math.max(0,h-Atk);
+                
                 if(newHp===0){
                   setisSucced(0);
+                  bgm.stop();
+                  bgm.play('/Music/Main-flow.ogg', true);
                   setQuiz({kind:'none'});
-                  handleWinerLogic();
+                  currentTile?.type === "B" && handleWinerLogic();
                 }else{
                   handleSwitchQuestion(1);
                 };
@@ -926,8 +1041,10 @@ const handleWinerLogic = async () => {
         className='positionInput'
         
         ></input>
-        
 
+        <SelfButton onClick={()=> {handleBgmMute()}}>
+          {Muted ? <MutedOutlined /> : <SoundOutlined/>}
+        </SelfButton>
 
         {/* Turn-based Game Timeline */}
         <div className="timeline-container">
@@ -970,7 +1087,7 @@ const handleWinerLogic = async () => {
             <div className="turn-actions">
               <button 
                 className="next-turn-btn"
-                onClick={()=>{nextTurn(), SkillCoolDownEffect()}}
+                onClick={()=>{nextTurn(), SkillCoolDownEffect(),setisSucced(1);setCodeInput("#Start Here ! The Last Input No need backslash !")}}
                 // disabled={isDisable()}
               >
                 End Turn
@@ -998,9 +1115,16 @@ const handleWinerLogic = async () => {
             {currentTile.description && <p>{currentTile.description}</p>}
 
             {currentTile.type === 'E' && currentTile.enemyId && (
-              <div style={{marginTop:'0.5rem'}}>
-                <p>Enemy: <b>{map.enemies[currentTile.enemyId].name}</b></p>
-                <p>HP: {enemyHp} | ATK: {map.enemies[currentTile.enemyId].attack}</p>
+        <div style={{marginTop:'0.5rem'}} className='enemy-container-box'>
+                <img src={`/Enemy/${map.enemies[currentTile.enemyId].styleImg}`} alt={map.enemies[currentTile.enemyId].name} 
+                  style={{width:'100px', height:'100px',userSelect:'none',outline:'none'}} 
+                  draggable={false}
+                />
+                <div className='enemy-detail-box'>
+                    <HealthBar current={enemyHp} maxHealth={map.enemies[currentTile.enemyId].hp}/> 
+                    <p style={{textAlign:'center', alignItems:'center'}}>Enemy: <b>{map.enemies[currentTile.enemyId].name}</b></p>  
+                    <p style={{display:'flex', flexDirection:'row', justifyContent:'center',alignContent:'center', textAlign:'center'}}> <img src='/Icon/Atk_Icon.png' style={{userSelect:"none", outline:"none"}} draggable={false}></img> ATK: {map.enemies[currentTile.enemyId].attack}</p>
+                </div>
                
               </div>
             )}
@@ -1010,10 +1134,17 @@ const handleWinerLogic = async () => {
             )}
 
             {currentTile.type === 'B' && currentTile.enemyId &&(
-                <div style={{marginTop:'0.5rem'}}>
-                  <p>Final Boss awaits…</p>
-                  <p>Enemy: <b>{map.enemies[currentTile.enemyId].name}</b></p>
-                  <p>HP: {enemyHp} | ATK: {map.enemies[currentTile.enemyId].attack}</p>
+          <div style={{marginTop:'0.5rem'}} className='enemy-container-box'>
+                <img src={`/Enemy/${map.enemies[currentTile.enemyId].styleImg}`} alt={map.enemies[currentTile.enemyId].name} 
+                  style={{width:'100px', height:'100px',userSelect:'none',outline:'none'}} 
+                  draggable={false}
+                />
+                <div className='enemy-detail-box'>
+                    <HealthBar current={enemyHp} maxHealth={map.enemies[currentTile.enemyId].hp}/> 
+                    <p style={{textAlign:'center', alignItems:'center'}}>Enemy: <b>{map.enemies[currentTile.enemyId].name}</b></p>  
+                    <p style={{display:'flex', flexDirection:'row', justifyContent:'center',alignContent:'center', textAlign:'center'}}> <img src='/Icon/Atk_Icon.png' style={{userSelect:"none", outline:"none"}} draggable={false}></img> ATK: {map.enemies[currentTile.enemyId].attack}</p>
+                </div>
+               
               </div>
             )}
           </>

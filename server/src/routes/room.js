@@ -3,6 +3,7 @@ const db = require('../config/db');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const e = require('express');
+const {v4} = require('uuid');
 
 const roomRoutes = express.Router();
 
@@ -24,12 +25,13 @@ function InsertRoom(roomCode, userId,role,MapId) {
             return reject({ success: false, message: "Database error while creating room.", roomCoded: error2.sqlState });
         }
         
-        db.query("INSERT INTO roomparticipant (UserId,RoomId, Roles) VALUE (?,?, ?)", [userId,roomCode,role], (error, res) => {
+        const ssid= v4();
+        db.query("INSERT INTO roomparticipant (UserId,RoomId, Roles,ssid) VALUE (?,?, ?,?)", [userId,roomCode,role,ssid], (error, res) => {
             if (error) {
                 return reject({ success: false, message: "Database error while adding participant.", roomCoded: error.sqlState });
             }
 
-            return resolve({ success: true, message: "Room created successfully.", roomCoded: roomCode });
+            return resolve({ success: true, message: "Room created successfully.", roomCoded: roomCode, ssid:ssid });
         });
                 
     });
@@ -62,9 +64,9 @@ roomRoutes.post("/createRoom", async (req,res)=>{
         const userId = result[0].UserId;
         
         try{
-             const {success, message, roomCoded} = await InsertRoom(roomCode, userId,'Owner',MapDetails);
+             const {success, message, roomCoded, ssid} = await InsertRoom(roomCode, userId,'Owner',MapDetails);
             if(success){
-            return res.status(200).json({success:success, message:message, roomCode:roomCoded, encryptUsername: encryptUsername, userId:userId});
+            return res.status(200).json({success:success, message:message, roomCode:roomCoded, encryptUsername: encryptUsername, userId:userId, ssid:ssid});
                 } 
         } catch (err){
             return res.status(500).json(err, {success:false, message:"Error creating room.", roomCoded: err.roomCoded});
@@ -105,8 +107,10 @@ roomRoutes.post("/joinRoom", async (req,res)=>{
             if(result2.length===0){
                 return res.status(404).json({success:false, message:"Room not found or is closed."});
             }
-            
-             db.query("INSERT INTO roomparticipant (UserId,RoomId, Roles) VALUE (?,?, ?)", [userId,roomCode,'Player'], (error, result3) => {
+                
+             const ssid= v4();
+
+             db.query("INSERT INTO roomparticipant (UserId,RoomId, Roles,ssid) VALUE (?,?, ?,?)", [userId,roomCode,'Player',ssid], (error, result3) => {
                 if (error || result3.affectedRows === 0) 
                 {
                     return res.status(500).json({ success: false, message: "Database error while adding participant.", roomCoded: error.sqlState });
@@ -115,7 +119,7 @@ roomRoutes.post("/joinRoom", async (req,res)=>{
                 
 
 
-                return res.status(200).json({ success: true, message: "Joined room successfully.", roomCoded: roomCode, encryptUsername: encryptUsername,userId:userId});
+                return res.status(200).json({ success: true, message: "Joined room successfully.", roomCoded: roomCode, encryptUsername: encryptUsername,userId:userId, ssid:ssid});
             });
             
             

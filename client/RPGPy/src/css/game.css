@@ -340,6 +340,29 @@
     pointer-events: none;
 }
 
+.enemy-container-box{
+    display: flex;
+    flex-direction: column;
+    gap:1rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.enemy-detail-box{
+    display: flex;
+    flex-direction: column;
+    gap: 0.825rem;
+    border: #4338ca 0.8px solid;
+    margin: 1.25rem;
+    padding: 1.25rem;
+}
+
+.enemy-stat-box{
+    display: flex;
+    flex-direction: column;
+    gap:1rem;
+
+}
 
 .cooldown-time{
   position: absolute;

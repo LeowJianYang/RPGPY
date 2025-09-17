@@ -2,8 +2,10 @@ import { SelfButton } from '../components/ErrorModal';
 import NavBar, { FooterBar } from '../components/navigation';
 import './../css/Documentation.css';
 import {useToast} from '../components/Toast';
+import tutorial from '../assets/Tutorial.md?raw';
 
 import axios from 'axios';
+import MarkdownReader from '../components/MarkdownReader';
 
 const Documentation = () => {
   const {notify} = useToast();
@@ -39,14 +41,17 @@ const Documentation = () => {
         <section id="tutorial" className="doc-section">
           <h2>Tutorial</h2>
           <div className="doc-card">
-            <h3>Getting Started</h3>
-            <p>This section is under construction. Tutorials on how to set up and play the game will be available here soon.</p>
-            <SelfButton
-              type='primary'
-              onClick={() => {
-                handleDownloadMap();
-              }}
-            >Map</SelfButton>
+            <MarkdownReader content={tutorial}/>
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              <SelfButton
+                type='primary'
+                onClick={() => {
+                  handleDownloadMap();
+                }}
+              >
+                Download Physical Map
+              </SelfButton>
+            </div>
             {/* Placeholder for future content */}
           </div>
         </section>

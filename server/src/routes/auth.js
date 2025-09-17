@@ -69,7 +69,26 @@ router.post("/login", async (req, res)=>{
     
 
     
-})
+});
+
+router.get('/checkSession', async (req,res)=>{
+    const {ssid,userid,roomId} = req.query;
+    console.log("[DEBUG]",ssid,"\n",userid,"\n",roomId);
+
+
+    db.query("Select * from roomparticipant where userId = ? AND ssid = ? AND roomId=?", [userid, ssid, roomId], async (err,result)=>{
+        if(err){
+            console.error("Database error:", err);
+            return res.status(500).json({ success: false, message: "Internal Server Error", sqlState: err.sqlState });
+        }
+
+        if(!result || result.length===0){
+            return res.status(401).json({ success: false, message: "Invalid session"});
+        }
+
+        return res.status(200).json({ success: true, message: "Session valid" });
+    })
+});
 
 
 

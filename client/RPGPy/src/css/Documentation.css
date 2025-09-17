@@ -119,6 +119,140 @@
   margin-bottom: 10px;
 }
 
+/* ReactMarkdown Styling */
+.doc-card h1,
+.doc-card h2,
+.doc-card h3,
+.doc-card h4,
+.doc-card h5,
+.doc-card h6 {
+  color: var(--doc-accent-color);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.doc-card h1 {
+  font-size: 2.5rem;
+  border-bottom: 3px solid var(--doc-accent-color);
+  padding-bottom: 0.5rem;
+}
+
+.doc-card h2 {
+  font-size: 2rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.3rem;
+}
+
+.doc-card h3 {
+  font-size: 1.5rem;
+  color: #555;
+}
+
+.doc-card p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+
+.doc-card ul,
+.doc-card ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.doc-card li {
+  margin-bottom: 0.5rem;
+}
+
+.doc-card table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+.doc-card th,
+.doc-card td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.doc-card th {
+  background-color: var(--doc-accent-color);
+  color: white;
+  font-weight: 600;
+}
+
+.doc-card tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.doc-card code {
+  background-color: #f4f4f4;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  color: #d63384;
+}
+
+.doc-card pre {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.doc-card blockquote {
+  border-left: 4px solid var(--doc-accent-color);
+  margin: 1.5rem 0;
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  font-style: italic;
+}
+
+.doc-card hr {
+  border: none;
+  border-top: 2px solid #eee;
+  margin: 2rem 0;
+}
+
+.doc-card strong {
+  font-weight: 600;
+  color: var(--doc-accent-color);
+}
+
+.doc-card em {
+  font-style: italic;
+  color: #666;
+}
+
+/* Dark theme adjustments */
+[data-theme='dark'] .doc-card table th {
+  background-color: #1890ff;
+}
+
+[data-theme='dark'] .doc-card tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
+
+[data-theme='dark'] .doc-card code {
+  background-color: #2a2a2a;
+  color: #ff6b6b;
+}
+
+[data-theme='dark'] .doc-card pre {
+  background-color: #1a1a1a;
+  border-color: #444;
+}
+
+[data-theme='dark'] .doc-card blockquote {
+  background-color: #2a2a2a;
+}
+
 /* Mobile First - Responsive Design */
 @media (max-width: 768px) {
   .doc-header h1 {
@@ -131,6 +265,15 @@
 
   .doc-card h3 {
     font-size: 1.25rem;
+  }
+
+  .doc-card table {
+    font-size: 0.8rem;
+  }
+
+  .doc-card th,
+  .doc-card td {
+    padding: 8px;
   }
 
 

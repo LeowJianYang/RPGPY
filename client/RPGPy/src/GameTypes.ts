@@ -23,6 +23,7 @@ export interface Enemy {
   name: string;
   hp: number;
   attack: number;
+  styleImg?:string;
 }
 
 export type LootTypes = BaseLoot | SkillsType;
@@ -31,7 +32,7 @@ export interface MapJSON {
   mapId: string;
   name: string;
   legend: Record<string, string>;
-  tiles: Record<string, { type: TileType; description?: string; quizPool?: string; enemyId?: string; lootTable?: string; branchExpected?: string; branchQuit?: number; }>;
+  tiles: Record<string, { type: TileType; description?: string; quizPool?: string; enemyId?: string; lootTable?: string; branchExpected?: string; branchQuit?: number;isBranch?:boolean }>;
   quizPools: Record<string, { q: string; a: string[]; correct?: number; expectedResult?: string;}[]>;
   lootTables: Record<string, string[]>;
   lootEffects: Record<string, LootTypes>;
