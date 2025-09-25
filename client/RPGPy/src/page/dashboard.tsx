@@ -9,6 +9,7 @@ import MultiPage from "./MultiPage";
 import ProfilePage from "./ProfilePage";
 import "../css/LoginDe.css";
 import { useNavigate } from "react-router-dom"
+import { useSearchParams } from "react-router-dom";
 
 
 
@@ -17,9 +18,11 @@ export default function DashboardPage(){
 
     const {setUser} = useUserStore();
     const [collapsed] = useState(false);
-    const [selectedKey, setSelectedKey] = useState<string[]>(['1']);
+    // const [selectedKey, setSelectedKey] = useState<string[]>(['1']);
     const [page, setPage]= useState<React.ReactNode>(<DashPage/>);
     const navigate = useNavigate();
+    const [searchParams,setSearchParams] = useSearchParams();
+    const selector = searchParams.get("selector") || "1";
 
     const {confirm} =Modal;
     const URL= import.meta.env.VITE_API_URL;
@@ -34,8 +37,12 @@ export default function DashboardPage(){
     useEffect(()=>{
 
         axios.get(`${URL}/authCookie`, {withCredentials:true}).then((res)=>{
-            setUser(res.data.Username);
-            console.log(res.data.user);
+            setUser({
+                email: res.data.Email,
+                user: res.data.Username,
+                uid: res.data.UID
+            });
+            console.log(res.data);
         })
         .catch((err)=>{
             console.log(err);
@@ -50,7 +57,7 @@ export default function DashboardPage(){
     useEffect(()=>{
 
 
-        switch(selectedKey[0]){
+        switch(selector){
             case "1":
                 setPage(<DashPage/>);
                 break;
@@ -74,7 +81,7 @@ export default function DashboardPage(){
         }
 
 
-    },[selectedKey])
+    },[selector])
 
 
    const handleLogoutConfirm = async() =>{
@@ -154,7 +161,7 @@ export default function DashboardPage(){
 
 
     const handleOnClick= (e:any)=>{
-        setSelectedKey([e.key]);
+        setSearchParams({selector: e.key});
         console.log(e.key);
     }
 
@@ -177,7 +184,7 @@ export default function DashboardPage(){
                         items={items}
                         theme="dark"
                         inlineCollapsed={collapsed}
-                        selectedKeys={selectedKey}
+                        selectedKeys={[selector]}
                         onClick={handleOnClick}
                         className="menu"
                         style={{borderRadius:"10px", color:darkDangerItemColor, backgroundColor:darkDangerItemActiveBg,marginTop:'1.2rem',}}

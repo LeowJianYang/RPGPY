@@ -521,6 +521,23 @@
   gap: var(--space-sm);
 }
 
+.clear-filter-anchor{
+  display: inline-flex;
+  font-size: clamp(0.6rem, 4vh, 0.875rem);
+  border-radius: 8px;
+  width: 4rem;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  border: red solid 1px;
+  color: #ff0000;
+  cursor: pointer;
+}
+
+.clear-filter-anchor:hover{
+  opacity: 0.5;
+}
+
 .leaderboard-item {
   display: flex;
   align-items: center;
@@ -608,6 +625,19 @@
 
 .current-user .user-score {
   color: rgba(255, 255, 255, 0.9);
+}
+
+.leaderboard-legend-section{
+  padding: 0.5rem;
+  margin:0.3rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.leaderboard-legend-section p{
+  color: #6b7280;
+  font-size: clamp(0.5rem, 4vh, 0.8rem);
+  text-align: center;
 }
 
 /* Announcements */

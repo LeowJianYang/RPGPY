@@ -27,7 +27,11 @@ export default function LoginPage() {
 
     useEffect(() => {
         axios.get(`${URL}/authCookie`, { withCredentials: true }).then((res) => {
-            setUser(res.data.Username);
+            setUser({
+                user: res.data.Username,
+                email: res.data.Email,
+                uid: res.data.UID
+            });
             setIsLogin(true);
             window.location.href = "/dashboard";
         }).catch((err) => {

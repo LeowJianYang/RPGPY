@@ -54,7 +54,7 @@ export default function Lobby(){
             // Now join room with user info
             const joinRoom = () => {
                 console.log('Joining room with user:', user, 'roomCode:', roomCode);
-                socket.emit('join-room', {roomCode, user: user});
+                socket.emit('join-room', {roomCode, user: user?.user});
             };
             
             // Wait for socket to connect before joining room

@@ -5,6 +5,7 @@ import { useState } from "react";
 import "../css/Login.css";
 import { LockOutlined, UserOutlined, MailOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from 'antd';
+import { useToast } from "../components/Toast";
 
 interface RegisterPageProps {
     onToggleForm: (e: React.MouseEvent) => void;
@@ -13,6 +14,7 @@ interface RegisterPageProps {
 export default function RegisterPage({ onToggleForm }: RegisterPageProps) {
     const [create] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const {notify} = useToast();
     const URL = import.meta.env.VITE_API_URL;
 
     const handleCreateAccount = async (values: any) => {
@@ -26,18 +28,19 @@ export default function RegisterPage({ onToggleForm }: RegisterPageProps) {
             });
 
             if (res.data.success) {
-                alert(`Account created successfully! Please log in.`);
+                notify('success','Account Created',"Account created successfully! Please log in.", "topRight");
                 // switch back to the login form
                 onToggleForm(new MouseEvent('click') as any); 
             } else {
-                alert("Something went wrong: " + res.data.message);
+                notify('error','Registration Failed', "Something went wrong: " + res.data.message, "topRight");
             }
         } catch (err: any) {
             console.error("Registration failed:", err);
             if (axios.isAxiosError(err) && err.response) {
-                alert("Registration failed: " + err.response.data.message);
+                notify('error','Registration Failed', "Registration failed: " + err.response.data.message, "topRight");
+            
             } else {
-                alert("An unexpected error occurred during registration.");
+                notify('error','Registration Failed', "An unexpected error occurred during registration.", "topRight");
             }
         } finally {
             setLoading(false);

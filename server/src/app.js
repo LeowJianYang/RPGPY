@@ -154,7 +154,7 @@ io.on('connection', (socket)=>{
 
 
 app.get("/authCookie", authMiddleWare, (req, res)=>{
-    res.json({user: req.user.Email, Username: req.user.Username});
+    res.json({email: req.user.Email, Username: req.user.Username, uid: req.user.UID});
 })
 
 

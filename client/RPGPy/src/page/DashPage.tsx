@@ -3,6 +3,10 @@
 import { useUserStore } from "../../components/UserStore"
 import type React from "react"
 import { useEffect, useState } from "react"
+import { Dropdown } from "antd"
+import type { MenuProps } from "antd"
+
+import axios from "axios"
 import {
   TrophyOutlined,
   BookOutlined,
@@ -10,8 +14,10 @@ import {
   RocketOutlined,
   StarOutlined,
   CheckCircleOutlined,
+  DownOutlined,
 } from "@ant-design/icons"
 import "../css/Dashboard.css"
+ const URL = import.meta.env.VITE_API_URL;
 
 interface UserStat {
   completed: number
@@ -19,6 +25,18 @@ interface UserStat {
   totalScore: number
   rank: number
 }
+
+interface Player {
+    username: string,
+    score: number,
+    status: string,
+}
+
+interface PlayerWithRank extends Player{
+   rank: number
+}
+
+type RoomCodeWithRank = Record<string, PlayerWithRank[]>;
 
 interface Adventure {
   id: string
@@ -28,13 +46,14 @@ interface Adventure {
 }
 
 interface LeaderboardEntry {
-  username: string
+  username: string | null
   score: number
   rank: number
+  status?: string
 }
 
 const DashPage: React.FC = () => {
-  const { user } = useUserStore()
+  const { setUser,user } = useUserStore()
   const [userStats, setUserStats] = useState<UserStat>({
     completed: 0,
     inProgress: 0,
@@ -43,20 +62,45 @@ const DashPage: React.FC = () => {
   })
   const [adventures, setAdventures] = useState<Adventure[]>([])
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
+  const [leaderBoardWithRoom, setLeaderBoardWithRoom] = useState<any>()
   const [loading, setLoading] = useState(true)
-  const [username, setUsername] = useState<string>("")
+  const [username, setUsername] = useState<string>('')
+  const [selectedRoomFill, setSelectedRoomFill] = useState<string>('All Rooms')
+  
+  useEffect(() => {
+      try{
+        axios.get(`${URL}/authCookie`, { withCredentials: true }).then((res) => {
+            setUser({
+                email: res.data.email,
+                user: res.data.Username,
+                uid: res.data.uid
+            });
+            console.log(res.data);
+        })
+        .catch((err)=>{
+            console.log("Not logged in:", err);
+        });
+      } catch (error) {
+        console.error("Error fetching auth cookie:", error);
+      }
+  },[]);
+
+
 
   useEffect(() => {
-    // Get username from localStorage
-    const storedUsername = localStorage.getItem("username") || user || ""
-    if (storedUsername) {
-      setUsername(storedUsername)
-    }
 
     // Fetch user stats
     const fetchData = async () => {
+      setUsername(user?.user || "NOT_FOUND");
+      console.log("Fetching dashboard data for user:", user?.user, user?.uid);
       try {
         setLoading(true)
+
+        const storedLeaderboard = await axios.get(`${URL}/game/leaderboard`, {params: {uid: user?.uid}, withCredentials:true});
+        const {queryLeaderboard} = storedLeaderboard.data;
+        
+        
+        console.log("Leaderboard Data:", queryLeaderboard);
 
         const mockUserStats: UserStat = {
           completed: 5,
@@ -64,6 +108,7 @@ const DashPage: React.FC = () => {
           totalScore: 1250,
           rank: 8,
         }
+
 
         const mockAdventures: Adventure[] = [
           { id: "1", title: "The Beginner's Python", progress: 100, difficulty: "Beginner" },
@@ -73,18 +118,40 @@ const DashPage: React.FC = () => {
           { id: "5", title: "API Integration Quest", progress: 10, difficulty: "Advanced" },
         ]
 
-        const mockLeaderboard: LeaderboardEntry[] = [
-          { username: "pythonmaster", score: 2200, rank: 1 },
-          { username: "codewarrior", score: 1950, rank: 2 },
-          { username: "devninja", score: 1800, rank: 3 },
-          { username: "scriptguru", score: 1600, rank: 4 },
-          { username: storedUsername || "you", score: 1250, rank: 5 },
-        ]
+        const allLeaderboard = Object.values(queryLeaderboard)
+        .flat()  // Let it become the whole status. 
+        .map((player: any)=>({
+            username: player.username,
+            score: player.score,
+            status: player.status
+        }))
+        .sort((a, b)=> b.score - a.score)
+        .map((player, index)=>({
+          ...player,
+          rank:index+1,
+        }))
 
-        setUserStats(mockUserStats)
-        setAdventures(mockAdventures)
-        setLeaderboard(mockLeaderboard)
+        const rankedRoomLeaderboard = Object.entries(queryLeaderboard as Record<string, Player[]>).reduce((acc,[roomCodes, players])=>{
 
+            const sorted = [...players].sort((a,b)=> b.score - a.score);
+            
+            const AddedRank= sorted.map((p,idx)=>({
+              ...p,
+              rank: idx+1,
+            }));
+
+            acc[roomCodes] = AddedRank;
+            return acc;
+        }, {} as RoomCodeWithRank)
+
+
+        const mockLeaderboard: LeaderboardEntry[] = allLeaderboard
+
+        setUserStats(mockUserStats);
+        setAdventures(mockAdventures);
+        setLeaderboard(mockLeaderboard);
+        setLeaderBoardWithRoom(rankedRoomLeaderboard);
+        console.log("Leaderboard with room data:", allLeaderboard)
         setLoading(false)
       } catch (error) {
         console.error("Error fetching dashboard data:", error)
@@ -94,6 +161,15 @@ const DashPage: React.FC = () => {
 
     fetchData()
   }, [user])
+
+  const roomCodes= Object.keys(leaderBoardWithRoom || {});
+
+  const items: MenuProps['items'] = roomCodes.map((code,idx)=>({
+        key: idx+1,
+        label: `Room Code: ${code}`
+  }))
+
+  
 
   const getDifficultyColor = (difficulty: Adventure["difficulty"]) => {
     switch (difficulty) {
@@ -120,6 +196,7 @@ const DashPage: React.FC = () => {
   }
 
   // Format username for display - limit to 15 characters with ellipsis
+ 
   const displayUsername =
     (username || "Explorer").length > 15 ? `${(username || "Explorer").substring(0, 15)}...` : username || "Explorer"
 
@@ -278,12 +355,34 @@ const DashPage: React.FC = () => {
           <div className="dashboard-card leaderboard-card">
             <div className="card-header">
               <div className="card-title-section">
-                <h3 className="card-title">Leaderboard</h3>
+                <h3 className="card-title" style={{display:"flex", gap:'1rem'}}>Leaderboard
+                  <Dropdown
+                    menu={{
+                      items,
+                      selectable: true,
+                      defaultSelectedKeys: ['0'],
+                      onClick: (e)=>{
+                         const selectedFilter = e.key;
+                         const SelectedRoomCode = roomCodes[Number(selectedFilter)-1];
+                         setSelectedRoomFill(SelectedRoomCode);
+                      }
+                    }}
+                  >
+                      <DownOutlined />
+                    </Dropdown>
+                    <a onClick={()=>{setSelectedRoomFill('All Rooms')}}
+                      className="clear-filter-anchor"
+                      >
+                      Clear
+                    </a>
+                </h3>
+                
                 <span className="card-subtitle">Top performers</span>
               </div>
             </div>
             <div className="leaderboard-list">
-              {leaderboard.map((entry, index) => (
+               {selectedRoomFill === 'All Rooms' ? (
+                 leaderboard.map((entry, index) => (
                 <div key={index} className={`leaderboard-item ${entry.username === username ? "current-user" : ""}`}>
                   <div className="rank-section">
                     <div className={`rank-badge ${entry.rank <= 3 ? "top-rank" : ""}`}>
@@ -293,10 +392,33 @@ const DashPage: React.FC = () => {
                   </div>
                   <div className="user-section">
                     <span className="username">{entry.username === username ? "You" : entry.username}</span>
-                    <span className="user-score">{entry.score.toLocaleString()} pts</span>
+                    <span className="user-score">{entry.score} pts</span>
                   </div>
                 </div>
-              ))}
+              ))
+               ):(
+                     leaderBoardWithRoom && leaderBoardWithRoom[selectedRoomFill].map((data:any, ind:any)=>(
+                        <div key={ind} className={`leaderboard-item ${data.username === username ? "current-user" : ""}`}>
+                          <div className="rank-section">
+                            <div className={`rank-badge ${data.rank <= 3 ? "top-rank" : ""}`}>
+                              <span className="rank-number">#{data.rank}</span>
+                            </div>
+                            {data.rank <= 3 && <TrophyOutlined className="trophy-icon" />}
+                          </div>
+                          <div className="user-section">
+                            <span className="username">{data.username === username ? "You" : data.username}</span>
+                            <span className="user-score">{data.score} pts</span>
+                          </div>
+                        </div>
+                     ))
+               )}
+
+               <hr />
+
+               <div className="leaderboard-legend-section">
+                   <p> All Records will only store <strong>24</strong> hours upon the game start</p>
+               </div>
+
             </div>
           </div>
 

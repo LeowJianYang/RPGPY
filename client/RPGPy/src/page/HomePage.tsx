@@ -43,7 +43,7 @@ export default function HomePage() {
                             <a href="/dashboard" className="cta-button primary">
                                 Start Learning
                             </a>
-                            <a href="/multiplayer" className="cta-button secondary">
+                            <a href="/dashboard?selector=2" className="cta-button secondary">
                                 Play with Friends
                             </a>
                         </div>
@@ -154,7 +154,7 @@ export default function HomePage() {
                                 <p className="feature-description">
                                     Join multiplayer coding sessions and collaborate with friends to solve challenges together in a fun, interactive environment.
                                 </p>
-                                <a href="/multiplayer" className="feature-button">
+                                <a href="/dashboard?selector=2" className="feature-button">
                                     Start Playing →
                                 </a>
                             </div>

@@ -37,7 +37,7 @@ router.post("/login", async (req, res)=>{
             const isMatch = await encrypt.compare(password, user.Passwords);
             if(isMatch){
                 
-                const token = jwt.sign({Email:user.Email, Username:user.Username}, "secretkey", {expiresIn:
+                const token = jwt.sign({Email:user.Email, Username:user.Username, UID: user.UserId}, "secretkey", {expiresIn:
 
                     req.body.remember ? "7h" : "1h"
                 });
@@ -45,8 +45,8 @@ router.post("/login", async (req, res)=>{
                 res.cookie("jwtAuthToken", token, {
                     httpOnly:true, 
                     maxAge: 36000000, 
-                    secure:true,
-                    sameSite:'none' //none for deploy~
+                    secure:false,
+                    sameSite:'lax' //none for deploy~
                 });
                 return res.status(200).json({success:true, message:"Successfully Login !"})
 
@@ -72,6 +72,7 @@ router.post("/login", async (req, res)=>{
 });
 
 router.get('/checkSession', async (req,res)=>{
+    
     const {ssid,userid,roomId} = req.query;
     console.log("[DEBUG]",ssid,"\n",userid,"\n",roomId);
 
@@ -125,8 +126,8 @@ router.post('/register', async (req, res)=>{
 router.post("/logout", async (req,res)=>{
     res.clearCookie("jwtAuthToken",{
         httpOnly:true,
-        secure:true,
-        sameSite:'none'
+        secure:false,
+        sameSite:'lax'
     })
 
     return res.status(200).json({success:true, message:"Successfully Logged Out !"})

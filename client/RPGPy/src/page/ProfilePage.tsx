@@ -60,7 +60,7 @@ const ProfilePage: React.FC = () => {
         setLoading(true)
 
         // Get username from localStorage or UserStore
-        const storedUsername = localStorage.getItem("username") || user || "Explorer"
+        const storedUsername = localStorage.getItem("username") || user?.user || "Explorer"
 
         // Mock profile data - in real app, this would come from API
         const mockProfile: UserProfile = {

@@ -32,7 +32,7 @@ export default function JoinMiddlePage(){
 
         const joinRoom = async() =>{
             console.log("USER",user)
-            await axios.post(`${URL}/room/joinRoom`, {username: user, roomCode: roomCode}, {withCredentials:true}).then((res)=>{
+            await axios.post(`${URL}/room/joinRoom`, {username: user?.user, roomCode: roomCode}, {withCredentials:true}).then((res)=>{
                  const {userId,encryptUsername} = res.data;
                 setData(()=>{
                     return {
@@ -48,7 +48,7 @@ export default function JoinMiddlePage(){
                 });
                 console.log("Joined room successfully:", res.data);
                 socket.connect();
-                socket.emit('join-room', {roomCode, user});
+                socket.emit('join-room', {roomCode, user: user?.user});
             
             }).catch((err)=>{
                  console.error("Failed to join room:", err);

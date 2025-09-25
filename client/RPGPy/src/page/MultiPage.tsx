@@ -73,7 +73,7 @@ export default function MultiPage() {
 
   const handleAfterJoin = async ()=>{
 
-    await axios.post(`${URL}/room/createRoom`, {roomCode: roomCode, Owner:user, MapDetails:MapDetails[0].MapId}, {withCredentials:true}).then((res)=>{
+    await axios.post(`${URL}/room/createRoom`, {roomCode: roomCode, Owner:user?.user, MapDetails:MapDetails[0].MapId}, {withCredentials:true}).then((res)=>{
 
       const {encryptUsername,userId,ssid}= res.data;
       setSsid(ssid); 
@@ -81,7 +81,7 @@ export default function MultiPage() {
        setLoading(false);
        setOpenForm(true);
        socket.connect();
-       socket.emit('join-room', {roomCode, user});
+       socket.emit('join-room', {roomCode, user: user?.user});
        
     }). catch((err)=>{
       setModalProp({title:"Error", content: err.response?.data?.message || "Failed to create room. Please try again.", buttonContent:[{buttonContent:"OK", buttonType:"primary", onClick:()=> setOpenForm(false)}]})
@@ -99,15 +99,15 @@ export default function MultiPage() {
 
 
   const handleJoinRoom = async () =>{
-    axios.post(`${URL}/room/joinRoom`, {username:user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
+    axios.post(`${URL}/room/joinRoom`, {username:user?.user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
       const {userId} = res.data;
       setSsid(res.data.ssid);
       setModalProp({title:"Joined Room", content:`Successfully joined room: ${roomCode}.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false), navigate(`/Lobby?roomCode=${roomCode}&participant=${res.data.encryptUsername}&userId=${userId}`)}}]})
       setLoading(false);
       setOpenForm(true);
       socket.connect();
-      socket.emit('join-room', {roomCode, user});
-      
+      socket.emit('join-room', {roomCode, user: user?.user});
+
     }). catch ((err)=>{
       setModalProp({title:"Error", content: err.response?.data?.message || "Failed to join room. Please check the room code and try again.", buttonContent:[{buttonContent:"OK", buttonType:"primary", onClick:()=> {setOpenForm(false)}}]})
       setLoading(false);

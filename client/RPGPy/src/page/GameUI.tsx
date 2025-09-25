@@ -119,7 +119,11 @@ export default function Game() {
     const fetchAuthCookie = async () => {
       try{
         const res = await http.get("/authCookie");
-        setUser(res.data.Username);
+        setUser({
+          user: res.data.Username,
+          email: res.data.Email,
+          uid: res.data.UID
+        });
         console.log('AUTH ',res.data.user); 
       }catch(err){
         console.log(err);
@@ -143,13 +147,13 @@ export default function Game() {
     socket.connect();
 
     socket.on('connect', () => {
-      console.log('Socket connected', user);
-      socket.emit('join-room', {roomCode, user});
+      console.log('Socket connected', user?.uid);
+      socket.emit('join-room', {roomCode, user: user?.user});
     });
 
     if (socket.connected) {
-        console.log('Socket already connected, joining room:', roomCode, user);
-        socket.emit('join-room', {roomCode, user});
+        console.log('Socket already connected, joining room:', roomCode, user?.uid);
+        socket.emit('join-room', {roomCode, user: user?.user});
     }
 
     //receive data
@@ -1024,7 +1028,7 @@ const handleBgmMute = () =>{
 
       <div className="InnerGameContainer">
         <div>Position: <b>{tileKey}</b> / 40</div>
-        <div>Player: <b>{user}</b></div>
+        <div>Player: <b>{user?.user}</b></div>
         <div>HP: <b>{hp}</b></div>
         <div>ATK: <b>{Atk}</b></div>
         <div>Score: <b>{Score}</b></div>
