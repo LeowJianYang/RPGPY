@@ -26,15 +26,15 @@
 }
 
 .btn.dashed {
-  border: 1px dashed gray;
+  border: 1px dashed var(--border-primary, gray);
   background: transparent;
-  color: black;
+  color: var(--text-primary, black);
 }
 
 .btn.secondary{
-    border: 1px solid gray;
+    border: 1px solid var(--border-primary, gray);
     background: transparent;
-    color: black;
+    color: var(--text-primary, black);
     transition: border 0.2s all;
 }
 
@@ -54,6 +54,7 @@
   justify-content: center; 
   background: rgba(0, 0, 0, 0.5); 
   z-index: 1000;
+  transition: background 0.3s ease;
 }
 
 .fade-in{
@@ -76,13 +77,14 @@
     flex-direction: column;
     justify-content: center;
     align-self: center;
-    background-color: #ffffff;
+    background-color: var(--bg-secondary, #ffffff);
+    border: 1px solid var(--border-primary, #e0e0e0);
     width: 30rem;
     height: auto;
     border-radius: 10px;
     margin: 1rem;
     padding: 1rem;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
 
@@ -99,16 +101,18 @@
 
 
 .ModalTitle{
-    color:black;
+    color: var(--text-primary, black);
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
+    transition: color 0.3s ease;
 }
 
 .ModalTitle h1 {
-    color:black !important;
+    color: var(--text-primary, black) !important;
     text-align: left !important;
     font-weight: bold !important; 
+    transition: color 0.3s ease;
 }
 
 .ModalTitle :nth-child{

@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import './css/index.css'
+import './css/themes.css'
 import App from './App.tsx'
 import LoginPage from './page/Login.tsx';
 import '@ant-design/v5-patch-for-react-19';
@@ -13,6 +14,11 @@ import MultiPage from './page/MultiPage.tsx';
 import DocumentationPage from './page/Documentation.tsx';
 import { Toast } from './components/Toast.tsx';
 import JoinMiddlePage from './page/joinMiddle.tsx';
+import Settings from './page/Settings.tsx';
+import { initializeTheme } from './utils/themeManager.ts';
+
+// Initialize theme on app startup
+initializeTheme();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -28,7 +34,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/Multi" element={<MultiPage/>} />
         <Route path='/Documentation' element={<DocumentationPage/>} />
         <Route path='/v0/auth/join' element={<JoinMiddlePage/>} />
-        
+        <Route path='/settings' element={<Settings/>} />
         </Routes>
       </Toast>
        

@@ -1,17 +1,34 @@
-/* Modern styles for the Multiplayer Hall */
+/*  Multiplayer Hall with Theme Support */
+
+:root {
+  /* Light Theme Colors */
+  --multi-bg-color: #f0f2f5;
+  --multi-card-bg: #ffffff;
+  --multi-text-color: #333;
+  --multi-border-color: #ccc;
+  --multi-input-bg: #ffffff;
+}
+
+/* Dark Theme Overrides */
+[data-theme="dark"] {
+  --multi-bg-color: #0f172a;
+  --multi-card-bg: #1e293b;
+  --multi-text-color: #f1f5f9;
+  --multi-border-color: #475569;
+  --multi-input-bg: #334155;
+}
 
 .multiplayer-hall {
   width: 100%;
-  min-height: 90vh  ; /* To fill Screen use Min Height */
+  min-height: 100vh; /* To fill Screen use Min Height */
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f0f2f5; 
+  background-color: var(--multi-bg-color); 
   padding: 20px;
   box-sizing: border-box;
   flex-direction: column;
-
-
+  transition: background-color 0.3s ease;
 }
 
 .hall-content {
@@ -22,17 +39,23 @@
   width: 100%;
   max-width: 500px; 
   padding: 2rem;
-  background-color: #ffffff;
+  background-color: var(--multi-card-bg);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+[data-theme="dark"] .hall-content {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .hall-title {
   font-size: clamp(1.8rem, 5vw, 2.2rem); 
-  color: #333;
+  color: var(--multi-text-color);
   margin-bottom: 0.5rem; 
   font-weight: bold;
+  transition: color 0.3s ease;
 }
 
 .input-wrapper {
@@ -42,11 +65,13 @@
 .room-code-input {
   width: 100%;
   padding: 0.8rem 1rem; 
-  border: 1px solid #ccc;
+  border: 1px solid var(--multi-border-color);
   border-radius: 8px;
   font-size: 1rem; 
   text-align: center;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: var(--multi-input-bg);
+  color: var(--multi-text-color);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
 .room-code-input:focus {
@@ -102,6 +127,7 @@
   transition: all 0.3s ease-in-out;
   background-color: #f3f4f6;
   margin:1rem;
+  background-color: var(--multi-bg-color);
 }
 
 .map-display:hover{
@@ -143,7 +169,7 @@
 }
 
 .map-display.mapdet .mapname{
-  color:#000000;
+  color:var(--multi-text-color);
   font-weight: 600;
   font-size: clamp(0.8rem, 3vh, 1rem);
 }

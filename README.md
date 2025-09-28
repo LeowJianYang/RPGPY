@@ -1,4 +1,4 @@
-# FWDD-Assignment
+# RPGPY Hybrid Educational Games (WORKING)
 
 A hybrid Physical + Digital semi-roguelike board game platform, built with React, Vite, SWC, and Express. This project features a modern UI, real-time multiplayer, and RESTful API backend.
 
@@ -38,6 +38,23 @@ A hybrid Physical + Digital semi-roguelike board game platform, built with React
      npm run dev
      ```
 
+4. **Add Your Own `.env.local` OR `.env` file:**
+   -`client\RPGPy\`
+   ```bash
+      VITE_API_URL
+   ```
+   -`server\`
+   ```bash
+      AES_KEY **for AES encryption**
+      IV **for AES IV Encryption**
+      DB_INFF_HN **for Database Host Name**
+      DB_INFF_UN **for Database Username**
+      DB_INFF_PR ** for Database Port**
+      DB_INFF_PW ** for Database Password**
+      DB_INFF_DBN **for Database Name**
+      SERVICE_URI **for Databse URI**
+      WEB_URL ** for Web URL (OPTIONAL) **
+   ```
 ---
 
 ## 📁 Project Structure
@@ -74,6 +91,7 @@ FWDD-Assignment/
 - **API:** RESTful
 - **State Management:** Zustand (client global state)
 - **Real-time:** Socket.IO (for multiplayer features)
+- **Databse:** MySQL DB 
 
 ---
 
@@ -95,6 +113,8 @@ FWDD-Assignment/
 
 ---
 
-## License
+## License/Copyright
 
 MIT License. See [LICENSE](./LICENSE) for details.
+Intro.js. See [NOTICE](./NOTICE.md) for details.
+Credits of the Sound. [CREDITS]()

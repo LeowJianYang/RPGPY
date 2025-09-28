@@ -1,13 +1,33 @@
-/* General Styles & Keyframes */
+/* Login Page with Theme Support */
 :root {
-    --primary-color: #6c63ff;
-    --primary-hover: #574de2;
-    --background-color: #f0f2f5;
-    --form-bg-color: #ffffff;
-    --text-color: #333;
-    --input-border-color: #d9d9d9;
-    --white-color: #fff;
-    --danger-color: #ff4d4f;
+    /* Light Theme Colors */
+    --login-primary-color: #6c63ff;
+    --login-primary-hover: #574de2;
+    --login-background-color: #f0f2f5;
+    --login-form-bg-color: #ffffff;
+    --login-text-color: #333;
+    --login-input-border-color: #d9d9d9;
+    --login-white-color: #fff;
+    --login-danger-color: #ff4d4f;
+    
+    /* Keep original variables for compatibility */
+    --primary-color: var(--login-primary-color);
+    --primary-hover: var(--login-primary-hover);
+    --background-color: var(--login-background-color);
+    --form-bg-color: var(--login-form-bg-color);
+    --text-color: var(--login-text-color);
+    --input-border-color: var(--login-input-border-color);
+    --white-color: var(--login-white-color);
+    --danger-color: var(--login-danger-color);
+}
+
+/* Dark Theme Overrides for Login */
+[data-theme="dark"] {
+    --login-background-color: #0f172a;
+    --login-form-bg-color: #1e293b;
+    --login-text-color: #f1f5f9;
+    --login-input-border-color: #475569;
+    --login-white-color: #f1f5f9;
 }
 
 @keyframes spin {

@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
 import '../css/NotFound.css';
-
+import { useNavigate } from 'react-router-dom';
 
 export default function NotFoundPage() {
+    const navigate = useNavigate();
+
     return (
         <div className="not-found-container">
             <div className="not-found-content">
@@ -17,11 +18,11 @@ export default function NotFoundPage() {
                     Oops! The page you're looking for seems to have gone on an adventure. 
                     Let's get you back to your coding journey!
                 </p>
-                <Link to="/" className="home-button">
-                    Return to Homepage
-                </Link>
-                
-                
+                <a onClick={() => navigate(-1)} className="home-button">
+                    Return to Previous Page
+                </a>
+
+
             </div>
                 
           

@@ -29,7 +29,7 @@ export default function MultiPage() {
   const [openScanToJoin, setOpenScanToJoin] = useState(false);
   const URL= import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-  const {setSsid} = useSessionStore();
+  const {setSsid,ssid} = useSessionStore();
 
 
   const handleCreateRoom = async () =>{
@@ -91,17 +91,19 @@ export default function MultiPage() {
     })
   }
 
-  const RedirectRoom = ()=>{
+  const RedirectRoom = async ()=>{
     
-    navigate(MapDet, {replace:true});
+    console.log("Redirecting to Room: ",ssid);
+    navigate(MapDet+`&ssid=${ssid}`, {replace:true});
+
   }
   
 
 
   const handleJoinRoom = async () =>{
     axios.post(`${URL}/room/joinRoom`, {username:user?.user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
-      const {userId} = res.data;
-      setSsid(res.data.ssid);
+      const {userId,ssid} = res.data;
+      setSsid(ssid);
       setModalProp({title:"Joined Room", content:`Successfully joined room: ${roomCode}.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false), navigate(`/Lobby?roomCode=${roomCode}&participant=${res.data.encryptUsername}&userId=${userId}`)}}]})
       setLoading(false);
       setOpenForm(true);

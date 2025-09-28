@@ -1,11 +1,28 @@
-/*game.css*/
+/*game.css with Theme Support*/
+
+:root {
+    /* Light Theme Colors */
+    --game-bg-color: #f8f9fa;
+    --game-text-color: #1a1a1a;
+    --game-container-bg: #ffffff;
+    --game-border-color: #e0e0e0;
+}
+
+/* Dark Theme Overrides */
+[data-theme="dark"] {
+    --game-bg-color: #0f172a;
+    --game-text-color: #f1f5f9;
+    --game-container-bg: #1e293b;
+    --game-border-color: #475569;
+}
 
 .gameContainer {
     padding: 1rem;
     max-width: 100%;
     margin-inline: auto;
-    background-color: #f8f9fa;
+    background-color: var(--game-bg-color);
     min-height: 100vh;
+    transition: background-color 0.3s ease;
 }
 
 @media (min-width: 768px) {
@@ -18,9 +35,10 @@
 .gameContainer h1 {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--game-text-color);
     text-align: left;
     margin-bottom: 1.5rem;
+    transition: color 0.3s ease;
 }
 
 .InnerGameContainer {
@@ -77,7 +95,7 @@
 
 .EventCard {
     margin-top: 1.25rem;
-    background: #ffffff;
+    background: var(--game-container-bg);
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 1.5rem;
@@ -87,11 +105,12 @@
 .EventCard h3{
     font-weight: 600;
     margin-bottom: 0.5rem;
+    color: var(--game-text-color);
 }
 
 .McqCard {
     margin-top: 1.25rem;
-    background: #ffffff;
+    background: var(--game-container-bg);
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -99,7 +118,7 @@
 
 .McqCard h4 {
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--game-text-color);
     font-size: 1.25rem;
     margin-bottom: 1rem;
 }
@@ -145,7 +164,7 @@
 
 .codeCard {
     margin-top: 1.25rem;
-    background: #ffffff;
+    background: var(--game-container-bg);
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -153,7 +172,7 @@
 
 .codeCard h4 {
     font-weight: 700;
-    color: #1a1a1a;
+    color: var(--game-text-color);
     font-size: 1.25rem;
     margin-bottom: 1rem;
 }
@@ -162,22 +181,22 @@
     white-space: pre-wrap;
     font-size: 0.875rem;
     line-height: 1.6;
-    background-color: #f8f9fa;
+    background-color: var(--game-bg-color);
     padding: 1rem;
     border-radius: 8px;
-    color: #1f2937;
+    color: var(--game-text-color);
 }
 
 .EditorClass {
     width: 100%;
-    border: 1px solid #e5e7eb;
+    border: 1px solid  var(--game-border-color);
     border-radius: 8px;
     padding: 1rem;
     margin-top: 1rem;
     font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, 'Liberation Mono', Menlo, monospace;
     font-size: 0.875rem;
     line-height: 1.6;
-    background-color: #f8f9fa;
+    background-color: var(--game-bg-color);
 }
 
 .codeCard button {
@@ -208,13 +227,13 @@
 
 .codeResult {
     margin-top: 1.5rem;
-    background-color: #f8f9fa;
+    background-color: var(--game-bg-color);
     border-radius: 8px;
     padding: 1rem;
 
     & p {
         font-weight: 600;
-        color: #1f2937;
+        color: var(--game-text-color);
         margin-bottom: 0.5rem;
     }
 }
@@ -245,7 +264,7 @@
 
 .backWarpper {
     margin-top: 1.5rem;
-    background: #ffffff;
+    background: var(--game-container-bg);
     border-radius: 12px;
     padding: 1.5rem;
     display: flex;
@@ -255,7 +274,7 @@
 
     & h4 {
         font-weight: 700;
-        color: #1a1a1a;
+        color: var(--game-text-color);
         font-size: 1.25rem;
     }
 

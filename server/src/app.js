@@ -13,6 +13,7 @@ const authRoutes = require("./routes/auth");
 const mapRoutes = require("./routes/mapVer");
 const roomRoutes = require("./routes/room");
 const gameRoutes = require("./routes/game");
+const achievements = require("./routes/achievements");
 const { roomState } = require('./config/roomState');
 
 
@@ -55,6 +56,7 @@ app.use("/auth", authRoutes);
 app.use("/map", mapRoutes);
 app.use("/room", roomRoutes);
 app.use('/game', gameRoutes);
+app.use('/achievements', achievements);
 
 io.on('connection', (socket)=>{
     console.log(`Socket connected: ${socket.id}`);

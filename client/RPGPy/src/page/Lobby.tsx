@@ -8,10 +8,10 @@ import { SelfButton,ModalForm } from "../components/ErrorModal"
 import type { ModalPropsType } from '../components/ButtonCompo';
 import { socket } from '../socket';
 import { useNavigate } from "react-router-dom"
-import  { ReloadOutlined,WarningFilled,CloseCircleFilled } from "@ant-design/icons"
+import  { ReloadOutlined } from "@ant-design/icons"
 import { useUserStore } from "../../components/UserStore"
 import { QRCode } from "antd"
-import { useToast } from "../components/Toast"
+
 
 
 
@@ -36,7 +36,7 @@ export default function Lobby(){
     const MapId= MapDetails[0]?.MapId ?? "No Map Selected";
     const [QRModalOpen, setQRModalOpen] = useState<boolean>(false);
     const [QRtext, setQRText] = useState<string>("");
-    const {notify} = useToast();
+
 
 
     useEffect(()=>{
@@ -54,7 +54,7 @@ export default function Lobby(){
             // Now join room with user info
             const joinRoom = () => {
                 console.log('Joining room with user:', user, 'roomCode:', roomCode);
-                socket.emit('join-room', {roomCode, user: user?.user});
+                socket.emit('join-room', {roomCode, user: user});
             };
             
             // Wait for socket to connect before joining room
@@ -87,33 +87,6 @@ export default function Lobby(){
             // Don't disconnect socket to preserve connection when navigating to game page
         };
     },[])    
-
-    const handleKickParticipant = async (username: string) => {
-        await axios.delete(`${URL}/room/kickParticipant`,{data:{roomCode,username},withCredentials:true}).then((res)=>{
-            console.log("Participant kicked: ", res.data);
-        })
-    };
-
-    useEffect(()=>{
-
-        socket.on('participant-kicked',async (data)=>{
-            console.log("Participant Kicked",data);
-            if(RoomParticipants.find(p=> p.Username === data.username) && RoomParticipants.find(p=> p.Username === CurrentUser)?.Roles !== 'Owner'){
-                setModalProps({title:"Kicked Out", content:'You have been removed from the room by the owner.', buttonContent:[{buttonContent:'OK',buttonType:'secondary',
-                onClick:()=>{
-                    navigate("/dashboard", {replace:true});
-                }}]});
-                setModalOpen(true);
-            }else{
-                notify('success', 'Participant Kicked', `An User has been removed from the room by the owner`, 'topRight');
-                
-            }
-        })
-        return ()=>{
-            socket.off('participant-kicked');
-        };
-
-    },[RoomParticipants,navigate])
 
     const generateQRCode = async ()=>{
         if (!roomCode) {
@@ -182,27 +155,18 @@ export default function Lobby(){
     };
 
     const handleParticipantLeave = async ()=>{
-        await axios.post(`${URL}/room/participantLeave`, {roomCode,userId:userId},{withCredentials:true}).then((res)=>{
+        await axios.post(`${URL}/room/participantLeave`, {roomCode},{withCredentials:true}).then((res)=>{
             console.log("Participant left the room: ", res.data);
+            socket.on( 'participant-left', (data)=>{
+                console.log("Participant Left",data);    
+                setModalProps({title:"Room Closed", content:'Participant Has Left the Room', buttonContent:[{buttonContent:'OK',buttonType:'secondary',
+                onClick:()=>{<Navigate to="/dashboard" replace/>}}]});
+                setModalOpen(true);
+            }
+
+            )
         })
     }
-
-    useEffect(()=>{
-              socket.on( 'participant-left', (data)=>{
-                console.log("Participant Left",data);  
-                if(RoomParticipants.find(p => p.Username === CurrentUser)?.Roles === 'Owner'){
-                    notify('warning', 'Participant Left', `An User has left the room`, 'topRight');
-                }else{
-                       setModalProps({title:"Successful", content:'Left the Room', buttonContent:[{buttonContent:'OK',buttonType:'secondary',
-                    onClick:()=>{navigate('/dashboard',{replace:true})}}]});
-                    setModalOpen(true);
-                }
-
-            });
-            return ()=>{
-                socket.off('participant-left'); 
-            }
-    },[RoomParticipants,CurrentUser,navigate])
     
     
     if (!roomCode && (participant === "NONE_AVAILABLE" || Owner === "NONE_AVAILABLE") || isError){
@@ -268,7 +232,6 @@ export default function Lobby(){
                                                 className="KickButton"
                                                 disabled={participant.Roles.toLowerCase() === "owner"}
                                                 aria-label={`Kick ${participant.Username}`}
-                                                onClick={()=>{handleKickParticipant(participant.Username)}}
                                             >
                                                 Kick
                                             </button>
@@ -284,15 +247,12 @@ export default function Lobby(){
 
                 <div className="RoomBox">
                     <p id="RoomHead">Ready To Start Game ?</p>
-                    <button className="startGameButton" onClick={()=>{handleStartGame()}} disabled={(RoomParticipants.find(p=>p.Username === CurrentUser)?.Roles === 'Owner' ?false :true) || RoomParticipants.length < 2}>Start Game</button>
+                    <button className="startGameButton" onClick={()=>{handleStartGame()}} disabled={RoomParticipants.find(p=>p.Username === CurrentUser)?.Roles === 'Owner' ?false :true}>Start Game</button>
                     {RoomParticipants.find(p=>p.Username === CurrentUser)?.Roles !== 'Owner' && (
-                        <p className="DisabledDetails"> <CloseCircleFilled style={{color:'#ff0000',paddingRight:'1rem', fontSize:'1.25rem'}}/>Only Owner Can Start the Game</p>
+                        <p className="DisabledDetails">Only Owner Can Start the Game</p>
                     )
 
                     }
-                    {RoomParticipants.length <2 && (
-                        <p className='WarningDetails'> <WarningFilled style={{color:'#faad14',paddingRight:'1rem', fontSize:'1.25rem'}}/>At least <strong>2</strong> Players to start a Game !</p>
-                    )}
                 </div>
 
                 
@@ -327,7 +287,7 @@ export default function Lobby(){
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                     <p>Scan the QR Code to Join Room: <strong>{roomCode}</strong></p>
                     {QRtext ? (
-                        <QRCode value={QRtext} size={200} />
+                        <QRCode value={QRtext} size={200} style={{backgroundColor: 'white'}}/>
                     ) : (
                         <p>Generating QR Code...</p>
                     )}

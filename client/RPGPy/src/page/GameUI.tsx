@@ -17,6 +17,7 @@ import HealthBar from '../components/HeathBar';
 import {useSessionStore} from '../../components/IDStore';
 
 
+
 type QuizState =
   | { kind: 'none' }
   | { kind: 'mcq'; q: string; a: string[]; correct: number }
@@ -122,7 +123,7 @@ export default function Game() {
         setUser({
           user: res.data.Username,
           email: res.data.Email,
-          uid: res.data.UID
+          uid: res.data.uid
         });
         console.log('AUTH ',res.data.user); 
       }catch(err){
@@ -734,10 +735,11 @@ export default function Game() {
 
   }
 
-  const handleHpZero =  ()=>{
+  const handleHpZero =  async ()=>{
     bgm.stop();
     bgm.play('/Music/Lose_sound.wav', false);
     setModalCont({title:"Opps! You Lose", content:"You HP is ZERO !!", buttonContent:[{buttonContent:"Back To Homepage",buttonType:'danger', onClick:()=>{window.location.href="/dashboard"}}]});
+    await handleAchievementCheck("Lose one times");
 
     handleErrorModal();
   }
@@ -819,6 +821,7 @@ export default function Game() {
       const hpPhrase = skills.find(det=> det.startsWith('HP:'));
       const durationPhrase = skills.find(det=> det.startsWith('Duration:'));
       const cooldownPhrase = skills.find(det=> det.startsWith('Cooldown:'));
+      await handleAchievementCheck("Use a Skill");
 
       const dmg = dmgPhrase ? parseInt(dmgPhrase.split(':')[1].trim()) : 0;
       const heal = healPhrase ? parseInt(healPhrase.split(':')[1].trim()) : 0;
@@ -880,10 +883,10 @@ export default function Game() {
       console.log("CurrS:", currSuf);
       console.log("Suff:",suffix);
       
-      // 检查移动距离是否超出范围
+    
       if ((suffix ?? 0) > ((currSuf ?? 0)+6) ) return true //R10-cursf x R17-suff
       
-      // 修复：使用 suffix（数字部分）而不是整个 dice 来比较
+
       if ((suffix ?? 0) >= branchNum) return false
       
       
@@ -895,19 +898,46 @@ export default function Game() {
     return false;
   }
 
+  const handleAchievementCheck = async (condition:string)=>{
+    try{
+      const res = await axios.post(`${URL}/achievements/check`, {
+        userId: Number(userid),
+        condition: condition
+      }, {withCredentials:true});
+
+      bgm.stop();
+      bgm.play('/Music/notification.mp3',false);
+      res.data.success === true && notify(
+        'info',
+        "Achievement Unlocked!",
+        `You have unlocked the achievement: ${res.data.achievementName}`,
+        'bottomRight'
+      );
+      console.log("[DEBUG] ACH CHECK", res.data);
+
+    } catch(err){
+      console.error("[DEBUG] ERROR IN ACH CHECK", err);
+
+    }
+
+  }
+
   //Winner Logic
   useEffect(()=>{
-      socket.on('game-over', (data)=>{
+      socket.on('game-over', async (data)=>{
        
         type LeaderboardData={
           username:string,
           Score:number;
         }
 
+        await handleAchievementCheck("Complete one game");
+
         bgm.stop();
         bgm.play('/Music/goal_sound.wav', false);
         console.log("DATA WINNER", data.winner);
         if(data.winner === user){
+
           setModalCont({title:"Congratulation! You Win", content:`Player ${data.winner} has won the game!\n Leaderboard: \n ${data.results3.map((item:LeaderboardData,idx:number)=>`${idx+1}. ${item.username} - ${item.Score} Pts`).join('\n')}`, buttonContent:[{buttonContent:"Back To Homepage",buttonType:'primary', onClick:()=>{window.location.href="/dashboard"}}]});
         } else {
           setModalCont({title:"Game Over!", content:`Player ${data.winner} has won the game!\n Leaderboard: \n
@@ -940,6 +970,8 @@ const handleWinerLogic = async () => {
       roomCode: roomCode, 
       username: user
     }, { withCredentials: true });
+
+    await handleAchievementCheck("Win one time");
 
     console.log(res.data);
   } catch (err) {

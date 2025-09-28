@@ -255,16 +255,27 @@ img {
 }
 
 .footer-bottom {
-  text-align: center;
+  display: flex;
+  flex-direction: row;
   padding-top: 2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   margin-top: 2rem;
+  justify-content: space-between;
 }
 
 .footer-bottom p {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.875rem;
   margin: 0;
+}
+
+.github-icon{
+  font-size: 24px;
+  padding-left: 0.5rem;
+  transition: color 0.3s ease-in-out;
+  &:hover{
+    color:#000000
+  }
 }
 
 @media (min-width: 768px) {

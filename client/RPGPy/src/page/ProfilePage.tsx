@@ -16,6 +16,8 @@ import {
   ClockCircleOutlined,
 } from "@ant-design/icons"
 import "../css/Profile.css"
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
 
 interface UserProfile {
   username: string
@@ -33,7 +35,7 @@ interface Achievement {
   id: string
   title: string
   description: string
-  icon: string
+  icon?: string
   earned: boolean
   earnedDate?: string
 }
@@ -53,7 +55,8 @@ const ProfilePage: React.FC = () => {
   })
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [loading, setLoading] = useState(true)
-
+  const URL = import.meta.env.VITE_API_URL
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -75,54 +78,68 @@ const ProfilePage: React.FC = () => {
           hoursStudied: 42,
         }
 
-        const mockAchievements: Achievement[] = [
+        const userAchievementData = await axios.get(`${URL}/achievements/user`, { params: { uid: user?.uid }, withCredentials: true })
+
+          // UserId: x  , "AchievementId":[ {} ]
+
+        const mockAchievements: Achievement[] = userAchievementData.data.achievements.map((item:any)=>(
           {
-            id: "1",
-            title: "First Steps",
-            description: "Complete your first Python adventure",
-            icon: "🎯",
-            earned: true,
-            earnedDate: "2024-01-15",
-          },
-          {
-            id: "2",
-            title: "Code Warrior",
-            description: "Complete 5 adventures",
-            icon: "⚔️",
-            earned: true,
-            earnedDate: "2024-02-20",
-          },
-          {
-            id: "3",
-            title: "Streak Master",
-            description: "Maintain a 7-day learning streak",
-            icon: "🔥",
-            earned: true,
-            earnedDate: "2024-03-01",
-          },
-          {
-            id: "4",
-            title: "Top Performer",
-            description: "Reach top 10 on leaderboard",
-            icon: "🏆",
-            earned: true,
-            earnedDate: "2024-03-10",
-          },
-          {
-            id: "5",
-            title: "Python Master",
-            description: "Complete 10 adventures",
-            icon: "🐍",
-            earned: false,
-          },
-          {
-            id: "6",
-            title: "Community Helper",
-            description: "Help 5 other learners",
-            icon: "🤝",
-            earned: false,
-          },
-        ]
+            id: item.id,
+            title: item.name,
+            description: item.details,
+            earned: item.earned,
+          }
+        ))
+
+
+        // const mockAchievements: Achievement[] = [
+        //   {
+        //     id: "1",
+        //     title: "First Steps",
+        //     description: "Complete your first Python adventure",
+        //     icon: "🎯",
+        //     earned: true,
+        //     earnedDate: "2024-01-15",
+        //   },
+        //   {
+        //     id: "2",
+        //     title: "Code Warrior",
+        //     description: "Complete 5 adventures",
+        //     icon: "⚔️",
+        //     earned: true,
+        //     earnedDate: "2024-02-20",
+        //   },
+        //   {
+        //     id: "3",
+        //     title: "Streak Master",
+        //     description: "Maintain a 7-day learning streak",
+        //     icon: "🔥",
+        //     earned: true,
+        //     earnedDate: "2024-03-01",
+        //   },
+        //   {
+        //     id: "4",
+        //     title: "Top Performer",
+        //     description: "Reach top 10 on leaderboard",
+        //     icon: "🏆",
+        //     earned: true,
+        //     earnedDate: "2024-03-10",
+        //   },
+        //   {
+        //     id: "5",
+        //     title: "Python Master",
+        //     description: "Complete 10 adventures",
+        //     icon: "🐍",
+        //     earned: false,
+        //   },
+        //   {
+        //     id: "6",
+        //     title: "Community Helper",
+        //     description: "Help 5 other learners",
+        //     icon: "🤝",
+        //     earned: false,
+        //   },
+        // ]
 
         setProfile(mockProfile)
         setAchievements(mockAchievements)
@@ -393,9 +410,9 @@ const ProfilePage: React.FC = () => {
 
       {/* Settings Button */}
       <div className="profile-actions">
-        <button className="settings-btn">
+        <button className="settings-btn" onClick={()=>{navigate("/settings")}}>
           <SettingOutlined />
-          Account Settings
+           Settings
         </button>
       </div>
     </div>

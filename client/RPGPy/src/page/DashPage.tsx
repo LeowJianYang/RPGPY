@@ -5,6 +5,15 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Dropdown } from "antd"
 import type { MenuProps } from "antd"
+import { ModalForm, SelfButton } from "../components/ErrorModal"
+import type { ModalFormProps } from "../components/ButtonCompo"
+import {HomeTwoTone, UserOutlined,TrophyTwoTone,InfoCircleTwoTone } from "@ant-design/icons"
+import { FaRankingStar } from "react-icons/fa6";
+import { MdDiamond } from "react-icons/md";
+//import type { ModalFormProps } from "../components/ButtonCompo"
+import 'intro.js';
+import 'intro.js/introjs.css';
+import { WarningTwoTone } from "@ant-design/icons"
 
 import axios from "axios"
 import {
@@ -17,6 +26,7 @@ import {
   DownOutlined,
 } from "@ant-design/icons"
 import "../css/Dashboard.css"
+import introJs from "intro.js"
  const URL = import.meta.env.VITE_API_URL;
 
 interface UserStat {
@@ -66,12 +76,14 @@ const DashPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState<string>('')
   const [selectedRoomFill, setSelectedRoomFill] = useState<string>('All Rooms')
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalProps, setModalProps] = useState<ModalFormProps>();
+
   useEffect(() => {
       try{
         axios.get(`${URL}/authCookie`, { withCredentials: true }).then((res) => {
             setUser({
-                email: res.data.email,
+                email: res.data.Email,
                 user: res.data.Username,
                 uid: res.data.uid
             });
@@ -169,6 +181,175 @@ const DashPage: React.FC = () => {
         label: `Room Code: ${code}`
   }))
 
+  const handleClickLeaderboard = async (index:number)=>{
+      setIsModalOpen(true);
+      if (selectedRoomFill === 'All Rooms')
+          {    setModalProps({
+            title: "Leaderboard Details",
+            onOk: ()=>{ setIsModalOpen(false); },
+            onCancel: ()=>{ setIsModalOpen(false); },
+            onClose: ()=>{ setIsModalOpen(false); },
+            open: isModalOpen,
+            children: (
+              <div className="leaderboard-modal-content">
+                <div className="leaderboard-modal-header">
+                  <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>
+                    Specific Details
+                  </h3>
+                </div>
+                <div className="leaderboard-modal-body">
+                  <div className="modal-info-grid">
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ background: '#fbbf24', color: 'white' }}><HomeTwoTone /></div>
+                        <span>Room Code</span>
+                      </div>
+                      <div className="room-code-display">{roomCodes[index] || "N/A"}</div>
+                    </div>
+                    
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ background: '#6366f1', color: 'white' }}><UserOutlined /></div>
+                        <span>Username</span>
+                      </div>
+                      <div className="modal-info-value">{leaderboard[index].username || "N/A"}</div>
+                    </div>
+                    
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ background: '#10b981', color: 'white' }}><MdDiamond /></div>
+                        <span>Score</span>
+                      </div>
+                      <div className="score-display">{leaderboard[index].score} pts</div>
+                    </div>
+                    
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ background: '#f59e0b', color: 'white' }}><FaRankingStar /></div>
+                        <span>Rank</span>
+                      </div>
+                      <div className={`rank-badge-modal ${
+                        leaderboard[index].rank === 1 ? 'rank-1' : 
+                        leaderboard[index].rank === 2 ? 'rank-2' : 
+                        leaderboard[index].rank === 3 ? 'rank-3' : 'rank-other'
+                      }`}>
+                        {leaderboard[index].rank <= 3 && <span className="modal-trophy-icon"><TrophyTwoTone /></span>}
+                        #{leaderboard[index].rank}
+                      </div>
+                    </div>
+                    
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ 
+                          background: leaderboard[index].status === 'victory' ? '#10b981' :
+                                     leaderboard[index].status === 'playing' ? '#3b82f6' :
+                                     leaderboard[index].status === 'quit' ? '#f59e0b' : '#ef4444',
+                          color: 'white' 
+                        }}><InfoCircleTwoTone /></div>
+                        <span>Status</span>
+                      </div>
+                      <div className={`status-badge-modal ${leaderboard[index].status || 'unknown'}`}>
+                        <div className="status-indicator"></div>
+                        {leaderboard[index].status || "N/A"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            footer: (
+              <SelfButton type="danger" onClick={()=>{setIsModalOpen(false);}}>
+                  Close
+              </SelfButton>
+            )
+          });
+        }
+
+        else {
+           const selectedData = leaderBoardWithRoom && leaderBoardWithRoom[selectedRoomFill][index];
+            setModalProps({
+            title: "Leaderboard Details",
+            onOk: ()=>{ setIsModalOpen(false); },
+            onCancel: ()=>{ setIsModalOpen(false); },
+            onClose: ()=>{ setIsModalOpen(false); },
+            open: isModalOpen,
+            children: (
+              <div className="leaderboard-modal-content" >
+                <div className="leaderboard-modal-header">
+                  <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700 }}>
+                    Specific Details
+                  </h3>
+                </div>
+                <div className="leaderboard-modal-body">
+                  <div className="modal-info-grid">
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ background: '#fbbf24', color: 'white' }}><HomeTwoTone /></div>
+                        <span>Room Code</span>
+                      </div>
+                      <div className="room-code-display">{selectedRoomFill}</div>
+                    </div>
+                    
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ background: '#6366f1', color: 'white' }}><UserOutlined /></div>
+                        <span>Username</span>
+                      </div>
+                      <div className="modal-info-value">{selectedData?.username || "N/A"}</div>
+                    </div>
+                    
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ background: '#10b981', color: 'white' }}><MdDiamond /></div>
+                        <span>Score</span>
+                      </div>
+                      <div className="score-display">{selectedData?.score || 0} pts</div>
+                    </div>
+                    
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ background: '#f59e0b', color: 'white' }}><FaRankingStar /></div>
+                        <span>Rank</span>
+                      </div>
+                      <div className={`rank-badge-modal ${
+                        selectedData?.rank === 1 ? 'rank-1' : 
+                        selectedData?.rank === 2 ? 'rank-2' : 
+                        selectedData?.rank === 3 ? 'rank-3' : 'rank-other'
+                      }`}>
+                        {selectedData?.rank <= 3 && <span className="modal-trophy-icon"><TrophyTwoTone /></span>}
+                        #{selectedData?.rank || 'N/A'}
+                      </div>
+                    </div>
+                    
+                    <div className="modal-info-item">
+                      <div className="modal-info-label">
+                        <div className="modal-info-icon" style={{ 
+                          background: selectedData?.status === 'victory' ? '#10b981' :
+                                     selectedData?.status === 'playing' ? '#3b82f6' :
+                                     selectedData?.status === 'quit' ? '#f59e0b' : '#ef4444',
+                          color: 'white' 
+                        }}><InfoCircleTwoTone /></div>
+                        <span>Status</span>
+                      </div>
+                      <div className={`status-badge-modal ${selectedData?.status || 'unknown'}`}>
+                        <div className="status-indicator"></div>
+                        {selectedData?.status || "N/A"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+            footer: (
+              <SelfButton type="danger" onClick={()=>{setIsModalOpen(false);}}>
+                  Close
+              </SelfButton>
+            )
+            });
+        }
+
+  }
+
   
 
   const getDifficultyColor = (difficulty: Adventure["difficulty"]) => {
@@ -195,13 +376,20 @@ const DashPage: React.FC = () => {
     )
   }
 
+  const handleTutorialStart = async ()=>{
+    introJs.tour().start();
+  }
+
   // Format username for display - limit to 15 characters with ellipsis
  
   const displayUsername =
     (username || "Explorer").length > 15 ? `${(username || "Explorer").substring(0, 15)}...` : username || "Explorer"
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container" data-title="Welcome to RPGPy !" data-intro={`This is your dashboard where you can track your learning adventures, stats, and more.\n Left side is the navigation menu to explore different sections of the platform.\n Click Multiplayer to start your journey !`}>
+
+       <button onClick={()=>{handleTutorialStart()}}>Start Tutorial</button>
+
       <div className="dashboard-header">
         <div className="welcome-section">
           <div className="welcome-content">
@@ -352,7 +540,7 @@ const DashPage: React.FC = () => {
         </div>
 
         <div className="sidebar-content">
-          <div className="dashboard-card leaderboard-card">
+          <div className="dashboard-card leaderboard-card" data-title="Leaderboard" data-intro="Check out the leaderboard to see how you rank among other adventurers!">
             <div className="card-header">
               <div className="card-title-section">
                 <h3 className="card-title" style={{display:"flex", gap:'1rem'}}>Leaderboard
@@ -382,37 +570,51 @@ const DashPage: React.FC = () => {
             </div>
             <div className="leaderboard-list">
                {selectedRoomFill === 'All Rooms' ? (
-                 leaderboard.map((entry, index) => (
-                <div key={index} className={`leaderboard-item ${entry.username === username ? "current-user" : ""}`}>
-                  <div className="rank-section">
-                    <div className={`rank-badge ${entry.rank <= 3 ? "top-rank" : ""}`}>
-                      <span className="rank-number">#{entry.rank}</span>
-                    </div>
-                    {entry.rank <= 3 && <TrophyOutlined className="trophy-icon" />}
-                  </div>
-                  <div className="user-section">
-                    <span className="username">{entry.username === username ? "You" : entry.username}</span>
-                    <span className="user-score">{entry.score} pts</span>
-                  </div>
-                </div>
-              ))
-               ):(
-                     leaderBoardWithRoom && leaderBoardWithRoom[selectedRoomFill].map((data:any, ind:any)=>(
-                        <div key={ind} className={`leaderboard-item ${data.username === username ? "current-user" : ""}`}>
-                          <div className="rank-section">
-                            <div className={`rank-badge ${data.rank <= 3 ? "top-rank" : ""}`}>
-                              <span className="rank-number">#{data.rank}</span>
-                            </div>
-                            {data.rank <= 3 && <TrophyOutlined className="trophy-icon" />}
-                          </div>
-                          <div className="user-section">
-                            <span className="username">{data.username === username ? "You" : data.username}</span>
-                            <span className="user-score">{data.score} pts</span>
-                          </div>
-                        </div>
-                     ))
-               )}
 
+                leaderboard.length >0 ?(
+
+                  leaderboard.map((entry, index) => (
+                  <div key={index} className={`leaderboard-item ${entry.username === username ? "current-user" : ""}`} onClick={()=>{
+                      handleClickLeaderboard(index);
+                  }}>
+                    <div className="rank-section">
+                      <div className={`rank-badge ${entry.rank <= 3 ? "top-rank" : ""}`}>
+                        <span className="rank-number">#{entry.rank}</span>
+                      </div>
+                      {entry.rank <= 3 && <TrophyOutlined className="trophy-icon" />}
+                    </div>
+                    <div className="user-section">
+                      <span className="username">{entry.username === username ? "You" : entry.username}</span>
+                      <span className="user-score">{entry.score} pts</span>
+                    </div>
+                  </div>
+              ))) :(
+                  <p className="no-data-text"> <WarningTwoTone style={{color:"#faad14"}}/>No leaderboard data available.</p>
+              )
+               ):(
+                      leaderBoardWithRoom[selectedRoomFill].length>0 ? (
+
+                      leaderBoardWithRoom && leaderBoardWithRoom[selectedRoomFill].map((data:any, ind:any)=>(
+                          <div key={ind} className={`leaderboard-item ${data.username === username ? "current-user" : ""}`}
+                          onClick={()=>{
+                              handleClickLeaderboard(ind);
+                          }}
+                          >
+                            <div className="rank-section">
+                              <div className={`rank-badge ${data.rank <= 3 ? "top-rank" : ""}`}>
+                                <span className="rank-number">#{data.rank}</span>
+                              </div>
+                              {data.rank <= 3 && <TrophyOutlined className="trophy-icon" />}
+                            </div>
+                            <div className="user-section">
+                              <span className="username">{data.username === username ? "You" : data.username}</span>
+                              <span className="user-score">{data.score} pts</span>
+                            </div>
+                          </div>
+                      ))):(
+                          <p className="no-data-text"><WarningTwoTone style={{color:"#faad14"}}/> No data for selected room.</p>
+                      )
+               )}
                <hr />
 
                <div className="leaderboard-legend-section">
@@ -455,6 +657,22 @@ const DashPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+          <ModalForm
+            title={modalProps?.title || "UNDEFINED"}
+            onOk={modalProps?.onOk || (()=>{})}
+            onCancel={modalProps?.onCancel || (()=>{})}
+           onClose={modalProps?.onClose || (()=>{})}
+            open={isModalOpen}
+            footer={
+              modalProps?.footer
+            }
+            multi={false}
+          >
+            {modalProps?.children || null}
+          </ModalForm>
+
+
     </div>
   )
 }

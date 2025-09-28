@@ -5,7 +5,7 @@ import { useEffect, useState,useRef } from "react";
 import axios from "axios";
 import { useUserStore } from "../../components/UserStore";
 import { socket } from "../socket";
-
+import { useSessionStore } from "../../components/IDStore";
 import "../css/TimeOut.css";
 
 export default function JoinMiddlePage(){
@@ -18,7 +18,7 @@ export default function JoinMiddlePage(){
     const [success, setSuccess] = useState(false);
     const isMounted = useRef(false);
     const [data, setData] = useState<{userId:string, encryptUsername:string}>({userId:'', encryptUsername:''});
-
+    const {setSsid,ssid} = useSessionStore();
     
         if(!roomCode){
             navigate('*', {replace:true});
@@ -31,14 +31,20 @@ export default function JoinMiddlePage(){
         },[user])
 
         const joinRoom = async() =>{
-            console.log("USER",user)
+            console.log("USER",user?.user)
             await axios.post(`${URL}/room/joinRoom`, {username: user?.user, roomCode: roomCode}, {withCredentials:true}).then((res)=>{
-                 const {userId,encryptUsername} = res.data;
+                  const {userId,encryptUsername,ssid: newSsid} = res.data;
+                 
+                 // Save ssid to SessionStore
+                 if(newSsid) {
+                     setSsid(newSsid);
+                 }
                 setData(()=>{
                     return {
                         userId: userId,
                         encryptUsername: encryptUsername
-                    };
+
+                        };
                 });
                 setLoading(()=>{
                     return false;
@@ -66,7 +72,7 @@ export default function JoinMiddlePage(){
         
         if (success && data.encryptUsername && data.userId) {
             timeoutId = setTimeout(() => {
-                navigate(`/Lobby?roomCode=${roomCode}&participant=${data.encryptUsername}&userId=${data.userId}`, {replace: true});
+                navigate(`/Lobby?roomCode=${roomCode}&participant=${data.encryptUsername}&userId=${data.userId}&ssid=${ssid}`, {replace: true});
             }, 1500);
         }
         

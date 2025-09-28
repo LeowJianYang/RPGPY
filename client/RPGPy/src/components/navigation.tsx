@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import "../css/navigation.css";
+import { useNavigate } from "react-router-dom";
+import { GithubFilled } from "@ant-design/icons";
 
 export default function NavBar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!mobileMenuOpen);
@@ -14,7 +17,7 @@ export default function NavBar() {
         <>
             <header className="navbar">
                 <div className="middleNav">
-                    <div className="imgNav">
+                    <div className="imgNav" onClick={()=>{navigate("/",{replace:true})}}>
                         <img src="/rpgpy-trans.png" alt="RPGPy Logo" />
                     </div>
                     
@@ -80,6 +83,9 @@ export function FooterBar() {
             
             <div className="footer-bottom">
                 <p>&copy; 2025 RPGPy. All rights reserved.</p>
+                <a href="https://github.com/LeowJianYang/FWDDWEB" target="_blank" rel="noopener noreferrer">
+                    <GithubFilled className="github-icon" />
+                </a>
             </div>
         </footer>
     );

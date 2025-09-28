@@ -40,7 +40,7 @@ export default function DashboardPage(){
             setUser({
                 email: res.data.Email,
                 user: res.data.Username,
-                uid: res.data.UID
+                uid: res.data.uid
             });
             console.log(res.data);
         })
