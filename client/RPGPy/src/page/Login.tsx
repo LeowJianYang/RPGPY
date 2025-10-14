@@ -10,8 +10,12 @@ import RegisterPage from "./Register";
 import axios from "axios";
 import { useUserStore } from "../../components/UserStore";
 import { useToast } from "../components/Toast";
+import { ConfigProvider } from 'antd';
+import { useTheme } from "../utils/themeManager";
 // You can find a suitable image and place it in your public folder
 const loginIllustration = "/rpgpy-trans.png"; 
+
+
 
 
 
@@ -24,6 +28,8 @@ export default function LoginPage() {
     const { setUser } = useUserStore();
     const URL = import.meta.env.VITE_API_URL;
     const {notify} = useToast();
+    const { theme } = useTheme();
+
 
     useEffect(() => {
         axios.get(`${URL}/authCookie`, { withCredentials: true }).then((res) => {
@@ -97,44 +103,71 @@ export default function LoginPage() {
                         <>
                             <h1 className="auth-title">Welcome Back!</h1>
                             <p className="auth-subtitle">Please enter your details to log in.</p>
-                            <Form
-                                form={loginform}
-                                name="Login"
-                                initialValues={{ remember: true }}
-                                onFinish={handleLogin}
-                                layout="vertical"
-                            >
-                                <Form.Item
-                                    name="email"
-                                    label="Email Address"
-                                    rules={[{ required: true, message: "Please enter your email!", type: "email" }]}
-                                    className="auth-form-item"
-                                >
-                                    <Input prefix={<UserOutlined />} placeholder="your.email@example.com" size="large" />
-                                </Form.Item>
+                            
+                            <ConfigProvider
+                                theme={{
+                                
+                                        token:{
+                                            colorText: theme === 'system' || theme === 'dark' ? '#f1f5f9' : '#000000',
+                                            colorTextPlaceholder: theme === 'system' || theme === 'dark' ? '#000000' : '#6b7280',
+                                        },
+                                        components: {
+                                        Form: {
+                                            labelColor: theme === 'system' || theme === 'dark' ? '#f1f5f9' : '#000000'
 
-                                <Form.Item
-                                    name="password"
-                                    label="Password"
-                                    rules={[{ required: true, message: "Please enter your password!" }]}
-                                    className="auth-form-item"
-                                >
-                                    <Input.Password prefix={<LockOutlined />} placeholder="Your password" size="large" />
-                                </Form.Item>
+                                        },
 
-                                <div className="auth-link-group">
-                                    <Form.Item name="remember" valuePropName="checked" noStyle>
-                                        <Checkbox>Remember me</Checkbox>
+                                        Input:{
+                                            activeBg: theme === 'system' || theme === 'dark' ? '#EA8C55' : '#ffffff',
+                                        }
+                                    },
+
+                                 
+                                }}
+                                >
+                            
+                            
+                                <Form
+                                    form={loginform}
+                                    name="Login"
+                                    initialValues={{ remember: true }}
+                                    onFinish={handleLogin}
+                                    layout="vertical"
+                                >
+                                    <Form.Item
+                                        name="email"
+                                        label="Email Address"
+                                        rules={[{ required: true, message: "Please enter your email!", type: "email" }]}
+                                        className="auth-form-item"
+                                        style={{ color: 'white' }}
+                                    >
+                                        <Input prefix={<UserOutlined />} placeholder="your.email@example.com" size="large" style={{ backgroundColor: theme === 'dark' || theme==='system' ? '#EA8C55' : '#ffffff' }} />
                                     </Form.Item>
-                                    <a href="#">Forgot Password?</a>
-                                </div>
 
-                                <Form.Item>
-                                    <Button block type="primary" htmlType="submit" className="auth-button" loading={loading}>
-                                        Login
-                                    </Button>
-                                </Form.Item>
-                            </Form>
+                                    <Form.Item
+                                        name="password"
+                                        label="Password"
+                                        rules={[{ required: true, message: "Please enter your password!" }]}
+                                        className="auth-form-item"
+                                        
+                                    >
+                                        <Input.Password prefix={<LockOutlined />} placeholder="Your password" size="large" style={{ backgroundColor: theme === 'dark' || theme==='system' ? '#EA8C55' : '#ffffff' }}/>
+                                    </Form.Item>
+
+                                    <div className="auth-link-group">
+                                        <Form.Item name="remember" valuePropName="checked" noStyle>
+                                            <Checkbox>Remember me</Checkbox>
+                                        </Form.Item>
+                                        <a href="#">Forgot Password?</a>
+                                    </div>
+
+                                    <Form.Item>
+                                        <Button block type="primary" htmlType="submit" className="auth-button" loading={loading}>
+                                            Login
+                                        </Button>
+                                    </Form.Item>
+                                </Form>
+                            </ConfigProvider>
                             <p className="auth-switch-text">
                                 Don't have an account? <a href="" onClick={toggleForm}>Sign Up</a>
                             </p>

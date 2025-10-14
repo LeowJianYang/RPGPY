@@ -15,6 +15,7 @@ import {BgmManager} from '../components/BgmManager';
 import { MutedOutlined, SoundOutlined } from '@ant-design/icons';
 import HealthBar from '../components/HeathBar';
 import {useSessionStore} from '../../components/IDStore';
+import introJs from 'intro.js';
 
 
 
@@ -23,7 +24,7 @@ type QuizState =
   | { kind: 'mcq'; q: string; a: string[]; correct: number }
   | { kind: 'code'; prompt: string; starter: string; expected:string };
 
-export default function Game() {
+export default function Game({Mode}: {Mode:string}) {
    const bgm = useMemo(() => new BgmManager(), []);
   const [map, setMap] = useState<MapJSON | null>(null);
   const [position, setPosition] = useState<string|number>(1);
@@ -60,6 +61,7 @@ export default function Game() {
   const EnteringBranch = useRef(false);
   const branchCodeRef = useRef<string>("");
   const {ssid} = useSessionStore();
+  const started= useRef(false);
  
   useEffect(()=>{
 
@@ -83,6 +85,16 @@ export default function Game() {
     }
 
   },[])
+
+  useEffect(()=>{
+    console.log("MODE", Mode);
+     Mode === "Tutorial" ? document.title = "RPGPy - Tutorial Mode" : document.title = "RPGPy - Game Mode";
+     if (Mode === "Tutorial" && !started.current){
+        started.current = true;
+        setTimeout(()=>{handleTutorialLogic();},500);
+     }
+      
+  },[Mode]);
 
 
 
@@ -136,6 +148,7 @@ export default function Game() {
 
     http.get(`/map/${mapid}`).then(res => {
         setMap(res.data);
+
         }).catch(console.error);
     
     bgm.play('/Music/Main-flow.ogg', true);
@@ -447,6 +460,10 @@ export default function Game() {
     }
   }, [map, currentTile]);
 
+  // Tutorial Logic
+  const handleTutorialLogic = async ()=>{
+    introJs.tour().start();
+  };
 
 //Position Control
   const rollPosition = async () =>{
@@ -458,7 +475,7 @@ export default function Game() {
     // const nextStep=map.tiles[`${prefix === null ? "":prefix}${suffix??+1}`]; 
     const NormTileLogic = async ()=>{
       
-      const next = Math.min(Number(dice), 40);
+      const next = Math.min(Number(dice), map.LastIndex);
       console.log("[DEBUG] NORM IN ROLL POSITION", next);
 
       if(Number.isNaN(next)){
@@ -481,7 +498,7 @@ export default function Game() {
         const letter = numberStr ? numberStr[1] : null;
         
 
-        const next= `${letter}${Math.min((num ?? 0), 40)}` 
+        const next= `${letter}${Math.min((num ?? 0), map.LastIndex)}`; 
         console.log("[DEBUG] SPECIAL IN ROLL POSITION", branchCodeRef.current);
 
         // if (letter !== branchCodeRef.current){
@@ -862,7 +879,7 @@ export default function Game() {
  //disabled={position as unknown as number >= 40 || dice === null || (currentTile?.type === "R" ? (keySplit(dice?.toString() ?? "").suffix?? 0 >= Number(currentTile?.branchQuit)):false)}
 
 
-    if (position as unknown as number >=40) return true;
+    if (position as unknown as number >=(map?.LastIndex ?? 0)) return true;
 
     if (dice === null || dice === "") return true;
 
@@ -1055,11 +1072,11 @@ const handleBgmMute = () =>{
   if (!map) return <div style={{ padding: 16 }}>Loading map…</div>;
 
   return (
-    <div className="gameContainer">
+    <div className="gameContainer" data-title= "Welcome to the tutorial !" data-intro="This is the main game interface where you can see your status, interact with tiles, and manage your inventory.">
       <h1 >{map.name}</h1>
 
-      <div className="InnerGameContainer">
-        <div>Position: <b>{tileKey}</b> / 40</div>
+      <div className="InnerGameContainer" data-title= "Player Status" data-intro="This section displays your current position, health points (HP), attack power (ATK), and score. Keep an eye on these stats as you progress through the game!">
+        <div>Position: <b>{tileKey}</b> / {(map.LastIndex).toString()}</div>
         <div>Player: <b>{user?.user}</b></div>
         <div>HP: <b>{hp}</b></div>
         <div>ATK: <b>{Atk}</b></div>
@@ -1075,7 +1092,7 @@ const handleBgmMute = () =>{
         value={dice ?? ""}
         onChange={(e)=> setDice(e.target.value)}
         className='positionInput'
-        
+        data-title= "Position Input" data-intro="Enter the position you want to move to in this input box. Make sure to enter a valid position based on your current location and the game's rules."
         ></input>
 
         <SelfButton onClick={()=> {handleBgmMute()}}>
@@ -1083,7 +1100,7 @@ const handleBgmMute = () =>{
         </SelfButton>
 
         {/* Turn-based Game Timeline */}
-        <div className="timeline-container">
+        <div className="timeline-container" data-title= "Game Timeline" data-intro="This section provides an overview of the game's timeline, including the current round, whose turn it is, and the order of players. If it's your turn, you'll see options to end your turn or roll the dice.">
           <h4>Game Timeline</h4>
           <div className="current-turn-info">
             <p><strong>Round:</strong> {CurrentTurn?.round || 1}</p>
@@ -1142,7 +1159,7 @@ const handleBgmMute = () =>{
       </div>
 
       {/* EventCard */}
-      <div className="EventCard">
+      <div className="EventCard" data-title= "Tile Event" data-intro="This section displays information about the current tile you are on. Depending on the type of tile, you may encounter enemies, find loot, or face other events. Pay attention to the details provided here to make informed decisions during your turn.">
         <h3>Tile Event</h3>
         {!currentTile && <p>Nothing here.</p>}
         {currentTile && (
@@ -1251,9 +1268,9 @@ const handleBgmMute = () =>{
       )}
 
       {/* Backpack & Equipment Areas*/}
-      <div className='backWarpper'>
+      <div className='backWarpper' data-title= "Inventory & Equipment" data-intro="This section allows you to manage your inventory and equipment. You can view the items you have collected, use them, and see the details of your equipped items. Click on an item to see more information or to use it during your turn.">
         <h4>Equipment</h4>
-        <div className='equipmentWarpper'>
+        <div className='equipmentWarpper' data-intro="Last! Good Luck !">
           <ul>
             {equip.map((eq,idx)=><li key={idx} style={{position:'relative'}}
             onClick={()=>onClickEquip(eq)} className={SkillsUsed.find(skill=> skill.Cooldown!==0 && skill.usedSkill===eq)? "cooldown-box":""}
@@ -1370,7 +1387,8 @@ const handleBgmMute = () =>{
               <p>{ModalCont?.content ?? ""}</p>
             
             </ModalForm>
-         
+              
+            
 
 
       </div>

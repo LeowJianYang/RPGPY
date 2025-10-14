@@ -40,5 +40,6 @@ export interface MapJSON {
   enemies: Record<string, Enemy>;
   SkillsSet: Record<string, {type: string, description: string, damage?:number, heal?:number, HP?:number, duration?:number, Cooldown:number}>;
   RolesSet: Record<string, {description:string, ATK:number, HP:number, Skills:string[]}>;
+  LastIndex:number;
 }
 

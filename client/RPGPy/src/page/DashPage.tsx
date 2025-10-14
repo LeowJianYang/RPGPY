@@ -14,15 +14,16 @@ import { MdDiamond } from "react-icons/md";
 import 'intro.js';
 import 'intro.js/introjs.css';
 import { WarningTwoTone } from "@ant-design/icons"
-
+import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import {
   TrophyOutlined,
   BookOutlined,
   FireOutlined,
   RocketOutlined,
-  StarOutlined,
+  SettingOutlined,
   CheckCircleOutlined,
+  StarOutlined,
   DownOutlined,
 } from "@ant-design/icons"
 import "../css/Dashboard.css"
@@ -48,12 +49,12 @@ interface PlayerWithRank extends Player{
 
 type RoomCodeWithRank = Record<string, PlayerWithRank[]>;
 
-interface Adventure {
-  id: string
-  title: string
-  progress: number
-  difficulty: "Beginner" | "Intermediate" | "Advanced"
-}
+interface quickAction {
+    name: string,
+    description: string,
+    icon?: React.ReactNode,
+    link: string
+};
 
 interface LeaderboardEntry {
   username: string | null
@@ -70,7 +71,6 @@ const DashPage: React.FC = () => {
     totalScore: 0,
     rank: 0,
   })
-  const [adventures, setAdventures] = useState<Adventure[]>([])
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [leaderBoardWithRoom, setLeaderBoardWithRoom] = useState<any>()
   const [loading, setLoading] = useState(true)
@@ -78,6 +78,8 @@ const DashPage: React.FC = () => {
   const [selectedRoomFill, setSelectedRoomFill] = useState<string>('All Rooms')
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalProps, setModalProps] = useState<ModalFormProps>();
+  const [quickActions, setQuickActions] = useState<quickAction[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
       try{
@@ -120,15 +122,16 @@ const DashPage: React.FC = () => {
           totalScore: 1250,
           rank: 8,
         }
+            
+      const quickItems: quickAction[] =[
+        {name: "Start A Game", description: "Begin a new coding adventure with friends", icon: <RocketOutlined />, link: "/dashboard?selector=2"},
+        {name: "Join A Game", description: "Enter a room code to join an existing game", icon: <FaRankingStar />, link: "/dashboard?selector=2"},
+        {name: "Profiles", description: "View Profile details and Achievement", icon: <BookOutlined />, link: "/dashboard?selector=3"},
+        {name: "Settings", description: "Review settings and preferences", icon: <SettingOutlined />, link: "/settings"},
+      ];
+      
 
 
-        const mockAdventures: Adventure[] = [
-          { id: "1", title: "The Beginner's Python", progress: 100, difficulty: "Beginner" },
-          { id: "2", title: "Functions & Logic", progress: 75, difficulty: "Beginner" },
-          { id: "3", title: "Data Structures Deep Dive", progress: 50, difficulty: "Intermediate" },
-          { id: "4", title: "File I/O Adventure", progress: 25, difficulty: "Intermediate" },
-          { id: "5", title: "API Integration Quest", progress: 10, difficulty: "Advanced" },
-        ]
 
         const allLeaderboard = Object.values(queryLeaderboard)
         .flat()  // Let it become the whole status. 
@@ -160,8 +163,8 @@ const DashPage: React.FC = () => {
         const mockLeaderboard: LeaderboardEntry[] = allLeaderboard
 
         setUserStats(mockUserStats);
-        setAdventures(mockAdventures);
         setLeaderboard(mockLeaderboard);
+        setQuickActions(quickItems);
         setLeaderBoardWithRoom(rankedRoomLeaderboard);
         console.log("Leaderboard with room data:", allLeaderboard)
         setLoading(false)
@@ -180,6 +183,7 @@ const DashPage: React.FC = () => {
         key: idx+1,
         label: `Room Code: ${code}`
   }))
+
 
   const handleClickLeaderboard = async (index:number)=>{
       setIsModalOpen(true);
@@ -350,20 +354,6 @@ const DashPage: React.FC = () => {
 
   }
 
-  
-
-  const getDifficultyColor = (difficulty: Adventure["difficulty"]) => {
-    switch (difficulty) {
-      case "Beginner":
-        return "difficulty-beginner"
-      case "Intermediate":
-        return "difficulty-intermediate"
-      case "Advanced":
-        return "difficulty-advanced"
-      default:
-        return "difficulty-beginner"
-    }
-  }
 
   if (loading) {
     return (
@@ -484,40 +474,15 @@ const DashPage: React.FC = () => {
 
       <div className="content-grid">
         <div className="main-content">
-          <div className="dashboard-card adventures-card">
-            <div className="card-header">
-              <div className="card-title-section">
-                <h3 className="card-title">Your Learning Adventures</h3>
-                <span className="active-count">{adventures.filter((a) => a.progress < 100).length} active</span>
-              </div>
-            </div>
-            <div className="adventures-list">
-              {adventures.map((adventure) => (
-                <div key={adventure.id} className="adventure-item">
-                  <div className="adventure-content">
-                    <div className="adventure-info">
-                      <h4 className="adventure-title">{adventure.title}</h4>
-                      <span className={`difficulty-badge ${getDifficultyColor(adventure.difficulty)}`}>
-                        {adventure.difficulty}
-                      </span>
-                    </div>
-                    <div className="progress-section">
-                      <div className="progress-container">
-                        <div className="progress-track">
-                          <div className="progress-fill" style={{ width: `${adventure.progress}%` }}></div>
-                        </div>
-                        <span className="progress-percentage">{adventure.progress}%</span>
-                      </div>
-                      {adventure.progress === 100 && (
-                        <div className="completion-badge">
-                          <CheckCircleOutlined /> Complete
-                        </div>
-                      )}
-                    </div>
+          <div className="dashboard-card quick-actions-list">
+            <h3 className="card-title">Quick Actions</h3>
+               {quickActions.map((actions, idx)=>(
+                  <div key={idx} className="quick-action-item" onClick={()=>{navigate(actions.link)}}> 
+                      {actions.icon}
+                      <p className="quick-action-name">{actions.name}</p>
+                      <p className="quick-action-desc">{actions.description}</p>
                   </div>
-                </div>
-              ))}
-            </div>
+               ))}
           </div>
 
           <div className="dashboard-card cta-card">
@@ -531,7 +496,7 @@ const DashPage: React.FC = () => {
                   Discover new Python adventures tailored to your skill level and interests.
                 </p>
               </div>
-              <button className="cta-button">
+              <button className="cta-button" onClick={()=>{navigate("/dashboard?selector=2")}}>
                 <span>Start New Adventure</span>
                 <RocketOutlined className="button-icon" />
               </button>

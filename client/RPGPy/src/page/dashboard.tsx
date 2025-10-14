@@ -69,7 +69,7 @@ export default function DashboardPage(){
                 break;
             
             case "5":
-               navigate(`/documentation`, {replace:true});
+               navigate(`/docs`, {replace:true});
                 break;
 
             case "4":

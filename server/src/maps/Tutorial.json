@@ -1,0 +1,114 @@
+{
+  "mapId": "Tutorial",
+  "name": "Tutorial",
+  "LastIndex": 20,
+
+  "legend": {
+    "S": "Start",
+    "E": "Enemy",
+    "C": "Chest / Skill",
+    "Q": "Quiz",
+    "M": "MCQ (was Lock)",
+    "R": "Branch",
+    "B": "Boss",
+    "X": "Empty"
+  },
+
+  "tiles": {
+    "01": { "type": "X", "description": "START" },
+    "02": { "type": "C", "lootTable": "treasure_skill" },
+    "03": { "type": "Q", "quizPool": "python_code_questions" },
+    "04": { "type": "E", "enemyId": "slime_001", "quizPool": "python_basics" },
+    "05": { "type": "M", "quizPool": "python_control_flow" },
+    "06": { "type": "C", "lootTable": "treasure_mid" },
+    "07": { "type": "E", "enemyId": "bat_002", "quizPool": "python_control_flow" },
+    "08": { "type": "Q", "quizPool": "python_code_questions" },
+    "09": { "type": "C", "lootTable": "treasure_skill" },
+    "10": { "type": "R", "branchExpected": "L10" },
+    "11": { "type": "E", "enemyId": "goblin_003", "quizPool": "python_control_flow" },
+    "12": { "type": "C", "lootTable": "treasure_rare" },
+    "13": { "type": "Q", "quizPool": "python_code_questions" },
+    "14": { "type": "E", "enemyId": "wolf_006", "quizPool": "python_control_flow" },
+    "15": { "type": "C", "lootTable": "treasure_mid" },
+    "16": { "type": "E", "enemyId": "mage_007", "quizPool": "python_code_questions" },
+    "17": { "type": "M", "quizPool": "python_control_flow" },
+    "18": { "type": "Q", "quizPool": "python_code_questions" },
+    "19": { "type": "C", "lootTable": "treasure_skill" },
+    "20": { "type": "B", "enemyId": "dragon_001", "quizPool": "python_code_questions", "description": "END - Boss Fight" },
+
+    "L10": { "type": "E", "enemyId": "bandit_008", "quizPool": "python_control_flow", "isBranch": true },
+    "L11": { "type": "C", "lootTable": "treasure_mid", "isBranch": true },
+    "L12": { "type": "Q", "quizPool": "python_code_questions", "isBranch": true },
+    "L13": { "type": "E", "enemyId": "knight_009", "quizPool": "python_control_flow", "isBranch": true },
+    "L14": { "type": "X", "branchQuit": "20" }
+  },
+
+  "quizPools": {
+    "python_basics": [
+      { "q": "What is the output of print(2+3)?", "a": ["23", "5", "Error"], "correct": 1, "expectedResult": "5" },
+      { "q": "Which keyword defines a function in Python?", "a": ["def", "func", "lambda"], "correct": 0 ,"expectedResult":"def" }
+    ],
+    "python_control_flow": [
+      { "q": "Which statement is used for decision making?", "a": ["if", "for", "while"], "correct": 0, "expectedResult": "if"},
+      { "q": "Which keyword can be used with both `for` and `while` loops?", "a": ["return", "break", "print"], "correct": 1, "expectedResult": "break"}
+    ],
+    "python_code_questions":[
+      {"q": "Using a `for` loop, print the numbers from 1 to 3, each on a new line.", "expectedResult": "1\n2\n3\n"},
+      {"q": "Using a `while` loop, print numbers from 5 down to 1.", "expectedResult": "5\n4\n3\n2\n1\n"},
+      {"q": "Given x=10, print 'Positive' if greater than 0, else 'Negative'.", "expectedResult": "Positive\n"}
+    ]
+  },
+
+  "lootTables": { 
+    "treasure_low": ["Potion", "Gold"],
+    "treasure_mid": ["Iron Sword", "Dragon Armor"],
+    "treasure_high": ["Magic Staff", "Laser Sword"],
+    "treasure_rare": ["Special Bow", "Potion Lvl 2", "Iron Sword Lvl 3"],
+    "treasure_skill":["Fireball Lvl 2","Laser Beam Lvl 3", "Heal Lvl 3", "Laser Beam","Heal Lvl 2"]
+  },
+
+  "RolesSet": {
+    "Warrior": {"description":"A strong melee fighter", "ATK":3, "HP":20, "Skills":["Warrior Strike"]},
+    "Mage": {"description":"A master of elemental magic", "ATK":2, "HP":15, "Skills":["Fireball"]},
+    "Healer": {"description":"Supports the team with healing", "ATK":1, "HP":18, "Skills":["Heal"]}
+  },
+
+  "SkillsSet": {
+    "Fireball": {"type": "Attack", "description":"Deals 10 damage to an enemy", "damage":10, "Cooldown":3},
+    "Heal": {"type": "Heal", "description":"Restores 15 HP", "heal":15, "Cooldown":5},
+    "Warrior Strike": {"type": "Attack", "description":"Deals 2 damage to an enemy", "damage":2, "Cooldown":2}
+  },
+
+  "lootEffects": {
+    "Potion":{"type":"Restock","description": "Add 5 HP", "HP":5},
+    "Iron Sword": {"type":"Weapon","description": "Add 2 ATK", "ATK":2},
+    "Magic Staff": {"type":"Weapon","description": "Add 3 ATK", "ATK":3},
+    "Dragon Armor": {"type":"Amour","description": "Add 10 HP", "HP":10},
+    "Gold":{"type":"Loot","description": "Useless GOLD"},
+    "Special Bow": {"type":"Weapon","description": "Add 10 ATK", "ATK":10},
+    "Laser Beam": {"type":"Attack","description": "Deals 12 ATK", "damage":12, "Cooldown":10},
+    "Laser Beam Lvl 3": {"type":"Attack","description": "Deals 20 ATK", "damage":20, "Cooldown":10},
+    "Heal Lvl 3": {"type":"Heal","description": "Restores 25 HP", "heal":25, "Cooldown":10},
+    "Fireball Lvl 2": {"type":"Attack","description": "Deals 15 ATK", "damage":15, "Cooldown":6},
+    "Heal Lvl 2": {"type":"Heal","description": "Restores 22 HP", "heal":22, "Cooldown":7},
+    "Potion Lvl 2":{"type":"Restock","description": "Add 12 HP", "HP":12},
+    "Iron Sword Lvl 3": {"type":"Weapon","description": "Add 14 ATK", "ATK":14},
+    "Laser Sword": {"type":"Weapon","description": "Add 8 ATK", "ATK":8}
+  },
+
+  "Player": {
+    "ATK": 5,
+    "HP": 50
+  },
+
+  "enemies": {
+    "slime_001": { "name": "Slime", "hp": 10, "attack": 2, "styleImg": "Slime.png" },
+    "bat_002": { "name": "Bat", "hp": 15, "attack": 3, "styleImg": "Bat.png" },
+    "goblin_003": { "name": "Goblin", "hp": 20, "attack": 4, "styleImg": "Goblin.png" },
+    "wolf_006": { "name": "Wolf", "hp": 18, "attack": 4, "styleImg": "Wolf.png" },
+    "mage_007": { "name": "Dark Mage", "hp": 22, "attack": 7, "styleImg": "Mage.png" },
+    "bandit_008": { "name": "Bandit", "hp": 28, "attack": 6, "styleImg": "Bandit.png" },
+    "knight_009": { "name": "Corrupted Knight", "hp": 35, "attack": 8, "styleImg": "Knight.png" },
+    "dragon_001": { "name": "Dragon Boss", "hp": 100, "attack": 15, "styleImg": "Dragon.png" }
+  }
+}

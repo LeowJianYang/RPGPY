@@ -88,7 +88,7 @@ FWDD-Assignment/
 
 - **Frontend:** React + Vite + SWC
 - **Backend:** Express (Node.js)
-- **API:** RESTful
+- **API:** RESTful/RPC
 - **State Management:** Zustand (client global state)
 - **Real-time:** Socket.IO (for multiplayer features)
 - **Databse:** MySQL DB 
@@ -101,7 +101,7 @@ FWDD-Assignment/
   - `client/RPGPy/` - Main UI logic and pages
   - `client/RPGPy/components/` - Global state (e.g., UserStore)
   - `client/RPGPy/src/components/` - UI widgets (modals, loading, etc.)
-- `server/` - Backend API and logic (RESTful, Express)
+- `server/` - Backend API and logic (RESTful/RPC, Express)
 
 ---
 
@@ -110,6 +110,7 @@ FWDD-Assignment/
 - Start both client and server as described above.
 - Access the app via the client dev server URL (usually http://localhost:5173/).
 - The backend runs on http://localhost:3000/ by default.
+- Please Change the ```secure:false``` and ```sameSite:none``` for development
 
 ---
 
@@ -117,4 +118,4 @@ FWDD-Assignment/
 
 MIT License. See [LICENSE](./LICENSE) for details.
 Intro.js. See [NOTICE](./NOTICE.md) for details.
-Credits of the Sound. [CREDITS]()
+Credits of the Sound. [CREDITS](./CREDITS.md)

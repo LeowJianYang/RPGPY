@@ -1,0 +1,88 @@
+
+
+.introjs-tooltip {
+  background-color: #121212 !important;
+  color: #ffffff !important;            
+  border-radius: 12px !important;
+  border: 1px solid #333 !important;
+  font-family: "Inter", "Poppins", sans-serif;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+  padding: 16px 20px !important;
+}
+
+
+.introjs-arrow {
+  border-color: transparent !important;
+}
+.introjs-arrow.top {
+  border-bottom-color: #121212 !important;
+}
+.introjs-arrow.bottom {
+  border-top-color: #121212 !important;
+}
+.introjs-arrow.left {
+  border-right-color: #121212 !important;
+}
+.introjs-arrow.right {
+  border-left-color: #121212 !important;
+}
+
+.introjs-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+  opacity: 1 !important;
+}
+
+.introjs-helperLayer {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 2px solid #4caf50 !important;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.4) !important;
+}
+
+.introjs-button {
+  background-color: #4caf50 !important; 
+  color: #fff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 600;
+  padding: 6px 14px !important;
+  transition: background-color 0.2s ease;
+}
+
+.introjs-button:hover {
+  background-color: #43a047 !important;
+}
+
+
+.introjs-skipbutton {
+  background-color: transparent !important;
+  color: #999 !important;
+  text-decoration: underline !important;
+}
+
+
+.introjs-disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+
+.introjs-bullets ul li a.active {
+  background: #4caf50 !important;
+}
+.introjs-bullets ul li a {
+  background: #555 !important;
+}
+
+
+.introjs-tooltip-header {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff !important;
+}
+
+
+.introjs-tooltiptext {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #f0f0f0 !important;
+}

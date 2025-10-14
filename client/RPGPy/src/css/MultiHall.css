@@ -182,7 +182,29 @@
   color:#218838;
 }
 
+.tip-section{
+  background-color: #fffbe6;
+  border: var(--multi-border-color) 0.6px solid;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-top: 1.8rem;
+}
 
+.tip-content {
+  display: flex;
+  flex-direction: column;
+  gap:1.2rem;
+  flex-wrap: wrap;
+}
+
+.tip-content > h3{
+  color:#000000;
+}
+
+.tip-content >p{
+  color:#000000;
+  font-size: clamp(0.8rem, 4vh, 1rem);
+}
 
 /* Responsive Design- Enhance for Desktop Screen */
 @media (min-width: 600px) {

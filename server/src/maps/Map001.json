@@ -1,6 +1,7 @@
 {
   "mapId": "MAP001",
   "name": "Dungeon of Logic",
+  "LastIndex": 40,
 
 "legend": {
     "S": "Start",

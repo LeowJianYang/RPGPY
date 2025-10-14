@@ -25,6 +25,7 @@ export default function NavBar() {
                     <nav className="innerNav">
                         <a className="contentNav" href="/">Home</a>
                         <a className="contentNav" href="/about">About</a>
+                        <a className="contentNav" href="/Docs">Docs</a>
                         <a className="LoginBtn" href="/Login">Login/SignUp</a>
                     </nav>
 
@@ -42,6 +43,7 @@ export default function NavBar() {
                 <a className="closeNav" onClick={toggleMobileMenu}>CLOSE</a>
                 <a className="contentNav" href="/" onClick={toggleMobileMenu}>Home</a>
                 <a className="contentNav" href="/about" onClick={toggleMobileMenu}>About</a>
+                <a className="contentNav" href="/Docs" onClick={toggleMobileMenu}>Docs</a>
                 <a className="LoginBtn" href="/Login" onClick={toggleMobileMenu}>Login/SignUp</a>
             </div>
         </>
@@ -68,14 +70,14 @@ export function FooterBar() {
                 
                 <div className="innerCont">
                     <p className="text-title">How to Play</p>
-                    <a className="text-cont" href="/tutorial">Tutorial</a>
-                    <a className="text-cont" href="/guide">Game Guide</a>
-                    <a className="text-cont" href="/faq">FAQ</a>
+                    <a className="text-cont" href="/docs?section=tutorial">Tutorial</a>
+                    <a className="text-cont" href="/docs?section=downloads">Map</a>
+                    <a className="text-cont" href="/docs?section=help">FAQ</a>
                 </div>
                 
                 <div className="innerCont">
                     <p className="text-title">Resources</p>
-                    <a className="text-cont" href="/documentation">Documentation</a>
+                    <a className="text-cont" href="/Docs">Documentation</a>
                     <a className="text-cont" href="/examples">Code Examples</a>
                     <a className="text-cont" href="/community">Community</a>
                 </div>

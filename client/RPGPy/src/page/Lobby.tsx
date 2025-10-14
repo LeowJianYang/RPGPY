@@ -124,7 +124,11 @@ export default function Lobby(){
     useEffect(()=>{
         socket.on('game-started', (data)=>{
             console.log("Game started: ", data);
-            navigate(`/Game?roomCode=${data.roomCode}&mapid=${data.MapId}&userid=${userId}`, {replace:true});
+            if(MapDetails[0]?.MapName == "Tutorial"){
+                navigate(`/Game/tutorial?roomCode=${data.roomCode}&mapid=${data.MapId}&userid=${userId}`, {replace:true});
+            }else{
+                navigate(`/Game?roomCode=${data.roomCode}&mapid=${data.MapId}&userid=${userId}`, {replace:true});
+            }
         })
 
         return ()=>{

@@ -11,7 +11,7 @@ import { socket } from '../socket';
 import { ScanOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 import { useSessionStore } from "../../components/IDStore";
-
+import {BulbOutlined } from '@ant-design/icons';
 
 
 export default function MultiPage() {
@@ -140,6 +140,14 @@ export default function MultiPage() {
           <button className="btn-multi join-room-btn" onClick={()=>{handleJoinRoom(), setLoading(true)}}>Join Room</button>
           <ScanOutlined onClick={()=>{setOpenScanToJoin(true), setScanSuccess(false),setIsScanning(true)}}/>
         </div>
+      </div>
+
+      <div className="tip-section">
+            <div className="tip-content">
+                <h3><BulbOutlined /> Tips !</h3>
+                <p> Please Downoload the Maps or Tutorial Maps and Scan QR code state on map for create room !</p>
+                <SelfButton type="primary" onClick={()=> {navigate("/docs?navigator=downloads")}}>Download Maps Here !</SelfButton>
+            </div>
       </div>
 
             <ModalForm

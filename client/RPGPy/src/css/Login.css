@@ -118,6 +118,7 @@
 
 .auth-form-item {
     margin-bottom: 20px;
+    color: var(--login-text-color)
 }
 
 .auth-button {
