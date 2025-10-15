@@ -51,7 +51,9 @@ export default function Game({Mode}: {Mode:string}) {
   const URL= import.meta.env.VITE_API_URL;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [roles, setRoles]= useState<{roleName:string,description:string, ATK:number, HP:number, Skills:string[]}[]>([]);
+  
+  //const [roles, setRoles]= useState<{roleName:string,description:string, ATK:number, HP:number, Skills:string[]}[]>([]);
+  // Note: roles state is maintained for potential future use, currently using rolesArray directly to avoid async state issues
   const [Muted, setMuted] = useState(bgm.isBgmMuted());
   const [SkillsUsed, setSkillsUsed] = useState<{Cooldown:number, duration?:number, usedSkill:string}[]>([]);
   const {notify} = useToast();
@@ -158,7 +160,7 @@ export default function Game({Mode}: {Mode:string}) {
 
   useEffect(()=>{
 
-    socket.connect();
+    if(!socket.connected) socket.connect();
 
     socket.on('connect', () => {
       console.log('Socket connected', user?.uid);
@@ -169,6 +171,18 @@ export default function Game({Mode}: {Mode:string}) {
         console.log('Socket already connected, joining room:', roomCode, user?.uid);
         socket.emit('join-room', {roomCode, user: user?.user});
     }
+
+    // Add handler for successful room join
+    socket.on('room-joined', (data) => {
+      console.log('Successfully joined room:', data);
+      // Request current turn order after joining, but only if we don't have it yet
+      if (!CurrentTurn) {
+        setTimeout(() => {
+          console.log('Requesting turn order after room join...');
+          requestCurrentGameState();
+        }, 1000); // Small delay to let server process
+      }
+    });
 
     //receive data
     socket.on('turn-order',(data)=>{
@@ -185,14 +199,73 @@ export default function Game({Mode}: {Mode:string}) {
       }
     })
 
+    // Optional: Add handler for direct turn-order requests (if your server supports it)
+    socket.on('request-turn-order', () => {
+      console.log('Server requesting turn order refresh...');
+    });
+
     return () => {
       socket.off('connect');
       socket.off('room-joined');
       socket.off('turn-order');
-      socket.disconnect();
+      socket.off('request-turn-order');
+      //socket.disconnect();
       
     }
   },[socket])
+
+  // Function to request current game state via socket
+  const requestCurrentGameState = async (retryCount = 0) => {
+    try {
+      console.log(`Requesting current game state for room: ${roomCode} (attempt ${retryCount + 1})`);
+      
+      // Use your existing /game/turn endpoint to trigger turn-order broadcast
+      const response = await http.post('/game/turn', { roomCode });
+      console.log("Turn state request sent:", response.data);
+      return true;
+    } catch (error) {
+      console.error(`Error requesting current game state (attempt ${retryCount + 1}):`, error);
+      
+      // Retry up to 2 times with increasing delay
+      if (retryCount < 2) {
+        setTimeout(() => {
+          requestCurrentGameState(retryCount + 1);
+        }, (retryCount + 1) * 1000);
+        return false;
+      }
+      
+      // If all retries failed, try direct socket fallback
+      console.log('HTTP requests failed, trying socket fallback...');
+      socket.emit('request-turn-order', { roomCode });
+      return false;
+    }
+  };
+
+  // Additional useEffect to ensure we get turn order even if room-joined event is missed
+  useEffect(() => {
+    let attempts = 0;
+    const maxAttempts = 2; // Reduced attempts since we're using broadcasts
+    
+    const checkTurnOrder = () => {
+      if (!CurrentTurn && socket.connected && roomCode !== "NONE_AVAILABLE" && attempts < maxAttempts) {
+        attempts++;
+        console.log(`Requesting turn order... attempt ${attempts}`);
+        // Try to trigger turn-order broadcast
+        requestCurrentGameState();
+      }
+    };
+
+    // First check after 2 seconds (give more time for initial socket setup)
+    const initialTimer = setTimeout(checkTurnOrder, 2000);
+    
+    // Follow-up check after 5 seconds if still no data
+    const secondTimer = setTimeout(checkTurnOrder, 5000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearTimeout(secondTimer);
+    };
+  }, [CurrentTurn, roomCode, socket.connected]);
 
   // Cleanup BGM when component unmounts
   useEffect(() => {
@@ -208,25 +281,48 @@ export default function Game({Mode}: {Mode:string}) {
         const keys= Object.keys(map?.RolesSet);
         const randomKey= keys[Math.floor(Math.random()*keys.length)];
         const rolesArray= map?.RolesSet[randomKey];
-        setRoles([{
+        
+        // Set roles state
+        // setRoles([{
+        //   roleName: randomKey,
+        //   description: rolesArray.description,
+        //   ATK: rolesArray.ATK,
+        //   HP: rolesArray.HP,
+        //   Skills: rolesArray.Skills
+        // }]);
+        
+        // Set HP and ATK
+        setHp(rolesArray.HP);
+        setAtk(rolesArray.ATK);
+
+        // Use rolesArray directly instead of roles[0] to avoid async state issue
+        const firstSkill = rolesArray.Skills[0] ?? "S";
+        setEquip(["W","A", firstSkill]);
+        
+        // Set equipment details using the actual skill from rolesArray
+        setEquipDet([
+          `Description: ${map?.SkillsSet[rolesArray.Skills[0]]?.description ?? "No description"}`, 
+          `Type: ${map?.SkillsSet[rolesArray.Skills[0]]?.type ?? "Unknown"}`,
+          `Damage: ${map?.SkillsSet[rolesArray.Skills[0]]?.damage ?? 0}`,
+          `Heal: ${map?.SkillsSet[rolesArray.Skills[0]]?.heal ?? 0}`,
+          `HP: ${map?.SkillsSet[rolesArray.Skills[0]]?.HP ?? 0}`,
+          `Duration: ${map?.SkillsSet[rolesArray.Skills[0]]?.duration ?? 0}`, 
+          `Cooldown: ${map?.SkillsSet[rolesArray.Skills[0]]?.Cooldown ?? 0}`
+        ]);
+        
+        console.log("[DEBUG] EQUIP SET", rolesArray.Skills[0]);
+        console.log("[DEBUG] ROLES", JSON.stringify([{
           roleName: randomKey,
           description: rolesArray.description,
           ATK: rolesArray.ATK,
           HP: rolesArray.HP,
           Skills: rolesArray.Skills
-      }]);
-      setHp(rolesArray.HP);
-      setAtk(rolesArray.ATK);
-
-      setEquip(["W","A",roles[0]?.Skills[0]??"S"]);
-      setEquipDet([`Description: ${map?.SkillsSet[rolesArray.Skills[0]]?.description}`, `Type: ${map?.SkillsSet[rolesArray.Skills[0]]?.type}`,`Damage: ${map?.SkillsSet[rolesArray.Skills[0]]?.damage??0}`,`Heal: ${map?.SkillsSet[rolesArray.Skills[0]]?.heal??0}`,`HP: ${map?.SkillsSet[rolesArray.Skills[0]]?.HP??0}`,`Duration: ${map?.SkillsSet[rolesArray.Skills[0]]?.duration??0}`, `Cooldown: ${map?.SkillsSet[rolesArray.Skills[0]]?.Cooldown}`])
-      console.log("[DEBUG] EQUIP SET",EquipDet);
-      console.log("[DEBUG] ROLES", JSON.stringify(roles));
+        }]));
     } else{
        setHp(map?.Player.HP ?? 0);
       setAtk(map?.Player.ATK??0);
       setEquip(["W","A","S"])
-      console.log(hp+Atk)
+      console.log("[DEBUG] Default setup - HP:", map?.Player.HP, "ATK:", map?.Player.ATK);
     }
     
 
@@ -1101,40 +1197,64 @@ const handleBgmMute = () =>{
 
         {/* Turn-based Game Timeline */}
         <div className="timeline-container" data-title= "Game Timeline" data-intro="This section provides an overview of the game's timeline, including the current round, whose turn it is, and the order of players. If it's your turn, you'll see options to end your turn or roll the dice.">
-          <h4>Game Timeline</h4>
-          <div className="current-turn-info">
-            <p><strong>Round:</strong> {CurrentTurn?.round || 1}</p>
-            <p><strong>Current Turn:</strong> {
-              CurrentTurn?.turnOrder && CurrentTurn?.playersName && CurrentTurn?.currentTurn !== undefined
-                ? (() => {
-                    const currentSocketId = CurrentTurn.turnOrder[CurrentTurn.currentTurn];
-                    const playerIndex = CurrentTurn.players?.indexOf(currentSocketId) ?? -1;
-                    return playerIndex !== -1 ? CurrentTurn.playersName[playerIndex] : 'Unknown';
-                  })()
-                : 'Unknown'
-            }</p>
-            <p><strong>Is Your Turn:</strong> {isMyTurn() ? '✅ Yes' : '❌ No'}</p>
+          <div className="timeline-header">
+            <h4>Game Timeline</h4>
+            {!CurrentTurn && (
+              <button 
+                className="refresh-timeline-btn"
+                onClick={() => requestCurrentGameState()}
+                title="Refresh game state"
+              >
+                🔄
+              </button>
+            )}
           </div>
-          
-          <div className="player-order">
-            <h5>Player Order:</h5>
-            <div className="players-list">
-              {CurrentTurn?.turnOrder.map((socketId, idx) => {
-                const playerIndex = CurrentTurn.players?.indexOf(socketId) ?? -1;
-                const playerName = playerIndex !== -1 ? CurrentTurn.playersName?.[playerIndex] : 'Unknown';
-                return (
-                  <div 
-                    key={idx} 
-                    className={`player-item ${idx === CurrentTurn?.currentTurn ? 'active-player' : ''}`}
-                  >
-                    <span className="player-number">{idx + 1}</span>
-                    <span className="player-name">{playerName}</span>
-                    {idx === CurrentTurn?.currentTurn && <span className="current-indicator">👑</span>}
-                  </div>
-                );
-              }) || []}
+          {!CurrentTurn ? (
+            <div className="loading-state">
+              <p>Loading game state...</p>
+              <small>Connecting to game room and fetching current turn information.</small>
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="current-turn-info">
+                <p><strong>Round:</strong> {CurrentTurn?.round || 1}</p>
+                <p><strong>Current Turn:</strong> {
+                  CurrentTurn?.turnOrder && CurrentTurn?.playersName && CurrentTurn?.currentTurn !== undefined
+                    ? (() => {
+                        const currentSocketId = CurrentTurn.turnOrder[CurrentTurn.currentTurn];
+                        const playerIndex = CurrentTurn.players?.indexOf(currentSocketId) ?? -1;
+                        return playerIndex !== -1 ? CurrentTurn.playersName[playerIndex] : 'Unknown';
+                      })()
+                    : 'Loading...'
+                }</p>
+                <p><strong>Is Your Turn:</strong> {isMyTurn() ? '✅ Yes' : '❌ No'}</p>
+              </div>
+              
+              <div className="player-order">
+                <h5>Player Order:</h5>
+                <div className="players-list">
+                  {CurrentTurn?.turnOrder?.length > 0 ? (
+                    CurrentTurn.turnOrder.map((socketId, idx) => {
+                      const playerIndex = CurrentTurn.players?.indexOf(socketId) ?? -1;
+                      const playerName = playerIndex !== -1 ? CurrentTurn.playersName?.[playerIndex] : 'Unknown';
+                      return (
+                        <div 
+                          key={idx} 
+                          className={`player-item ${idx === CurrentTurn?.currentTurn ? 'active-player' : ''}`}
+                        >
+                          <span className="player-number">{idx + 1}</span>
+                          <span className="player-name">{playerName}</span>
+                          {idx === CurrentTurn?.currentTurn && <span className="current-indicator">👑</span>}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <p>No players found. Please wait for game initialization...</p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
 
           {isMyTurn() && (
             <div className="turn-actions">

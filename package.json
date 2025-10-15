@@ -3,16 +3,23 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm run dev --prefix client/RPGPy\" \"npm run dev --prefix server\""
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
+  "scripts": {
+  "dev": "concurrently \"npm run dev --prefix client/RPGPy\" \"npm run dev --prefix server\"",
+  
+  "build:client": "cd client/RPGPy && npm run build",
+  "build:server": "cd server && npm run build",
+  "build": "npm run build:client && npm run build:server",
+  
+  "serve:client": "cd client/RPGPy && npx serve -s dist -l 5173",
+  "serve:server": "npm run dev --prefix server",
+  "serve": "concurrently \"npm run serve:client\" \"npm run serve:server\""
+},
+
   "dependencies": {
     "gsap": "^3.13.0",
-    "ogl": "^1.0.11"
+    "ogl": "^1.0.11",
+    "concurrently": "^8.2.2",
+    "serve": "^14.2.0"
   }
 }
