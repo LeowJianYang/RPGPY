@@ -18,6 +18,7 @@ import JoinMiddlePage from './page/joinMiddle.tsx';
 import Settings from './page/Settings.tsx';
 import { initializeTheme } from './utils/themeManager.ts';
 import './css/intro.css';
+import ShopPage from './page/Shop.tsx';
 
 // Initialize theme on app startup
 initializeTheme();
@@ -39,6 +40,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path='/Docs' element={<Docs/>} />
         <Route path='/v0/auth/join' element={<JoinMiddlePage/>} />
         <Route path='/settings' element={<Settings/>} />
+        <Route path='/shop' element={<ShopPage/>} />
         </Routes>
       </Toast>
        

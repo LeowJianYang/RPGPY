@@ -50,6 +50,56 @@ export default function NavBar() {
     );
 }
 
+
+export function DocsNavBar() {
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const navigate = useNavigate();
+
+    const toggleMobileMenu = () => {
+        setMobileMenuOpen(!mobileMenuOpen);
+    };
+
+    return (
+        <>
+            <header className="navbar-docs">
+                <div className="middleNav">
+                    <div className="imgNav">
+                        <img src="/rpgpy-trans.png" alt="RPGPy Logo" onClick={()=>{navigate("/",{replace:true})}} />
+                        <p className="header-cont-docs">|</p>
+                        <p className="header-cont-docs">Docs</p>
+                    </div>
+                    
+                    {/* Desktop Navigation */}
+                    <nav className="innerNav">
+                        <a className="contentNav" href="/">Home</a>
+                        <a className="contentNav" href="/about">About</a>
+                        <a className="contentNav" href="/Docs">Docs</a>
+                        <a className="LoginBtn" href="/Login">Login/SignUp</a>
+                    </nav>
+
+                    {/* Mobile Menu  */}
+                    <div className="mobile-menu-toggle" onClick={toggleMobileMenu}>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </header>
+
+            {/* Mobile Menu */}
+            <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
+                <a className="closeNav" onClick={toggleMobileMenu}>CLOSE</a>
+                <a className="contentNav" href="/" onClick={toggleMobileMenu}>Home</a>
+                <a className="contentNav" href="/about" onClick={toggleMobileMenu}>About</a>
+                <a className="contentNav" href="/Docs" onClick={toggleMobileMenu}>Docs</a>
+                <a className="LoginBtn" href="/Login" onClick={toggleMobileMenu}>Login/SignUp</a>
+            </div>
+        </>
+    );
+}
+
+
+
 export function FooterBar() {
     return (
         <footer className="footerContainer">
@@ -70,9 +120,9 @@ export function FooterBar() {
                 
                 <div className="innerCont">
                     <p className="text-title">How to Play</p>
-                    <a className="text-cont" href="/docs?section=tutorial">Tutorial</a>
-                    <a className="text-cont" href="/docs?section=downloads">Map</a>
-                    <a className="text-cont" href="/docs?section=help">FAQ</a>
+                    <a className="text-cont" href="/docs?navigator=tutorial">Tutorial</a>
+                    <a className="text-cont" href="/docs?navigator=downloads">Map</a>
+                    <a className="text-cont" href="/docs?navigator=help">FAQ</a>
                 </div>
                 
                 <div className="innerCont">

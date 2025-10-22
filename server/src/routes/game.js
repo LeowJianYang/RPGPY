@@ -3,7 +3,7 @@
 const express = require('express');
 const gameRoutes = express.Router();
 const { roomState,shuffle } = require('../config/roomState');
-const db = require('../config/db');
+const {connection:db} = require('../config/db');
 const { error } = require('console');
 
 

@@ -1,5 +1,5 @@
 import { SelfButton } from '../components/ErrorModal';
-import NavBar, { FooterBar } from '../components/navigation';
+import DocsNavBar, { FooterBar } from '../components/navigation';
 import './../css/Documentation.css';
 import {useToast} from '../components/Toast';
 import tutorial from '../assets/Tutorial.md?raw';
@@ -31,7 +31,7 @@ const Documentation = () => {
 
   return (
     <div className="doc-container">
-      <NavBar/>
+      <DocsNavBar/>
       <header className="doc-header">
         <h1>Project Documentation</h1>
         <p>Welcome to the official documentation. Here you'll find tutorials and license information.</p>

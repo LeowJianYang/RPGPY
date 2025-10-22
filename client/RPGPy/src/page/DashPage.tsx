@@ -2,7 +2,7 @@
 
 import { useUserStore } from "../../components/UserStore"
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState,useRef } from "react"
 import { Dropdown } from "antd"
 import type { MenuProps } from "antd"
 import { ModalForm, SelfButton } from "../components/ErrorModal"
@@ -79,6 +79,7 @@ const DashPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalProps, setModalProps] = useState<ModalFormProps>();
   const [quickActions, setQuickActions] = useState<quickAction[]>([]);
+  const stateQueryLeaderboard = useRef<any>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -112,9 +113,15 @@ const DashPage: React.FC = () => {
 
         const storedLeaderboard = await axios.get(`${URL}/game/leaderboard`, {params: {uid: user?.uid}, withCredentials:true});
         const {queryLeaderboard} = storedLeaderboard.data;
-        
-        
+        stateQueryLeaderboard.current = queryLeaderboard;
+
         console.log("Leaderboard Data:", queryLeaderboard);
+      }
+       catch (error) {
+        console.error("Error fetching dashboard data:", error)
+        setLoading(false)
+      }
+      finally{
 
         const mockUserStats: UserStat = {
           completed: 5,
@@ -133,7 +140,7 @@ const DashPage: React.FC = () => {
 
 
 
-        const allLeaderboard = Object.values(queryLeaderboard)
+        const allLeaderboard = Object.values(stateQueryLeaderboard.current)
         .flat()  // Let it become the whole status. 
         .map((player: any)=>({
             username: player.username,
@@ -146,7 +153,7 @@ const DashPage: React.FC = () => {
           rank:index+1,
         }))
 
-        const rankedRoomLeaderboard = Object.entries(queryLeaderboard as Record<string, Player[]>).reduce((acc,[roomCodes, players])=>{
+        const rankedRoomLeaderboard = Object.entries(stateQueryLeaderboard.current as Record<string, Player[]>).reduce((acc,[roomCodes, players])=>{
 
             const sorted = [...players].sort((a,b)=> b.score - a.score);
             
@@ -167,9 +174,6 @@ const DashPage: React.FC = () => {
         setQuickActions(quickItems);
         setLeaderBoardWithRoom(rankedRoomLeaderboard);
         console.log("Leaderboard with room data:", allLeaderboard)
-        setLoading(false)
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error)
         setLoading(false)
       }
     }

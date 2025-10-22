@@ -14,7 +14,10 @@ const mapRoutes = require("./routes/mapVer");
 const roomRoutes = require("./routes/room");
 const gameRoutes = require("./routes/game");
 const achievements = require("./routes/achievements");
+const shopRoutes = require("./routes/shop");
+const userRoutes = require("./routes/user");
 const { roomState } = require('./config/roomState');
+
 
 
 const app= express();
@@ -57,6 +60,8 @@ app.use("/map", mapRoutes);
 app.use("/room", roomRoutes);
 app.use('/game', gameRoutes);
 app.use('/achievements', achievements);
+app.use('/shop', authMiddleWare ,shopRoutes);
+app.use('/user', authMiddleWare, userRoutes);
 
 io.on('connection', (socket)=>{
     console.log(`Socket connected: ${socket.id}`);
@@ -157,7 +162,9 @@ io.on('connection', (socket)=>{
 
 app.get("/authCookie", authMiddleWare, (req, res)=>{
     res.json({email: req.user.Email, Username: req.user.Username, uid: req.user.UID});
-})
+});
+
+
 
 
 server.listen(3000, ()=>{

@@ -110,7 +110,8 @@ FWDD-Assignment/
 - Start both client and server as described above.
 - Access the app via the client dev server URL (usually http://localhost:5173/).
 - The backend runs on http://localhost:3000/ by default.
-- Please Change the ```secure:false``` and ```sameSite:none``` for development
+- Please Change the ```secure:false``` and ```sameSite:lax``` for development
+- For Deploy Change it to ```secure:true ``` and ```sameSite:none```.
 
 ---
 

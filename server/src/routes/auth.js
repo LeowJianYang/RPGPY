@@ -1,6 +1,6 @@
 //routes/auth.js
 const express = require('express');
-const db = require('../config/db');
+const {connection:db} = require('../config/db');
 const encrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require('crypto');

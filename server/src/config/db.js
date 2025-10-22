@@ -1,10 +1,11 @@
 //config/db.js
 
 const db = require("mysql2");
+const dbPromise = require("mysql2/promise");
 
 const url = new URL(process.env.SERVICE_URI);
 
-const connection=db.createPool({
+const connection=  db.createPool({
     host: process.env.DB_INFF_HN,
     user: process.env.DB_INFF_UN,
     password: process.env.DB_INFF_PW,
@@ -12,6 +13,17 @@ const connection=db.createPool({
     port:process.env.DB_INFF_PR,
     waitForConnections:true,
 })
+
+const promiseConnection = dbPromise.createPool({
+    host: process.env.DB_INFF_HN,
+    user: process.env.DB_INFF_UN,
+    password: process.env.DB_INFF_PW,
+    database: url.pathname.replace("/",""),
+    port:process.env.DB_INFF_PR,
+    waitForConnections:true,
+});
+
+
 
 
 // db.getConnection((err, connection)=>{
@@ -24,5 +36,5 @@ const connection=db.createPool({
 //     }
 // })
 
-module.exports = connection;
+module.exports = { connection, promiseConnection };
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CloseOutlined, MenuOutlined, BookOutlined, RocketOutlined, DownloadOutlined, 
          SafetyCertificateOutlined, QuestionCircleOutlined, SettingOutlined } from '@ant-design/icons';
-import NavBar, { FooterBar } from '../components/navigation';
+import {DocsNavBar, FooterBar } from '../components/navigation';
 import { SelfButton } from '../components/ErrorModal';
 import '../css/Docs.css';
 import { useToast } from '../components/Toast';
@@ -417,12 +417,13 @@ SOFTWARE.`}
             </div>
 
             <h2>Third-Party Licenses</h2>
-            <p>This project uses several open-source libraries. Please refer to their respective licenses:</p>
+            <p>This project uses several open-source/ attributes needed libraries or assets. Please refer to their respective licenses:</p>
             <ul>
               <li><strong>React</strong> - MIT License</li>
               <li><strong>TypeScript</strong> - Apache License 2.0</li>
               <li><strong>Vite</strong> - MIT License</li>
               <li><strong>Ant Design</strong> - MIT License</li>
+              <li><strong><a href='https://github.com/LeowJianYang/RPGPY/blob/master/CREDITS.md' style={{color: 'blue', cursor:"pointer"}}>Click Here for More Details</a></strong> </li>
             </ul>
           </div>
         );
@@ -480,7 +481,7 @@ SOFTWARE.`}
 
   return (
     <div className="docs-container">
-      <NavBar />
+      <DocsNavBar />
       
       <div className="docs-main-wrapper">
         <aside className={`docs-sidebar ${sidebarOpen ? 'open' : ''}`}>

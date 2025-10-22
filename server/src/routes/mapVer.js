@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const db = require('../config/db');
+const {connection:db} = require('../config/db');
 let turn =0;
 const {roomState,shuffle} = require('../config/roomState'); 
 

@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../config/db');
+const {connection:db} = require('../config/db');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const e = require('express');

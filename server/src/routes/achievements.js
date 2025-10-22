@@ -2,7 +2,7 @@
 
 const express = require('express');
 const achievements = express.Router();
-const db = require('../config/db');
+const {connection: db} = require('../config/db');
 
 // Get All Achievements
 
