@@ -14,8 +14,8 @@ A hybrid Physical + Digital semi-roguelike board game platform, built with React
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/LeowJianYang/FWDDWEB.git
-   cd FWDDWEB
+   git clone https://github.com/LeowJianYang/RPGPY.git
+   cd RPGPy
    ```
 
 2. **Install dependencies for both client and server:**

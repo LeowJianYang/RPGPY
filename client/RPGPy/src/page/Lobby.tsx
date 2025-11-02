@@ -11,8 +11,7 @@ import { useNavigate } from "react-router-dom"
 import  { ReloadOutlined } from "@ant-design/icons"
 import { useUserStore } from "../../components/UserStore"
 import { QRCode } from "antd"
-
-
+import CopyButton from "../components/CopyButton"
 
 
 
@@ -195,6 +194,7 @@ export default function Lobby(){
                     <div className="TextRom">
                         <span>Room Code:</span>
                         <span className="roomcode-value">{roomCode}</span>
+                        <CopyButton textToCopy={roomCode?? ""} />
                     </div>
                     <div className="TextRom">
                         <span>Map Details:</span>

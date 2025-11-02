@@ -106,7 +106,7 @@ const ShopPage: React.FC = () => {
               <img src={items.imageUrl} alt={items.name} />
            </picture>
            <p><strong>Items: </strong> {items.name}</p>
-           <p><strong>Price: </strong> C$ {items.price.toFixed(2)}</p>
+           <p><strong>Price: </strong> C$ {items.price?.toFixed(2) ?? 0}</p>
            <p><strong>Description: </strong> {items.description}</p>
         </div>
       </>,
@@ -150,10 +150,10 @@ const ShopPage: React.FC = () => {
       
       {/* Hero Section */}
       <section className="shop-hero">
-        <div className="hero-content">
-          <h1 className="hero-title">Discover Amazing Products</h1>
-          <p className="hero-subtitle">Curated collection of premium items for your lifestyle</p>
-          <div className="hero-stats">
+        <div className="shop-hero-content">
+          <h1 className="shop-hero-title">Discover Amazing Products</h1>
+          <p className="shop-hero-subtitle">Curated collection of premium items for your lifestyle</p>
+          <div className="shop-hero-stats">
             <div className="stat-item">
               <span className="stat-number">{products.length}+</span>
               <span className="stat-label">Products</span>
@@ -204,7 +204,7 @@ const ShopPage: React.FC = () => {
               <picture>
                 <img src="/Icon/coin.png" alt="Coin Icon" className="coin-icon" />
               </picture>
-              <p className='coin-text'>C$ {coins.toFixed(2)}</p>
+              <p className='coin-text'>C$ {coins?.toFixed(2) ?? 0}</p>
             </div>
 
           

@@ -7,17 +7,21 @@ import axios from "axios"
 import {IoMdArrowBack} from "react-icons/io"
 import { useTheme } from "../utils/themeManager";
 const URL= import.meta.env.VITE_API_URL;
+import { useToast } from "../components/Toast";
+import type { ModalFormProps } from "../components/ButtonCompo";
+import { ModalForm, SelfButton } from "../components/ErrorModal";
 export default function Settings(){
     
     const { user,setUser } = useUserStore();
     const navigate = useNavigate();
-
+    const {notify} = useToast();
     // Use global theme hook
     const { theme, changeTheme } = useTheme();
     const [notifications, setNotifications] = useState(true);
     const [soundEnabled, setSoundEnabled] = useState(true);
     const [language, setLanguage] = useState('english');
-
+    const [ModalOpen, setModalOpen] = useState(false);
+    const [modalProps, setModalProps] = useState<ModalFormProps>();
     
     useEffect(()=>{
 
@@ -65,6 +69,62 @@ export default function Settings(){
         localStorage.setItem('theme-preference', newTheme);
         applyTheme(newTheme);
     };
+
+    const handleAccountDecorationChange = async (header: string, decorationType: string) =>{
+            await axios.post(`${URL}/user/v1/${decorationType}/${header}/${user?.uid}`,{},{withCredentials:true}).then((_res)=>{
+
+                notify('info', 'Settings', `Account ${decorationType} updated successfully.`, 'top');
+
+            }).catch((err)=>{
+                notify('error', 'Settings', `Failed to update account ${decorationType}.`, 'top');
+                console.error(err);
+            });
+    };
+
+    const handleSelectDecoration = async (decorationType: string) =>{
+        try{
+            const response = await axios.get(`${URL}/user/v1/inventory/${decorationType}/${user?.uid}`,{withCredentials:true});
+            console.log("[DEBUG] RESULT HEADER "+response.data);
+            setModalProps({
+                open:ModalOpen,
+                title:`Select Account ${decorationType.charAt(0).toUpperCase() + decorationType.slice(1)}`,
+                onCancel:()=>{setModalOpen(false)},
+                onClose:()=>{setModalOpen(false)},
+                footer:<>
+                    <SelfButton type="danger" onClick={()=>{setModalOpen(false)}}>Close</SelfButton>
+                </>,
+                children:
+                <>
+                    <p>Click for select one {decorationType.charAt(0).toUpperCase() + decorationType.slice(1)} Decoration</p>
+                    <div className="header-selection-container">
+                        <div className="header-options-list">
+                            {response.data.map((item:any, idx:number)=>(
+                                <div key={idx} className={`header-option ${decorationType}`} onClick={()=>{handleAccountDecorationChange(item.id, decorationType)}}> 
+                                    {decorationType === 'nametag' ? 
+                                    <div>
+                                        <div className="preview-text" style={{backgroundImage:`url(${URL}/user/v1/background/style/${user?.uid})`}}>AaBb</div>
+                                        <div className="option-name">{item.name}</div>
+                                    </div> 
+                                    : 
+                                    <div>
+                                        <div className="preview-image" style={{backgroundImage:`url(${URL}/user/v1/${decorationType}/style/${user?.uid})`}}></div>
+                                        <div className="option-name">{item.name}</div>
+                                    </div>}
+                                </div>
+                            ))}
+                        </div>
+
+                    </div>
+                </>
+
+            });
+        }
+        catch(err){
+            notify('error', 'Settings', 'Failed to retrieve account headers.', 'top');
+            console.error(err);
+        }
+    };
+
 
     return(
         <div className="settings-container">
@@ -125,6 +185,19 @@ export default function Settings(){
                             </div>
                             <button className="setting-button danger">
                                 Change Password
+                            </button>
+                        </div>
+
+                        <div className="setting-item">
+                            <div className="setting-info">
+                                <div className="setting-icon">ICON</div>
+                                <div className="setting-content">
+                                    <h3 className="setting-label">Account Header</h3>
+                                    <p className="setting-description">Decorate with Account Header</p>
+                                </div>
+                            </div>
+                            <button className="setting-button secondary" onClick={()=>{handleSelectDecoration('background'), setModalOpen(true)}}>
+                                Change
                             </button>
                         </div>
                     </div>
@@ -188,6 +261,19 @@ export default function Settings(){
                                 <option value="chinese">中文</option>
                                 <option value="malay">Bahasa Melayu</option>
                             </select>
+                        </div>
+
+                        <div className="setting-item">
+                            <div className="setting-info">
+                                <div className="setting-icon">COLOUR</div>
+                                <div className="setting-content">
+                                    <h3 className="setting-label">Name Tag Color</h3>
+                                    <p className="setting-description">Select your preferred name tag color</p>
+                                </div>
+                            </div>
+                            <button className="setting-button secondary" onClick={()=>{handleSelectDecoration('nametag'), setModalOpen(true)}}>
+                                Change
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -261,6 +347,20 @@ export default function Settings(){
                     </div>
                 </div>
             </div>
+
+
+            <ModalForm
+                open={ModalOpen}
+                close={modalProps?.close}
+                title={modalProps?.title ?? ""}
+                onCancel={modalProps?.onCancel}
+                onClose={modalProps?.onClose}
+                onOk={modalProps?.onOk}
+                footer={modalProps?.footer}
+            >
+                {modalProps?.children}
+            </ModalForm>
+
         </div>
     )
 }

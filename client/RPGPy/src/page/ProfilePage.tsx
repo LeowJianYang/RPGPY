@@ -91,56 +91,6 @@ const ProfilePage: React.FC = () => {
           }
         ))
 
-
-        // const mockAchievements: Achievement[] = [
-        //   {
-        //     id: "1",
-        //     title: "First Steps",
-        //     description: "Complete your first Python adventure",
-        //     icon: "🎯",
-        //     earned: true,
-        //     earnedDate: "2024-01-15",
-        //   },
-        //   {
-        //     id: "2",
-        //     title: "Code Warrior",
-        //     description: "Complete 5 adventures",
-        //     icon: "⚔️",
-        //     earned: true,
-        //     earnedDate: "2024-02-20",
-        //   },
-        //   {
-        //     id: "3",
-        //     title: "Streak Master",
-        //     description: "Maintain a 7-day learning streak",
-        //     icon: "🔥",
-        //     earned: true,
-        //     earnedDate: "2024-03-01",
-        //   },
-        //   {
-        //     id: "4",
-        //     title: "Top Performer",
-        //     description: "Reach top 10 on leaderboard",
-        //     icon: "🏆",
-        //     earned: true,
-        //     earnedDate: "2024-03-10",
-        //   },
-        //   {
-        //     id: "5",
-        //     title: "Python Master",
-        //     description: "Complete 10 adventures",
-        //     icon: "🐍",
-        //     earned: false,
-        //   },
-        //   {
-        //     id: "6",
-        //     title: "Community Helper",
-        //     description: "Help 5 other learners",
-        //     icon: "🤝",
-        //     earned: false,
-        //   },
-        // ]
-
         setProfile(mockProfile)
         setAchievements(mockAchievements)
         setLoading(false)
@@ -169,7 +119,7 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="profile-container">
       {/* Profile Header */}
-      <div className="profile-header">
+      <div className="profile-header" style={{backgroundImage:`url(${URL}/user/v1/background/style/${user?.uid})`}}>
         <div className="profile-avatar-section">
           <div className="profile-avatar">
             <img

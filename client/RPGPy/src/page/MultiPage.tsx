@@ -12,6 +12,7 @@ import { ScanOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 import { useSessionStore } from "../../components/IDStore";
 import {BulbOutlined } from '@ant-design/icons';
+import Backpack from "../components/Backpack";
 
 
 export default function MultiPage() {
@@ -96,6 +97,21 @@ export default function MultiPage() {
     console.log("Redirecting to Room: ",ssid);
     navigate(MapDet+`&ssid=${ssid}`, {replace:true});
 
+  }
+
+  // Handle when user selects an item from backpack
+  const handleSelectBackpackItem = (itemName: string) => {
+    console.log("Selected item from backpack:", itemName);
+  }
+
+  // Handle adding selected item to GameUI inventory
+  const handleAddToInventory = (itemName: string) => {
+    console.log("Adding item to game inventory:", itemName);
+    // Store in localStorage to pass to GameUI
+    const existingItems = localStorage.getItem('pendingInventoryItems');
+    const items = existingItems ? JSON.parse(existingItems) : [];
+    items.push(itemName);
+    localStorage.setItem('pendingInventoryItems', JSON.stringify(items));
   }
   
 
@@ -283,6 +299,14 @@ export default function MultiPage() {
             </ModalForm.Page>
 
           </ModalForm>
+
+      {/* Backpack Component*/}
+      <div className="backpack-section">
+        <Backpack 
+          onSelectItem={handleSelectBackpackItem}
+          onAddToInventory={handleAddToInventory}
+        />
+      </div>
       
     </div>
   );

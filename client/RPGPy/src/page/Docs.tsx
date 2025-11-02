@@ -156,7 +156,7 @@ const Docs: React.FC = () => {
             <div className="tutorial-card">
               <h3>1. Clone the Repository</h3>
               <div className="code-block">
-                <pre><code>git clone https://github.com/your-repo/rpgpy.git
+                <pre><code>git clone https://github.com/LeowJianYang/FWDDWEB.git
 cd rpgpy</code></pre>
               </div>
 

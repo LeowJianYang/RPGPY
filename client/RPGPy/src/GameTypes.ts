@@ -7,7 +7,7 @@ export type SkillType = 'Attack' | 'Defense' | 'Heal';
 export type BaseLoot =  | { type: "Restock"; description: string; HP: number }
   | { type: "Weapon"; description: string; ATK: number }
   | { type: "Amour"; description: string; HP: number }
-  | { type: "Loot"; description: string };
+  | { type: "Loot"; description: string; GOLD: number };
 
 export interface SkillsType {
   type: SkillType;

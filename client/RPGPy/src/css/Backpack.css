@@ -1,0 +1,267 @@
+/* Backpack Container */
+.backpack-container {
+  background-color: #667eea;
+  border: var(--multi-border-color) 0.6px solid;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-top: 1.8rem;
+}
+
+.backpack-container.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+/* Header */
+.backpack-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.backpack-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  padding-right: 0.8rem;
+}
+
+/* Content */
+.backpack-content {
+  min-height: 200px;
+}
+
+.empty-message {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.2rem;
+  padding: 3rem;
+}
+
+/* Grid Layout */
+.backpack-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Item Card */
+.backpack-item {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+}
+
+.backpack-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.backpack-item.selected {
+  border-width: 3px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
+}
+
+/* Selected Icon */
+.selected-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  color: #52c41a;
+  animation: scaleIn 0.3s ease;
+  z-index: 2;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Quantity Badge */
+.item-quantity-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Quantity Text */
+.item-quantity-text {
+  color: #3498db;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0 0;
+  padding: 0.4rem 0.6rem;
+  background: #e3f2fd;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px solid #90caf9;
+}
+
+/* Rarity Badge */
+.item-rarity {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Item Details */
+.item-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+  color: #2c3e50;
+}
+
+.item-description {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.item-effect {
+  color: #27ae60;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0.8rem 0 0 0;
+  padding: 0.5rem;
+  background: #e8f5e9;
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* Footer */
+.backpack-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  margin-top: 1.5rem;
+  gap:1.2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.selected-info {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.selected-info strong {
+  color: #667eea;
+  font-weight: 700;
+}
+
+.selected-quantity {
+  color: #3498db;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-left: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .backpack-grid {
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .backpack-header h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .backpack-container {
+    padding: 1rem;
+    margin: 1rem;
+  }
+
+  .backpack-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .backpack-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  .backpack-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .backpack-footer button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .backpack-grid {
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+
+  .backpack-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .backpack-item {
+    padding: 1rem;
+  }
+
+  .item-name {
+    font-size: 1.1rem;
+  }
+}

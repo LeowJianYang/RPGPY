@@ -206,6 +206,14 @@
   font-size: clamp(0.8rem, 4vh, 1rem);
 }
 
+/* Backpack Section */
+.backpack-section {
+  width: auto;
+  max-width: 1400px;
+  margin: 2rem auto 0;
+  padding: 0 1rem;
+}
+
 /* Responsive Design- Enhance for Desktop Screen */
 @media (min-width: 600px) {
 
@@ -233,5 +241,17 @@
   .btn-multi {
     padding: 1rem;
     font-size: 1.2rem;
+  }
+
+  .backpack-section {
+    padding: 0 2rem;
+    
+  }
+}
+
+@media (max-width: 600px) {
+  .backpack-section {
+    padding: 0 0.5rem;
+    max-width: 500px;
   }
 }

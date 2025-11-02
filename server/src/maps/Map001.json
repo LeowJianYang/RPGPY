@@ -152,7 +152,7 @@
     "Iron Sword": {"type":"Weapon","description": "Add 2 ATK", "ATK":2},
     "Magic Staff": {"type":"Weapon","description": "Add 3 ATK", "ATK":3},
     "Dragon Armor": {"type":"Amour","description": "Add 10 HP", "HP":10},
-    "Gold":{"type":"Loot","description": "Useless GOLD"},
+    "Gold":{"type":"Loot","description": "10 GOLD", "GOLD":10},
     "Special Bow": {"type":"Weapon","description": "Add 10 ATK", "ATK":10},
     "Laser Beam": {"type":"Attack","description": "Deals 12 ATK", "damage":12, "Cooldown":10},
     "Laser Beam Lvl 3": {"type":"Attack","description": "Deals 20 ATK", "damage":20, "Cooldown":10},

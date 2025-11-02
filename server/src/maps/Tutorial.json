@@ -16,7 +16,7 @@
 
   "tiles": {
     "01": { "type": "X", "description": "START" },
-    "02": { "type": "C", "lootTable": "treasure_skill" },
+    "02": { "type": "C", "lootTable": "treasure_low" },
     "03": { "type": "Q", "quizPool": "python_code_questions" },
     "04": { "type": "E", "enemyId": "slime_001", "quizPool": "python_basics" },
     "05": { "type": "M", "quizPool": "python_control_flow" },
@@ -60,7 +60,7 @@
   },
 
   "lootTables": { 
-    "treasure_low": ["Potion", "Gold"],
+    "treasure_low": ["Gold"],
     "treasure_mid": ["Iron Sword", "Dragon Armor"],
     "treasure_high": ["Magic Staff", "Laser Sword"],
     "treasure_rare": ["Special Bow", "Potion Lvl 2", "Iron Sword Lvl 3"],
@@ -84,7 +84,7 @@
     "Iron Sword": {"type":"Weapon","description": "Add 2 ATK", "ATK":2},
     "Magic Staff": {"type":"Weapon","description": "Add 3 ATK", "ATK":3},
     "Dragon Armor": {"type":"Amour","description": "Add 10 HP", "HP":10},
-    "Gold":{"type":"Loot","description": "Useless GOLD"},
+    "Gold":{"type":"Loot","description": "Add 10 Gold", "GOLD":10},
     "Special Bow": {"type":"Weapon","description": "Add 10 ATK", "ATK":10},
     "Laser Beam": {"type":"Attack","description": "Deals 12 ATK", "damage":12, "Cooldown":10},
     "Laser Beam Lvl 3": {"type":"Attack","description": "Deals 20 ATK", "damage":20, "Cooldown":10},
@@ -109,6 +109,6 @@
     "mage_007": { "name": "Dark Mage", "hp": 22, "attack": 7, "styleImg": "Mage.png" },
     "bandit_008": { "name": "Bandit", "hp": 28, "attack": 6, "styleImg": "Bandit.png" },
     "knight_009": { "name": "Corrupted Knight", "hp": 35, "attack": 8, "styleImg": "Knight.png" },
-    "dragon_001": { "name": "Dragon Boss", "hp": 100, "attack": 15, "styleImg": "Dragon.png" }
+    "dragon_001": { "name": "Dragon Boss", "hp": 20, "attack": 10, "styleImg": "Dragon.png" }
   }
 }

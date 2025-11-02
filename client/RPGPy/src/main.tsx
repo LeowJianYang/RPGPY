@@ -31,8 +31,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/" element={<App/>} />
           <Route path="/Login" element={<LoginPage />} />
           <Route path="/dashboard" element={<DashboardPage/>} />
-          <Route path='/Game' element={<Game Mode="Game"/>} />
-          <Route path='/Game/tutorial' element={<Game Mode="Tutorial"/>} />
+          <Route path='/Game' element={<Game Mode='Game'/>} />
+            <Route path='/Game/tutorial' element={<Game Mode='Tutorial'/>} />
         <Route path='/Lobby' element={<Lobby/>} />
         <Route path="*" element={<NotFoundPage/>} />
         <Route path="/Multi" element={<MultiPage/>} />

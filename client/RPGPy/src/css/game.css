@@ -125,7 +125,7 @@
 
 .McqCard p {
     margin-top: 0.75rem;
-    color: #4b5563;
+    color: var(--game-text-color);
     line-height: 1.6;
 }
 

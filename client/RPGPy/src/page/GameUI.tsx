@@ -16,6 +16,8 @@ import { MutedOutlined, SoundOutlined } from '@ant-design/icons';
 import HealthBar from '../components/HeathBar';
 import {useSessionStore} from '../../components/IDStore';
 import introJs from 'intro.js';
+import Countdown from '../components/countdown';
+import { IoMdRefresh } from 'react-icons/io';
 
 
 
@@ -25,7 +27,7 @@ type QuizState =
   | { kind: 'code'; prompt: string; starter: string; expected:string };
 
 export default function Game({Mode}: {Mode:string}) {
-   const bgm = useMemo(() => new BgmManager(), []);
+  const bgm = useMemo(() => new BgmManager(), []);
   const [map, setMap] = useState<MapJSON | null>(null);
   const [position, setPosition] = useState<string|number>(1);
   const [hp, setHp] = useState<number>(0);
@@ -53,7 +55,6 @@ export default function Game({Mode}: {Mode:string}) {
   const navigate = useNavigate();
   
   //const [roles, setRoles]= useState<{roleName:string,description:string, ATK:number, HP:number, Skills:string[]}[]>([]);
-  // Note: roles state is maintained for potential future use, currently using rolesArray directly to avoid async state issues
   const [Muted, setMuted] = useState(bgm.isBgmMuted());
   const [SkillsUsed, setSkillsUsed] = useState<{Cooldown:number, duration?:number, usedSkill:string}[]>([]);
   const {notify} = useToast();
@@ -64,6 +65,7 @@ export default function Game({Mode}: {Mode:string}) {
   const branchCodeRef = useRef<string>("");
   const {ssid} = useSessionStore();
   const started= useRef(false);
+  const coinRef = useRef<number>(10);
  
   useEffect(()=>{
 
@@ -97,6 +99,26 @@ export default function Game({Mode}: {Mode:string}) {
      }
       
   },[Mode]);
+
+  // Load pending inventory items from backpack (localStorage)
+  useEffect(() => {
+    const pendingItems = localStorage.getItem('pendingInventoryItems');
+    if (pendingItems) {
+      try {
+        const items = JSON.parse(pendingItems);
+        if (Array.isArray(items) && items.length > 0) {
+          // Add all pending items to inventory
+          setInventory(prev => [...prev, ...items]);
+          // Clear the pending items
+          localStorage.removeItem('pendingInventoryItems');
+          console.log('[BACKPACK] Added items from backpack to inventory:', items);
+        }
+      } catch (error) {
+        console.error('[BACKPACK] Error loading pending items:', error);
+        localStorage.removeItem('pendingInventoryItems');
+      }
+    }
+  }, []); // Run once on mount
 
 
 
@@ -199,7 +221,7 @@ export default function Game({Mode}: {Mode:string}) {
       }
     })
 
-    // Optional: Add handler for direct turn-order requests (if your server supports it)
+    // Add handler for direct turn-order requests
     socket.on('request-turn-order', () => {
       console.log('Server requesting turn order refresh...');
     });
@@ -328,14 +350,30 @@ export default function Game({Mode}: {Mode:string}) {
 
   },[map])
 
-  // Split the Number and String
-  function keySplit(key:string){
-    const numberStr = key.match(/^([A-Za-z]+)(\d+)$/);  // 0 means not find anything, 1 means String, 2 means number
-    const num = numberStr ? Number(numberStr[2]) : null;
-    const letter = numberStr ? numberStr[1] : null;
+  // Split the Number and String - Enhanced to handle both pure numbers and letter+number combinations
+  function keySplit(key: string) {
+    // First check if it's a pure number
+    const pureNumber = key.match(/^\d+$/);
+    if (pureNumber) {
+      return {
+        prefix: null,
+        suffix: Number(key)
+      };
+    }
+    
+    // Then check if it's letter+number combination
+    const letterNumber = key.match(/^([A-Za-z]+)(\d+)$/);
+    if (letterNumber) {
+      return {
+        prefix: letterNumber[1],
+        suffix: Number(letterNumber[2])
+      };
+    }
+    
+    // If neither pattern matches, return nulls
     return {
-      prefix: letter,
-      suffix: num
+      prefix: null,
+      suffix: null
     };
   }
 
@@ -373,6 +411,27 @@ export default function Game({Mode}: {Mode:string}) {
     }
   };
 
+  // Auto fire End Turn button 
+  const autoFireEndTurn = () => {
+    console.log("=== Auto Fire End Turn ===");
+    console.log("Current Turn:", CurrentTurn);
+    console.log("Socket ID:", socket.id);
+    console.log("Is My Turn:", isMyTurn());
+    
+    
+    if (!isMyTurn()) {
+      console.log("Not my turn, cannot auto fire End Turn");
+      return;
+    }
+    
+    console.log("Auto firing End Turn...");
+    
+    nextTurn();
+    SkillCoolDownEffect();
+    setisSucced(1);
+    setCodeInput("#Start Here ! The Last Input No need backslash !");
+  };
+
   // check is turn or not
   const isMyTurn = () => {
     if (!CurrentTurn || !user) return false;
@@ -383,7 +442,15 @@ export default function Game({Mode}: {Mode:string}) {
 
   // Encoding the current position Event 
   const {prefix,suffix} = keySplit(position.toString());
-  const tileKey = useMemo(() => `${prefix ===null ? "": prefix}${suffix??position.toString().padStart(2, '0')}`, [position]);
+  const tileKey = useMemo(() => {
+    if (prefix !== null && suffix !== null) {
+      // Branch position like L14 -> L14
+      return `${prefix}${suffix}`;
+    } else {
+      // Regular position like 2 -> 02, 15 -> 15
+      return position.toString().padStart(2, '0');
+    }
+  }, [position, prefix, suffix]);
   const currentTile = useMemo(() => {
     if (!map) return null;
     setSkResult(null);
@@ -477,7 +544,13 @@ export default function Game({Mode}: {Mode:string}) {
          // 0 succed >0 not succeed
              setisSucced(1);
             const pick = pool[Math.floor(Math.random()*pool.length)];
+            if(currentTile.quizPool!=="python_code_questions" ){
             setQuiz({ kind:"mcq",q:pick.q, a:pick.a, correct:pick.correct as number });
+          } else {
+            // FOR CODE QUIZ  
+            setQuiz({ kind: 'code', prompt: pick.q, starter: 'print("...")' , expected: pick.expectedResult?? ""});
+
+          }
         break;
       }
       case 'C': {
@@ -562,115 +635,186 @@ export default function Game({Mode}: {Mode:string}) {
   };
 
 //Position Control
-  const rollPosition = async () =>{
+  // Position Control - Handle player movement based on dice input
+  const rollPosition = async () => {
     if (!map) return;
 
-    const {prefix,suffix} = keySplit(dice?.toString() ?? "");
+    console.log("=== rollPosition Debug ===");
+    console.log("Current position:", position);
+    console.log("Dice input:", dice);
+    console.log("Current tile:", currentTile);
 
+    const {prefix, suffix} = keySplit(dice?.toString() ?? "");
+    const isRegularDice = prefix === null && suffix !== null;
+    const isBranchCode = prefix !== null && suffix !== null;
+    const {prefix: currPrefix} = keySplit(position.toString());
 
-    // const nextStep=map.tiles[`${prefix === null ? "":prefix}${suffix??+1}`]; 
-    const NormTileLogic = async ()=>{
+    // Handle regular dice movement
+    const handleRegularMove = async () => {
+      const currentPos = Number(position);
+      const diceValue = Number(dice);
+      const nextPos = currentPos + diceValue;
       
-      const next = Math.min(Number(dice), map.LastIndex);
-      console.log("[DEBUG] NORM IN ROLL POSITION", next);
-
-      if(Number.isNaN(next)){
-        throw new Error ("Invalid Tiles")
-      } else{
-        setPosition(next);
-        await http.post('/map/progress-update', { mapId:mapid, userId: Number(userid), score:Score, roomCode:roomCode }).catch(() => {
-          console.error("[DEBUG] ERROR IN ROLL POSITION-NORM");
-        });
-        console.log("[DEBUG] ROLL POSITION", currentTile?.type); 
+      console.log("[DEBUG] Regular move from", currentPos, "to", nextPos);
+      
+      if (nextPos > map.LastIndex) {
+        throw new Error("Position exceeds map limit");
       }
+      
+      setPosition(nextPos);
+      await http.post('/map/progress-update', { 
+        mapId: mapid, 
+        userId: Number(userid), 
+        score: Score, 
+        roomCode: roomCode 
+      }).catch(() => {
+        console.error("[DEBUG] ERROR updating progress for regular move");
+      });
+    };
 
-     
-    }
+    // Handle branch code movement
+    const handleBranchMove = async () => {
+      const next = `${prefix}${suffix}`;
+      
+      console.log("[DEBUG] Branch move to", next);
+      console.log("[DEBUG] Current branch ref:", branchCodeRef.current);
+      
+      if (!map.tiles[next]?.type) {
+        throw new Error("Invalid branch position");
+      }
+      
+      // If we're in a branch, ensure we're using the correct branch letter
+      if (EnteringBranch.current && prefix !== branchCodeRef.current) {
+        throw new Error("Branch code mismatch");
+      }
+      
+      setPosition(next);
+      await http.post('/map/progress-update', { 
+        mapId: mapid, 
+        userId: Number(userid), 
+        score: Score, 
+        roomCode: roomCode 
+      }).catch(() => {
+        console.error("[DEBUG] ERROR updating progress for branch move");
+      });
+    };
 
-    const specialTileLogic= async ()=>{
-        
-        const numberStr = (dice as string)?.match(/^([A-Za-z]+)(\d+)$/);  // 0 means not find anything, 1 means String, 2 means number
-        const num = numberStr ? Number(numberStr[2]) : null;
-        const letter = numberStr ? numberStr[1] : null;
-        
-
-        const next= `${letter}${Math.min((num ?? 0), map.LastIndex)}`; 
-        console.log("[DEBUG] SPECIAL IN ROLL POSITION", branchCodeRef.current);
-
-        // if (letter !== branchCodeRef.current){
-        //   throw new Error ("Branch Code Not Match")
-        // }
-
-        if(!map.tiles[next]?.type || letter !== branchCodeRef.current){
-          throw new Error ("Invalid Tiles")
-          
-        } else{
-          
-        setPosition(next);
-        console.log("[DEBUG] ELSE IN ROLL POSITION", next); //roomid userid score
-        await http.post('/map/progress-update', { mapId: mapid, userId: Number(userid), score:Score, roomCode:roomCode }).catch(() => {
-          console.error("[DEBUG] ERROR IN ROLL POSITION- SPECIAL");
-        });
-        }
-
-    }
+    // Handle branch exit using regular dice
+    const handleBranchExit = async () => {
+      const diceValue = Number(dice);
+      
+      console.log("[DEBUG] Branch exit attempt - dice:", diceValue);
+      
+      // For branch exit, the dice value IS the target position
+      // This is different from regular movement where dice is added to current position
+      let targetPos = diceValue;
+      
+      console.log("[DEBUG] Branch exit target position:", targetPos);
+      
+      if (targetPos > map.LastIndex) {
+        throw new Error("Exit position exceeds map limit");
+      }
+      
+      // Exit branch state
+      EnteringBranch.current = false;
+      branchCodeRef.current = "";
+      
+      setPosition(targetPos);
+      await http.post('/map/progress-update', { 
+        mapId: mapid, 
+        userId: Number(userid), 
+        score: Score, 
+        roomCode: roomCode 
+      }).catch(() => {
+        console.error("[DEBUG] ERROR updating progress for branch exit");
+      });
+      
+      console.log("[DEBUG] Successfully exited branch to position", targetPos);
+    };
 
     try {
+      // Case 1: Entering a branch (regular position + branch code input)
+      if (currPrefix === null && isBranchCode && currentTile?.branchExpected) {
+        const expected = currentTile.branchExpected;
+        const target = `${prefix}${suffix}`;
         
-      if (currentTile?.branchExpected && prefix !== null && !currentTile.branchQuit) {
-      // Entering Branch
-      const expected = currentTile?.branchExpected;
-      const target = `${prefix}${suffix ?? ""}`;
-      console.log("[DEBUG] EXPECTED:", expected, "TARGET:", target);
-
-      if (expected !== target) {
-        throw new Error("Invalid Branch Code");
+        console.log("[DEBUG] Entering branch - Expected:", expected, "Target:", target);
+        
+        if (expected !== target) {
+          throw new Error("Invalid branch entry code");
+        }
+        
+        // Set branch state
+        EnteringBranch.current = true;
+        branchCodeRef.current = prefix ?? "";
+        
+        await safeCall(handleBranchMove);
+        return;
       }
       
-      if(!EnteringBranch.current){
-        EnteringBranch.current=true;
-        branchCodeRef.current= prefix ?? "";
-        console.log("[DEBUG] BRANCH SET", prefix);
+      // Case 2: Moving within a branch (branch position + branch code input)
+      if (currPrefix !== null && isBranchCode) {
+        console.log("[DEBUG] Moving within branch");
+        // Ensure branch state is set correctly
+        if (!EnteringBranch.current) {
+          console.log("[DEBUG] Branch state was reset, restoring it for branch move");
+          EnteringBranch.current = true;
+          branchCodeRef.current = currPrefix;
+        }
+        await safeCall(handleBranchMove);
+        return;
       }
-
-      safeCall(()=>specialTileLogic());
-      console.log("[DEBUG] First T");
       
-
-
-      } else if (!currentTile?.branchExpected && prefix !== null && !currentTile?.branchQuit && currentTile?.isBranch===true && EnteringBranch.current) {
-        // Exit Tile
-
-        safeCall(()=>specialTileLogic());
-        console.log("[DEBUG] Second T");
-
-
-      } else if (currentTile?.type!=="R" || Number(dice)>=Number(currentTile.branchQuit)) {
-        // Normal Tile
-        EnteringBranch.current=false;
-        branchCodeRef.current="";
-        safeCall(()=>NormTileLogic());
-        console.log("[DEBUG] Third T");
-      } else{
-        console.log(dice);
-        console.log("ERR"+ currentTile.branchQuit);
-        setModalCont({title:"Opps!", content:"Invalid Number/Steps Entered",buttonContent:[
-          
-          {buttonContent:"OK", buttonType:"primary", onClick:()=>{SetisError(false)}}
-        
-        ]});
-        handleErrorModal();
+      // Case 3: Exiting a branch (branch position + regular dice input)
+      // Check if we're in a branch position (has prefix) and using regular dice
+      if (currPrefix !== null && isRegularDice) {
+        console.log("[DEBUG] Exiting branch - position has prefix, using regular dice");
+        // Ensure branch state is set correctly before exit
+        if (!EnteringBranch.current) {
+          console.log("[DEBUG] Branch state was reset, restoring it for exit");
+          EnteringBranch.current = true;
+          branchCodeRef.current = currPrefix;
+        }
+        await safeCall(handleBranchExit);
+        return;
       }
-    } catch (err:any){
+      
+      // Case 4: Regular movement (regular position + regular dice input)
+      if (currPrefix === null && isRegularDice) {
+        console.log("[DEBUG] Regular movement");
+        await safeCall(handleRegularMove);
+        return;
+      }
+      
+      // Case 5: On branch tile but not entering branch (using regular dice to skip)
+      if (currentTile?.type === "R" && isRegularDice && !isBranchCode && currPrefix === null) {
+        const diceValue = Number(dice);
+        const branchQuitPoint = Number(currentTile?.branchQuit ?? 0);
         
-      setModalCont({title:"Opps!", content:err instanceof Error ? err.message: String(err) ,buttonContent:[
-          {buttonContent:"OK", buttonType:"primary", onClick:()=>{SetisError(false)}},
-        ]});
-        handleErrorModal();
+        // If dice value reaches or exceeds the branch quit point, allow skipping the branch
+        if (diceValue >= branchQuitPoint) {
+          console.log("[DEBUG] Skipping branch via regular dice");
+          await safeCall(handleRegularMove);
+          return;
+        }
+      }
+      
+      // If none of the above cases match, it's an invalid move
+      throw new Error("Invalid move combination");
+      
+    } catch (err: any) {
+      console.error("[DEBUG] rollPosition error:", err);
+      setModalCont({
+        title: "Move Error", 
+        content: err instanceof Error ? err.message : String(err),
+        buttonContent: [{
+          buttonContent: "OK", 
+          buttonType: "primary", 
+          onClick: () => { SetisError(false); }
+        }]
+      });
+      handleErrorModal();
     }
-
-  
-    
   }
 
   const handleErrorModal= ()=>{
@@ -837,7 +981,7 @@ export default function Game({Mode}: {Mode:string}) {
       };
 
       case 'Loot':{
-
+        coinRef.current += eff?.GOLD as number;
         break;
       }
 
@@ -969,46 +1113,148 @@ export default function Game({Mode}: {Mode:string}) {
 
   }
 
-  // Check the position is illegal or not
+  // Check if the move is valid or not
+  // Check if the move is valid or not
   const isDisable = ()=>{
+    // Always check if there's an active quiz that hasn't been completed FIRST
+    if (isClicked > 1){
+        return true; // Disable if clicked more than once
+    }
 
- //disabled={position as unknown as number >= 40 || dice === null || (currentTile?.type === "R" ? (keySplit(dice?.toString() ?? "").suffix?? 0 >= Number(currentTile?.branchQuit)):false)}
+    if (currentTile?.quizPool != undefined && isSucced != 0) {
+      return true; // Must complete quiz before moving
+    }
 
+    if ((currentTile?.type === "E" || currentTile?.type === "B") && enemyHp > 0) {
+      return true; // Must defeat enemy before moving
+    }
 
-    if (position as unknown as number >=(map?.LastIndex ?? 0)) return true;
+    // Check if position reached the end of the map
+    if (position as unknown as number >= (map?.LastIndex ?? 0)) return true;
 
+    // Check if dice value is empty
     if (dice === null || dice === "") return true;
 
+    // Check if current tile exists
     if (!currentTile) return true;
 
-    if((Number(dice) ?? 0) > (Number(position)+6)) return true;
+    // Parse dice input to check if it's a branch code or regular number
+    const {prefix, suffix} = keySplit(dice.toString());
+    const isRegularDice = prefix === null && suffix !== null; // Regular number like 1,2,3,4,5,6
+    const isBranchCode = prefix !== null && suffix !== null;  // Branch code like L10, L11
+    const {suffix: currSuf, prefix: currPrefix} = keySplit(position.toString());
 
+    console.log("=== isDisable Debug ===");
+    console.log("Current position:", position, "prefix:", currPrefix, "suffix:", currSuf);
+    console.log("Dice input:", dice, "prefix:", prefix, "suffix:", suffix);
+    console.log("Is regular dice:", isRegularDice, "Is branch code:", isBranchCode);
+    console.log("Current tile type:", currentTile?.type);
+    console.log("Quiz pool:", currentTile?.quizPool, "isSucced:", isSucced);
+    console.log("EnteringBranch.current:", EnteringBranch.current);
+    console.log("branchCodeRef.current:", branchCodeRef.current);
 
-    if ((Number(dice) ?? 0) <= Number(position)) return true;
-     
-    if (currentTile?.quizPool != undefined && isSucced!=0) return true;
-
-    if (currentTile?.type === "R"){
-
-      const branchNum = Number(currentTile?.branchQuit ?? 0); // 40
-      const {suffix} = keySplit(dice.toString());
-      const {suffix:currSuf} = keySplit(position.toString());
-      console.log("CurrS:", currSuf);
-      console.log("Suff:",suffix);
-      
+    // Determine if we're currently in a branch based on position prefix OR branch state
+    const isInBranch = currPrefix !== null || EnteringBranch.current;
     
-      if ((suffix ?? 0) > ((currSuf ?? 0)+6) ) return true //R10-cursf x R17-suff
-      
+    console.log("Is in branch:", isInBranch);
 
-      if ((suffix ?? 0) >= branchNum) return false
+    // Case 1: We are in a branch (position has prefix like L14)
+    if (isInBranch) {
+      console.log("=== Branch Logic ===");
       
+      // Option A: Continue moving within branch using branch code
+      if (isBranchCode) {
+        // Check if using the same branch letter
+        if (currPrefix && prefix !== currPrefix) {
+          console.log("Different branch letter:", prefix, "vs", currPrefix);
+          return true;
+        }
+        
+        // Apply 6-step rule within branch
+        const currentBranchPos = currSuf ?? 0;
+        const targetBranchPos = suffix ?? 0;
+        
+        if (targetBranchPos > currentBranchPos + 6) {
+          console.log("Too far in branch:", targetBranchPos, ">", currentBranchPos + 6);
+          return true;
+        }
+        
+        if (targetBranchPos <= currentBranchPos) {
+          console.log("Moving backward in branch:", targetBranchPos, "<=", currentBranchPos);
+          return true;
+        }
+        
+        console.log("Valid branch move from", (currPrefix || "") + currentBranchPos, "to", prefix + targetBranchPos);
+        return false; // Valid branch move
+      }
       
-      return true;
-    } 
+      // Option B: Exit branch using regular dice to normal tiles
+      if (isRegularDice) {
+        const diceValue = Number(dice);
+        
+        // For branch exit, allow any valid dice value (1-6 or specific exit values)
+        if (diceValue < 1) {
+          console.log("Invalid dice value for branch exit:", diceValue);
+          return true;
+        }
+        
+        console.log("Valid branch exit attempt with dice:", diceValue);
+        return false; // Allow branch exit attempt (rollPosition will handle the logic)
+      }
+      
+      console.log("Invalid input format in branch");
+      return true; // Invalid input format in branch
+    }
 
-   
-   
-    return false;
+    // Case 2: We are NOT in a branch (regular position like 10, 15, etc.)
+    if (!isInBranch) {
+      console.log("=== Regular/Branch Entry Logic ===");
+      
+      // Case 2A: On a branch tile (R type) and trying to enter branch
+      if (currentTile?.type === "R" && isBranchCode) {
+        // Check if the branch code matches the expected branch entry
+        if (currentTile.branchExpected && dice.toString() !== currentTile.branchExpected) {
+          console.log("Invalid branch entry code:", dice, "expected:", currentTile.branchExpected);
+          return true;
+        }
+        console.log("Valid branch entry");
+        return false; // Valid branch entry
+      }
+      
+      // Case 2B: Regular movement with regular dice
+      if (isRegularDice) {
+        const diceValue = Number(dice);
+        const currentPos = Number(position);
+        
+        // Enforce strict 6-step rule: dice must be 1-6
+        if (diceValue < 1 || diceValue > 6) {
+          console.log("Invalid dice value (not 1-6):", diceValue);
+          return true;
+        }
+        
+        // Check if target position is valid (not moving backward)
+        const targetPos = currentPos + diceValue;
+        if (targetPos <= currentPos) {
+          console.log("Moving backward:", targetPos, "<=", currentPos);
+          return true;
+        }
+        
+        console.log("Valid regular move from", currentPos, "to", targetPos);
+        return false; // Valid move
+      }
+      
+      // Case 2C: Branch codes not allowed on non-branch tiles
+      if (isBranchCode && currentTile?.type !== "R") {
+        console.log("Branch code not allowed on non-branch tile");
+        return true;
+      }
+      
+      console.log("Invalid input format on regular tile");
+      return true; // Invalid input format
+    }
+
+    console.log("Fallback - invalid move");
+    return true; // Fallback - invalid
   }
 
   const handleAchievementCheck = async (condition:string)=>{
@@ -1035,6 +1281,17 @@ export default function Game({Mode}: {Mode:string}) {
 
   }
 
+  const handleAddCoins = async () =>{
+      await axios.post(`${URL}/game/v1/add-coins/${userid}/${coinRef.current}`,{}, {withCredentials:true} ).then((_res)=>{
+        console.log("[DEBUG] ADD COINS SUCCESS");
+        notify('success',"Coins Added!", `You have successfully earned ${coinRef.current} coins.`, 'top');
+      })
+      .catch((err)=>{
+          console.error("[DEBUG] ERROR IN ADD COINS", err);
+          notify('error',"Unexpected Error!", "Failed to add coins to your account.", 'top');
+      })
+  }
+
   //Winner Logic
   useEffect(()=>{
       socket.on('game-over', async (data)=>{
@@ -1049,6 +1306,9 @@ export default function Game({Mode}: {Mode:string}) {
         bgm.stop();
         bgm.play('/Music/goal_sound.wav', false);
         console.log("DATA WINNER", data.winner);
+
+        await handleAddCoins();
+
         if(data.winner === user){
 
           setModalCont({title:"Congratulation! You Win", content:`Player ${data.winner} has won the game!\n Leaderboard: \n ${data.results3.map((item:LeaderboardData,idx:number)=>`${idx+1}. ${item.username} - ${item.Score} Pts`).join('\n')}`, buttonContent:[{buttonContent:"Back To Homepage",buttonType:'primary', onClick:()=>{window.location.href="/dashboard"}}]});
@@ -1186,7 +1446,14 @@ const handleBgmMute = () =>{
         
         <input type='text' placeholder='Please Enter Number'
         value={dice ?? ""}
-        onChange={(e)=> setDice(e.target.value)}
+        onChange={(e)=> {
+          const value = e.target.value;
+          // Restrict input: only allow number for regular or branch codes (like L10, L11, etc.)
+          if (value === "" || /^\d+$/.test(value) || /^[A-Za-z]+\d+$/.test(value)) {
+            setDice(value);
+          }
+          // Reject any input that doesn't match these patterns
+        }}
         className='positionInput'
         data-title= "Position Input" data-intro="Enter the position you want to move to in this input box. Make sure to enter a valid position based on your current location and the game's rules."
         ></input>
@@ -1205,7 +1472,7 @@ const handleBgmMute = () =>{
                 onClick={() => requestCurrentGameState()}
                 title="Refresh game state"
               >
-                🔄
+                <IoMdRefresh />
               </button>
             )}
           </div>
@@ -1227,7 +1494,18 @@ const handleBgmMute = () =>{
                       })()
                     : 'Loading...'
                 }</p>
-                <p><strong>Is Your Turn:</strong> {isMyTurn() ? '✅ Yes' : '❌ No'}</p>
+                <p><strong>Is Your Turn:</strong> {isMyTurn() ? 
+                <>
+                 'Yes' 
+                <Countdown 
+                  key={`${CurrentTurn?.round}-${CurrentTurn?.currentTurn}-${CurrentTurn?.currentPlayer}`}
+                  intervalTime={90} 
+                  onTimeUp={()=>{
+                    autoFireEndTurn();
+                  }} 
+                />
+                </>
+                : 'No'}</p>
               </div>
               
               <div className="player-order">
@@ -1268,7 +1546,7 @@ const handleBgmMute = () =>{
               
               <button
             onClick={()=>{rollPosition(),ClickDice()}}
-            disabled={isDisable() && isClicked>=1}
+            disabled={isDisable()}
             >
             Roll Dice
             </button>
@@ -1340,7 +1618,7 @@ const handleBgmMute = () =>{
         </div>
       )}
 
-        {quiz.kind === 'none' && (
+      {quiz.kind === 'none' && (
         <div className="McqCard">
           <div className="McqInnerCard">
             <h3 className='none-h'>You're All Done !/ Nothing Here !</h3>

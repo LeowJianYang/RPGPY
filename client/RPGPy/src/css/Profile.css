@@ -112,6 +112,10 @@
   background: var(--profile-card-bg); border: 1px solid var(--profile-border-color);
   border-radius: var(--radius-lg); box-shadow: var(--shadow-md); padding: 1rem;
   transition: background-color 0.3s ease, border-color 0.3s ease;
+  background-size: cover;
+  aspect-ratio: 16/5;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 .profile-avatar-section { position: relative; }
 .profile-avatar {
@@ -143,7 +147,7 @@
 
 /* Stats - grid of cards */
 .stats-section {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; margin-top: 1rem;
+  display: flex; flex-direction: column;justify-content: space-around; gap: .75rem; margin-top: 1rem;
 }
 .stat-card {
   background: var(--profile-card-bg); 
@@ -153,7 +157,7 @@
   padding: .9rem;
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
-.stat-content { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .75rem; }
+.stat-content { display: flex; flex-direction: row; align-items: center; gap: .75rem; }
 .stat-icon-wrapper { width: 40px; height: 40px; border-radius: 9999px; display: grid; place-items: center; color: #fff; }
 .stat-icon-wrapper.primary { background: linear-gradient(135deg, var(--profile-primary), #93c5fd); }
 .stat-icon-wrapper.secondary { background: linear-gradient(135deg, #22c55e, #86efac); }
@@ -262,11 +266,64 @@
   .profile-header { flex-direction: row; align-items: center; justify-content: flex-start; gap: 1.25rem; }
   .profile-info { text-align: left; }
   .profile-name-section { justify-content: flex-start; }
-  .stats-section { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .stats-section { flex-direction: row;justify-content: space-around; gap: 1rem; }
   .achievements-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 }
 
 @media (min-width: 1024px) {
   .profile-container { padding: 2rem; }
+  .stats-section {flex-direction: row; justify-content: space-around;}
   .achievements-grid { grid-template-columns: repeat(3, 1fr); }
+  
+  .profile-header { 
+    gap: 1.5rem; 
+    padding: 2rem;
+  }
+  
+  .profile-avatar-section { 
+    position: relative;
+    margin-top: 0;
+    align-self: flex-end;
+  }
+  
+  .profile-avatar {
+    position: relative; 
+    margin-top: 0;
+    width: 120px; 
+    height: 120px;
+  }
+  
+  .profile-info { 
+    text-align: left; 
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-self: flex-end;
+    margin-bottom: 0.5rem;
+  }
+  
+  .profile-name-section { 
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    flex-direction: row;
+  }
+  
+  .profile-name {
+    font-size: 2rem;
+    margin: 0;
+  }
+  
+  .edit-profile-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .profile-tagline {
+    text-align: left;
+    margin: 0.25rem 0;
+  }
+  
+
 }

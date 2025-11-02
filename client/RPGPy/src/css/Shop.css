@@ -82,28 +82,28 @@
   opacity: 0.3;
 }
 
-.hero-content {
+.shop-hero-content {
   position: relative;
   z-index: 1;
   max-width: 800px;
   margin: 0 auto;
 }
 
-.hero-title {
+.shop-hero-title {
   font-size: 2rem;
   font-weight: 700;
   margin: 0 0 1rem 0;
   line-height: 1.2;
 }
 
-.hero-subtitle {
+.shop-hero-subtitle {
   font-size: 1.125rem;
   opacity: 0.9;
   margin: 0 0 2rem 0;
   line-height: 1.5;
 }
 
-.hero-stats {
+.shop-hero-stats {
   display: flex;
   justify-content: center;
   gap: 2rem;

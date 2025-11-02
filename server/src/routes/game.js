@@ -163,4 +163,15 @@ gameRoutes.get('/leaderboard', async (req,res)=>{
              });
 });
 
+gameRoutes.post('/v1/add-coins/:userId/:coins' , async (req,res)=>{
+    const {userId, coins} = req.params;
+    db.query("Update userdata set Coin = Coin + ? where UserId = ?", [Number(coins),userId] , async(error, _result)=>{
+        if(error){
+            console.log(error);
+            return res.status(500).json({error: "Database error", sqlState: error.sqlState});
+        };
+        return res.status(200).json({message: "Coins added successfully"});
+    })
+});
+
 module.exports = gameRoutes;
