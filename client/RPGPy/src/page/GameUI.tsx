@@ -6,18 +6,20 @@ import Editor from '@monaco-editor/react';
 import "../css/game.css";
 import { Button, Modal } from 'antd';
 import { useUserStore } from '../../components/UserStore';
-import  { ModalForm,SelfButton } from '../components/ErrorModal';
-import type { ModalPropsType } from '../components/ButtonCompo';
+import  { ModalForm,SelfButton } from '../components/Modal';
+import type { ModalPropsType } from '../utils/ButtonCompo';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { socket } from '../socket';
 import { useToast } from '../components/Toast';
-import {BgmManager} from '../components/BgmManager';
+import {BgmManager} from '../utils/BgmManager';
 import { MutedOutlined, SoundOutlined } from '@ant-design/icons';
 import HealthBar from '../components/HeathBar';
 import {useSessionStore} from '../../components/IDStore';
 import introJs from 'intro.js';
 import Countdown from '../components/countdown';
 import { IoMdRefresh } from 'react-icons/io';
+import {Scanner} from '@yudiel/react-qr-scanner';
+import CryptoJS from 'crypto-js';
 
 
 
@@ -66,7 +68,12 @@ export default function Game({Mode}: {Mode:string}) {
   const {ssid} = useSessionStore();
   const started= useRef(false);
   const coinRef = useRef<number>(10);
- 
+  
+  const [isScanning, setIsScanning] = useState<boolean>(false);
+  const scanResultRef = useRef<string>("");
+  const [scanResult, setScanResult] = useState<string>("");
+  const mapKey = import.meta.env.VITE_MAP_SECRET_KEY ;
+
   useEffect(()=>{
 
     const checkSession = async ()=>{
@@ -171,7 +178,8 @@ export default function Game({Mode}: {Mode:string}) {
     fetchAuthCookie();
 
     http.get(`/map/${mapid}`).then(res => {
-        setMap(res.data);
+      const decrypted = CryptoJS.AES.decrypt(res.data.map, mapKey).toString(CryptoJS.enc.Utf8);
+      setMap(JSON.parse(decrypted));
 
         }).catch(console.error);
     
@@ -966,6 +974,19 @@ export default function Game({Mode}: {Mode:string}) {
       };
 
       case "Amour":{
+        const effState = eff?.HP as number;
+        setEquip(
+          prev=> prev.map((val,ix)=>(ix ===1? items:val))
+        )
+
+        if(equip[1]!=="A"){
+          const Curr = (map?.lootEffects[equip[1]] as Extract<LootTypes, {type: 'Amour'}>)?.HP;
+          setHp(
+           Math.max(0,hp-Curr)
+          );
+        };
+
+        setHp(h=> Math.max(0,h+effState));
         console.log("[DEBUG] AMOUR SECTION")
         break;
       };
@@ -1038,6 +1059,8 @@ export default function Game({Mode}: {Mode:string}) {
       };
 
       case "Amour":{
+        const effState = eff?.HP as number;
+        setEquipDet([`Description: ${effDesc}`, `Type: Amour`, `HP: ${effState}`])
         console.log("[DEBUG] AMOUR SECTION")
         break;
       };
@@ -1063,6 +1086,7 @@ export default function Game({Mode}: {Mode:string}) {
     }
       
   }
+
 
   const handleInventoryClick = (items:string)=>{
       setOpen(true);
@@ -1363,6 +1387,27 @@ const handleBgmMute = () =>{
      }
 }
 
+
+const handleAuthInv= async (items:string)=>{
+
+    try{
+      const res =await axios.get(`${URL}/game/v1/inventory/authenticate/${items}`, {withCredentials:true} );
+
+      console.warn("[DEBUG] INV AUTH",map?.lootEffects[useInv]?.type);
+      if (res.data.decryption === useInv || res.data.decryption === map?.lootEffects[useInv]?.type){
+          scanResultRef.current = useInv;
+          setScanResult(res.data.decryption);  
+      } else {
+          scanResultRef.current = "ERR";
+          setScanResult("ERR");
+      }
+
+
+    }catch (err){
+      console.error("[DEBUG] ERROR IN AUTH INV", err);
+    }
+
+}
   
 
   const onSkFinish = (ok: boolean, output: string, error?: string) => {
@@ -1713,8 +1758,53 @@ const handleBgmMute = () =>{
           </div>
         )}
 
+        <ModalForm
+            title= "Use Inventory Item"
+            open={open}
+            onCancel={handleModalCancel}
+            onOk={()=>setIsScanning(false)}
+            footer= {
+              <SelfButton type='danger' onClick={()=>{setIsScanning(false), setOpen(false)}}>Cancel</SelfButton>
+            }
+            multi={true}
+            >
+              <ModalForm.Page>
+                <div>
+                   <p>Scan QR Code to use <b>{useInv}</b> </p>
+                   <SelfButton onClick={()=> setIsScanning(true)} disabled={isScanning}>Start Scanning</SelfButton>
+                    {isScanning && <Scanner onScan={async (result)=>{
+                        scanResultRef.current = result[0].rawValue;
+                        console.log("[DEBUG] SCAN RESULT", scanResultRef.current);
+                        setIsScanning(false);
+                        handleAuthInv(scanResultRef.current);
+                    }}>
+                      </Scanner>}
+                    
+                </div>
+                  
+              
+              </ModalForm.Page>
+                    
+              <ModalForm.Page>
+                {scanResult === "ERR"? (
+                  <div>
+                    <p style={{color:'red'}}>Authentication Failed !</p>
+                    <p>The scanned code does not match the item. Please try again.</p>
+                  </div>
+                ):(
+                  <div>
+                    <p>Scan Result: <b>{scanResult}</b></p>
+                    <SelfButton type="secondary" onClick={() =>{InventoryOk(scanResultRef.current)}} >Confirm</SelfButton>
+                  </div>
+                  
+                )}
+              </ModalForm.Page>
+              
 
-          <Modal
+        </ModalForm>
+
+
+          {/* <Modal
               title= "Do You Want to use this items ?"
               open={open}
               onCancel={handleModalCancel}
@@ -1728,8 +1818,8 @@ const handleBgmMute = () =>{
                 xxl: '40%',
               }}
               >
-                <p>This items will be used and might need answer an question !</p>
-          </Modal>
+                <p></p>
+          </Modal> */}
 
           <Modal
             title= "Equipment Details"

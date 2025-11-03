@@ -2,8 +2,8 @@ import { useState } from "react";
 import "../css/MultiHall.css";
 import axios from "axios";
 import { useUserStore } from "../../components/UserStore";
-import { ModalForm,SelfButton } from "../components/ErrorModal";
-import type { ModalPropsType } from '../components/ButtonCompo';
+import { ModalForm,SelfButton } from "../components/Modal";
+import type { ModalPropsType } from '../utils/ButtonCompo';
 import LoadingObject from "../components/LoadingObject"; 
 import {Scanner} from '@yudiel/react-qr-scanner';
 import {useMapDetailsStore} from '../../components/MapDetailsStore';
@@ -73,7 +73,7 @@ export default function MultiPage() {
 
 
   const handleAfterJoin = async ()=>{
-
+    await handleDeductItems();
     await axios.post(`${URL}/room/createRoom`, {roomCode: roomCode, Owner:user?.user, MapDetails:MapDetails[0].MapId}, {withCredentials:true}).then((res)=>{
 
       const {encryptUsername,userId,ssid}= res.data;
@@ -113,16 +113,30 @@ export default function MultiPage() {
     items.push(itemName);
     localStorage.setItem('pendingInventoryItems', JSON.stringify(items));
   }
+
+  const handleDeductItems = async ()=>{
+    const existingItems = localStorage.getItem('pendingInventoryItems');
+    const items = existingItems ? JSON.parse(existingItems) : [];
+    try {
+      await axios.post(`${URL}/user/v1/inventory/deductItems/${user?.uid}/${items}`, {}, {withCredentials:true});
+      console.log("Deducted items from backpack:", items);
+    } catch (error) {
+      console.error("Error deducting items from backpack:", error);
+    }
+
+  };
   
 
 
   const handleJoinRoom = async () =>{
+    await handleDeductItems();
     axios.post(`${URL}/room/joinRoom`, {username:user?.user,roomCode: roomCode}, {withCredentials:true}).then((res)=>{
       const {userId,ssid} = res.data;
       setSsid(ssid);
       setModalProp({title:"Joined Room", content:`Successfully joined room: ${roomCode}.`, buttonContent:[{buttonContent:"OK", buttonType:"primary" ,onClick:()=> {setOpenForm(false), navigate(`/Lobby?roomCode=${roomCode}&participant=${res.data.encryptUsername}&userId=${userId}`)}}]})
       setLoading(false);
       setOpenForm(true);
+      
       socket.connect();
       socket.emit('join-room', {roomCode, user: user?.user});
 

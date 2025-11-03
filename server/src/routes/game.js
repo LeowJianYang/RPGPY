@@ -5,6 +5,10 @@ const gameRoutes = express.Router();
 const { roomState,shuffle } = require('../config/roomState');
 const {connection:db} = require('../config/db');
 const { error } = require('console');
+const crypto = require('crypto');
+const Algorithm = 'aes-256-cbc';
+const AES_KEY = Buffer.from(process.env.AES_KEY, 'hex'); 
+const IV = Buffer.from(process.env.IV, 'hex');
 
 
 gameRoutes.post('/turn', async (req,res)=>{
@@ -172,6 +176,21 @@ gameRoutes.post('/v1/add-coins/:userId/:coins' , async (req,res)=>{
         };
         return res.status(200).json({message: "Coins added successfully"});
     })
+});
+
+gameRoutes.get('/v1/inventory/authenticate/:items', async(req,res)=>{
+    const {items} =req.params;
+    try{
+        const decipher = crypto.createDecipheriv(Algorithm, AES_KEY, IV);
+        let decrypted = decipher.update(items, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return res.status(200).json({decryption: decrypted});
+        
+    } catch (error){
+        return res.status(400).json({error: "Unable to get items !", details: error.message});
+    }
+
+    
 });
 
 module.exports = gameRoutes;

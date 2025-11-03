@@ -5,9 +5,9 @@ import type React from "react"
 import { useEffect, useState,useRef } from "react"
 import { Dropdown } from "antd"
 import type { MenuProps } from "antd"
-import { ModalForm, SelfButton } from "../components/ErrorModal"
-import type { ModalFormProps } from "../components/ButtonCompo"
-import {HomeTwoTone, UserOutlined,TrophyTwoTone,InfoCircleTwoTone } from "@ant-design/icons"
+import { ModalForm, SelfButton } from "../components/Modal"
+import type { ModalFormProps } from "../utils/ButtonCompo"
+import {HomeTwoTone, UserOutlined,TrophyTwoTone,InfoCircleTwoTone, ShopOutlined } from "@ant-design/icons"
 import { FaRankingStar } from "react-icons/fa6";
 import { MdDiamond } from "react-icons/md";
 //import type { ModalFormProps } from "../components/ButtonCompo"
@@ -135,6 +135,7 @@ const DashPage: React.FC = () => {
         {name: "Join A Game", description: "Enter a room code to join an existing game", icon: <FaRankingStar />, link: "/dashboard?selector=2"},
         {name: "Profiles", description: "View Profile details and Achievement", icon: <BookOutlined />, link: "/dashboard?selector=3"},
         {name: "Settings", description: "Review settings and preferences", icon: <SettingOutlined />, link: "/settings"},
+        {name: "Shop", description: "Browse and purchase items for your adventures", icon: <ShopOutlined/>, link:"/shop"}
       ];
       
 

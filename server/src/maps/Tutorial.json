@@ -16,7 +16,7 @@
 
   "tiles": {
     "01": { "type": "X", "description": "START" },
-    "02": { "type": "C", "lootTable": "treasure_low" },
+    "02": { "type": "C", "lootTable": "treasure_mid" },
     "03": { "type": "Q", "quizPool": "python_code_questions" },
     "04": { "type": "E", "enemyId": "slime_001", "quizPool": "python_basics" },
     "05": { "type": "M", "quizPool": "python_control_flow" },

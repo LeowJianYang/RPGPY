@@ -1,4 +1,4 @@
-import { SelfButton } from '../components/ErrorModal';
+import { SelfButton } from '../components/Modal';
 import DocsNavBar, { FooterBar } from '../components/navigation';
 import './../css/Documentation.css';
 import {useToast} from '../components/Toast';

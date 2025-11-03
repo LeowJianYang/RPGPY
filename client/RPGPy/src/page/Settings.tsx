@@ -8,8 +8,8 @@ import {IoMdArrowBack} from "react-icons/io"
 import { useTheme } from "../utils/themeManager";
 const URL= import.meta.env.VITE_API_URL;
 import { useToast } from "../components/Toast";
-import type { ModalFormProps } from "../components/ButtonCompo";
-import { ModalForm, SelfButton } from "../components/ErrorModal";
+import type { ModalFormProps } from "../utils/ButtonCompo";
+import { ModalForm, SelfButton } from "../components/Modal";
 export default function Settings(){
     
     const { user,setUser } = useUserStore();

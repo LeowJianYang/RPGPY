@@ -19,6 +19,7 @@
     "@yudiel/react-qr-scanner": "^2.3.1",
     "antd": "^5.27.0",
     "axios": "^1.11.0",
+    "crypto-js": "^4.2.0",
     "framer-motion": "^12.23.12",
     "howler": "^2.2.4",
     "intro.js": "^8.3.2",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@types/crypto-js": "^4.2.2",
     "@types/howler": "^2.2.12",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",

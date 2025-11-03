@@ -3,12 +3,12 @@ import { SearchOutlined, FilterOutlined, HeartOutlined, StarFilled } from '@ant-
 import type { Product } from '../../components/ProductsTypes';
 import '../css/Shop.css';
 import axios from 'axios';
-import api from '../components/api';
+import api from '../utils/api';
 import { useUserStore } from '../../components/UserStore';
 const URL= import.meta.env.VITE_API_URL;
-import { ModalForm } from '../components/ErrorModal';
-import type { ModalFormProps } from '../components/ButtonCompo';
-import { SelfButton } from '../components/ErrorModal';
+import { ModalForm } from '../components/Modal';
+import type { ModalFormProps } from '../utils/ButtonCompo';
+import { SelfButton } from '../components/Modal';
 import { useToast } from '../components/Toast';
 
 const categories = ['All', 'Skills', 'Decoration', 'Weapon'];

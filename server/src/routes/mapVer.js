@@ -5,6 +5,7 @@ const fs = require('fs');
 const {connection:db} = require('../config/db');
 let turn =0;
 const {roomState,shuffle} = require('../config/roomState'); 
+const CryptoJS = require("crypto-js");
 
 const mapRouter = express.Router();
 
@@ -14,7 +15,8 @@ mapRouter.get('/:mapid', (req, res) => {
   const file = path.join(__dirname, '../maps', `${req.params.mapid}.json`);
   if (!fs.existsSync(file)) return res.status(404).json({ message: 'Map not found' });
   const json = JSON.parse(fs.readFileSync(file, 'utf8'));
-  res.json(json);
+  const encrypted= CryptoJS.AES.encrypt(JSON.stringify(json), process.env.MAP_SECRET_KEY).toString();
+  res.json({ map: encrypted });
 });
 
 

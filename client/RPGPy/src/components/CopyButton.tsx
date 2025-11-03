@@ -1,5 +1,5 @@
 import { CopyOutlined } from "@ant-design/icons";
-import { useClipboard } from "./clipboard";
+import { useClipboard } from "../utils/clipboard";
 import { useToast } from "./Toast";
 import { useEffect } from "react";
 

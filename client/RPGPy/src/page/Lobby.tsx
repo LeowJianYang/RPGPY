@@ -4,8 +4,8 @@ import { Navigate, useSearchParams } from "react-router-dom"
 import axios from "axios"
 import "../css/Lobby.css"
 import { useMapDetailsStore } from "../../components/MapDetailsStore"
-import { SelfButton,ModalForm } from "../components/ErrorModal"
-import type { ModalPropsType } from '../components/ButtonCompo';
+import { SelfButton,ModalForm } from "../components/Modal"
+import type { ModalPropsType } from '../utils/ButtonCompo';
 import { socket } from '../socket';
 import { useNavigate } from "react-router-dom"
 import  { ReloadOutlined } from "@ant-design/icons"

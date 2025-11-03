@@ -2,7 +2,7 @@
 
 
 export type TileType = 'S' | 'E' | 'C' | 'Q' | 'B' | 'X' | 'M' | 'R';
-export type SkillType = 'Attack' | 'Defense' | 'Heal';
+export type SkillType = 'Attack' | 'Defense' | 'Heal'| 'Skills';
 
 export type BaseLoot =  | { type: "Restock"; description: string; HP: number }
   | { type: "Weapon"; description: string; ATK: number }
@@ -42,4 +42,6 @@ export interface MapJSON {
   RolesSet: Record<string, {description:string, ATK:number, HP:number, Skills:string[]}>;
   LastIndex:number;
 }
+
+
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CloseOutlined, MenuOutlined, BookOutlined, RocketOutlined, DownloadOutlined, 
          SafetyCertificateOutlined, QuestionCircleOutlined, SettingOutlined } from '@ant-design/icons';
 import {DocsNavBar, FooterBar } from '../components/navigation';
-import { SelfButton } from '../components/ErrorModal';
+import { SelfButton } from '../components/Modal';
 import '../css/Docs.css';
 import { useToast } from '../components/Toast';
 import axios from 'axios';

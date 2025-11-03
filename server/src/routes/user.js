@@ -121,6 +121,28 @@ userRoutes.get('/v1/:decorationType/style/:userId', async (req,res)=>{
     });
 });
 
+userRoutes.post('/v1/inventory/deductItems/:userId/:items', async (req,res)=>{
+    const {userId, items} = req.params;
+    connection.query(`Select prod_id from shop where prod_name = ?`, [items], async(error, result)=>{
+        if(error){
+            return res.status(500).json({error: "error", sqlState: error.sqlState});
+        };
+        if(result.length ===0){
+            return res.status(404).json({error: "Item not found in shop"});
+        };
+
+        const prod_id = result[0].prod_id;
+        connection.query(`Update inventory set counts = counts - 1 where userId = ? and prod_id = ? and counts > 0`, [userId, prod_id], async(error, result)=>{
+            if(error){
+                return res.status(500).json({error: "error", sqlState: error.sqlState});
+            };
+            if(result.affectedRows === 0){
+                return res.status(404).json({error: "Item not found in inventory"});
+            }
+            return res.status(200).json({message: "Item deducted from inventory"});
+        });
+    });
+});
 
 
 

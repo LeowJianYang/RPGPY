@@ -1,6 +1,6 @@
 
 import React from "react";
-import type { ButtonProps, ModalFormProps } from "./ButtonCompo";
+import type { ButtonProps, ModalFormProps } from "../utils/ButtonCompo";
 import "../css/SelfBtn.css"
 import {useState, useEffect} from "react";
 

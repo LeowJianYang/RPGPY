@@ -77,7 +77,7 @@ export default function Backpack({ onSelectItem, onAddToInventory }: BackpackPro
         // Add selected item to GameUI inventory
         if (onAddToInventory) {
             onAddToInventory(selectedItem);
-            message.success(`${selectedItem} ${selectedItemData?.quantity ? `(x${selectedItemData.quantity})` : ''} added to inventory!`);
+            message.success(`${selectedItem} ${selectedItemData?.quantity ? `(x1)` : ''} added to inventory!`);
             // Clear selection after adding
             setSelectedItem(null);
         }
