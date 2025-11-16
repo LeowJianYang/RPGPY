@@ -45,13 +45,15 @@
   },
 
   "quizPools": {
-    "python_basics": [
-      { "q": "What is the output of print(2+3)?", "a": ["23", "5", "Error"], "correct": 1, "expectedResult": "5" },
-      { "q": "Which keyword defines a function in Python?", "a": ["def", "func", "lambda"], "correct": 0 ,"expectedResult":"def" }
-    ],
     "python_control_flow": [
       { "q": "Which statement is used for decision making?", "a": ["if", "for", "while"], "correct": 0, "expectedResult": "if"},
-      { "q": "Which keyword can be used with both `for` and `while` loops?", "a": ["return", "break", "print"], "correct": 1, "expectedResult": "break"}
+      { "q": "Which keyword can be used with both `for` and `while` loops?", "a": ["return", "break", "print"], "correct": 1, "expectedResult": "break"},
+      { "q": "What is the purpose of `elif`?", "a": ["To check an additional condition if the previous `if` statement was false", "To end the `if` statement", "To create a loop"], "correct": 0, "expectedResult": "To check an additional condition if the previous `if` statement was false"},
+      { "q": "In which case would a `while` loop be more suitable than a `for` loop?", "a": ["When iterating over a fixed-size list", "When you want to run a loop a specific number of times", "When the number of iterations is unknown"], "correct": 2, "expectedResult": "When the number of iterations is unknown"},
+      { "q": "Which statement is used to terminate the current iteration of the loop and jump to the next one?", "a": ["`exit()`", "`pass`", "`continue`"], "correct": 2, "expectedResult": "`continue`"},
+      { "q": "What does the `in` keyword do in a `for` loop?", "a": ["It specifies the condition for the loop to run", "It iterates over each element in a sequence", "It checks if an item exists in a sequence"], "correct": 1, "expectedResult": "It iterates over each element in a sequence"},
+      { "q": "What is a major risk of a `while` loop?", "a": ["Infinite loop", "Syntax error", "Slow execution"], "correct": 0, "expectedResult": "Infinite loop"}
+
     ],
     "python_code_questions":[
       {"q": "Using a `for` loop, print the numbers from 1 to 3, each on a new line.", "expectedResult": "1\n2\n3\n"},

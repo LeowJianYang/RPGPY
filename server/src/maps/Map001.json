@@ -20,7 +20,7 @@
     "03": { "type": "Q", "quizPool": "python_code_questions" },
     "04": { "type": "U", "description": "Get a Equipment Card", "card": "EquipCard" },
     "05": { "type": "C", "lootTable": "treasure_skill" },
-    "06": { "type": "E", "enemyId": "slime_001", "quizPool": "python_basics" },
+    "06": { "type": "E", "enemyId": "slime_001", "quizPool": "python_control_flow" },
     "07": { "type": "M", "quizPool": "python_control_flow" },
     "08": { "type": "X" },
     "09": { "type": "U", "description": "Get a Equipment Card", "card": "EquipCard" },
@@ -74,10 +74,6 @@
     "R33": { "type": "X", "branchQuit": "40" }
   },
   "quizPools": {
-    "python_basics": [
-      { "q": "What is the output of print(2+3)?", "a": ["23", "5", "Error"], "correct": 1, "expectedResult": "5" },
-      { "q": "Which keyword defines a function in Python?", "a": ["def", "func", "lambda"], "correct": 0 ,"expectedResult":"def" }
-    ],
   "python_control_flow": [
       { "q": "Which statement is used for decision making?", "a": ["if", "for", "while"], "correct": 0, "expectedResult": "if"},
       { "q": "Which loop is used when the number of iterations is known?", "a": ["while loop", "for loop", "if statement"], "correct": 1, "expectedResult": "for loop"},
