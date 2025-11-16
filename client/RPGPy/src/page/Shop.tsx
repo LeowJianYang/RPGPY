@@ -152,15 +152,13 @@ const ShopPage: React.FC = () => {
       <section className="shop-hero">
         <div className="shop-hero-content">
           <h1 className="shop-hero-title">Discover Amazing Products</h1>
-          <p className="shop-hero-subtitle">Curated collection of premium items for your lifestyle</p>
+          <p className="shop-hero-subtitle">Personalize Your Profile and Game Experience</p>
           <div className="shop-hero-stats">
             <div className="stat-item">
               <span className="stat-number">{products.length}+</span>
               <span className="stat-label">Products</span>
             </div>
             <div className="stat-item">
-              <span className="stat-number">4.8</span>
-              <span className="stat-label">Rating</span>
             </div>
             <div className="stat-item">
               <span className="stat-number">24/7</span>
