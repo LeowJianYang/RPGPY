@@ -11,7 +11,6 @@ import Game from './page/GameUI.tsx';
 import Lobby from './page/Lobby.tsx';
 import NotFoundPage from './page/NotFound.tsx';
 import MultiPage from './page/MultiPage.tsx';
-import DocumentationPage from './page/Documentation.tsx';
 import Docs from './page/Docs.tsx';
 import { Toast } from './components/Toast.tsx';
 import JoinMiddlePage from './page/joinMiddle.tsx';
@@ -36,7 +35,6 @@ createRoot(document.getElementById('root')!).render(
         <Route path='/Lobby' element={<Lobby/>} />
         <Route path="*" element={<NotFoundPage/>} />
         <Route path="/Multi" element={<MultiPage/>} />
-        <Route path='/Documentation' element={<DocumentationPage/>} />
         <Route path='/Docs' element={<Docs/>} />
         <Route path='/v0/auth/join' element={<JoinMiddlePage/>} />
         <Route path='/settings' element={<Settings/>} />
