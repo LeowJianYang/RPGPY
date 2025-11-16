@@ -738,3 +738,274 @@ input:checked + .toggle-slider:before {
     display: none !important;
   }
 }
+
+/* ========================================
+   MODAL FORM STYLES
+   ======================================== */
+
+/* Modal Confirm Text */
+.modal-confirm-text {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: var(--space-lg);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Modal Form Container */
+.modal-form-container {
+  width: 100%;
+  padding: var(--space-md) 0;
+}
+
+/* Modal Form Fields */
+.modal-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+/* Modal Field Group */
+.modal-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+/* Modal Label */
+.modal-label {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+  display: block;
+  transition: color var(--transition-fast);
+}
+
+/* Modal Input */
+.modal-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all var(--transition-normal);
+  line-height: 1.5;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Modal Input Placeholder */
+.modal-input::placeholder {
+  color: var(--text-tertiary);
+  opacity: 0.7;
+}
+
+/* Modal Input Focus State */
+.modal-input:focus {
+  border-color: var(--border-focus);
+  background-color: var(--bg-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Modal Input Hover State */
+.modal-input:hover:not(:focus) {
+  border-color: var(--border-secondary);
+  background-color: var(--bg-hover);
+}
+
+/* Modal Input Disabled State */
+.modal-input:disabled {
+  background-color: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Modal Input Error State (optional, for future use) */
+.modal-input.error {
+  border-color: var(--danger-color);
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.modal-input.error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Modal Input Success State (optional, for future use) */
+.modal-input.success {
+  border-color: var(--success-color);
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.modal-input.success:focus {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* ========================================
+   RESPONSIVE MODAL STYLES - TABLET
+   ======================================== */
+
+@media (max-width: 768px) {
+  .modal-confirm-text {
+    font-size: 0.95rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .modal-form-container {
+    padding: var(--space-sm) 0;
+  }
+
+  .modal-form-fields {
+    gap: var(--space-md);
+  }
+
+  .modal-field-group {
+    gap: var(--space-sm);
+  }
+
+  .modal-label {
+    font-size: 0.9rem;
+  }
+
+  .modal-input {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* ========================================
+   RESPONSIVE MODAL STYLES - MOBILE
+   ======================================== */
+
+@media (max-width: 480px) {
+  .modal-confirm-text {
+    font-size: 0.9rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .modal-form-container {
+    padding: var(--space-xs) 0;
+  }
+
+  .modal-form-fields {
+    gap: var(--space-sm);
+  }
+
+  .modal-field-group {
+    gap: var(--space-xs);
+  }
+
+  .modal-label {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .modal-input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Larger touch targets for mobile */
+  .modal-input {
+    min-height: 44px; /* iOS recommended touch target size */
+  }
+
+  /* Adjust focus ring for mobile */
+  .modal-input:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  }
+}
+
+/* ========================================
+   MODAL INPUT ACCESSIBILITY
+   ======================================== */
+
+/* Autofill Styles */
+.modal-input:-webkit-autofill,
+.modal-input:-webkit-autofill:hover,
+.modal-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-secondary) inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+[data-theme="dark"] .modal-input:-webkit-autofill,
+[data-theme="dark"] .modal-input:-webkit-autofill:hover,
+[data-theme="dark"] .modal-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-secondary) inset;
+}
+
+/* Focus Visible (keyboard navigation) */
+.modal-input:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .modal-input {
+    border-width: 2px;
+  }
+
+  .modal-input:focus {
+    border-width: 3px;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .modal-input {
+    transition: none;
+  }
+}
+
+/* ========================================
+   MODAL INPUT PASSWORD SPECIFIC STYLES
+   ======================================== */
+
+/* Password Input Container (for future password strength indicator) */
+.modal-input[type="password"] {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.15em;
+}
+
+.modal-input[type="password"]::placeholder {
+  font-family: inherit;
+  letter-spacing: normal;
+}
+
+/* ========================================
+   MODAL INPUT EMAIL SPECIFIC STYLES
+   ======================================== */
+
+.modal-input[type="email"] {
+  text-transform: lowercase;
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS - LARGE DESKTOP
+   ======================================== */
+
+@media (min-width: 1440px) {
+  .modal-input {
+    padding: 1rem 1.25rem;
+    font-size: 1.05rem;
+  }
+
+  .modal-label {
+    font-size: 1rem;
+  }
+
+  .modal-confirm-text {
+    font-size: 1.05rem;
+  }
+}

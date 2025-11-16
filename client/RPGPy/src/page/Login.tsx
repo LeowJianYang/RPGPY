@@ -12,7 +12,6 @@ import { useUserStore } from "../../components/UserStore";
 import { useToast } from "../components/Toast";
 import { ConfigProvider } from 'antd';
 import { useTheme } from "../utils/themeManager";
-// You can find a suitable image and place it in your public folder
 const loginIllustration = "/rpgpy-trans.png"; 
 
 

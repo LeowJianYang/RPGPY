@@ -24,7 +24,7 @@ export default function NavBar() {
                     {/* Desktop Navigation */}
                     <nav className="innerNav">
                         <a className="contentNav" href="/">Home</a>
-                        <a className="contentNav" href="/about">About</a>
+                        <a className="contentNav" href="/docs?navigator=help">Help</a>
                         <a className="contentNav" href="/Docs">Docs</a>
                         <a className="LoginBtn" href="/Login">Login/SignUp</a>
                     </nav>
@@ -42,7 +42,7 @@ export default function NavBar() {
             <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
                 <a className="closeNav" onClick={toggleMobileMenu}>CLOSE</a>
                 <a className="contentNav" href="/" onClick={toggleMobileMenu}>Home</a>
-                <a className="contentNav" href="/about" onClick={toggleMobileMenu}>About</a>
+                <a className="contentNav" href="/docs?navigator=help" onClick={toggleMobileMenu}>Help</a>
                 <a className="contentNav" href="/Docs" onClick={toggleMobileMenu}>Docs</a>
                 <a className="LoginBtn" href="/Login" onClick={toggleMobileMenu}>Login/SignUp</a>
             </div>
@@ -72,8 +72,7 @@ export function DocsNavBar() {
                     {/* Desktop Navigation */}
                     <nav className="innerNav">
                         <a className="contentNav" href="/">Home</a>
-                        <a className="contentNav" href="/about">About</a>
-                        <a className="contentNav" href="/Docs">Docs</a>
+                        <a className="contentNav" href="/docs?navigator=help">Help</a>
                         <a className="LoginBtn" href="/Login">Login/SignUp</a>
                     </nav>
 
@@ -90,8 +89,7 @@ export function DocsNavBar() {
             <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
                 <a className="closeNav" onClick={toggleMobileMenu}>CLOSE</a>
                 <a className="contentNav" href="/" onClick={toggleMobileMenu}>Home</a>
-                <a className="contentNav" href="/about" onClick={toggleMobileMenu}>About</a>
-                <a className="contentNav" href="/Docs" onClick={toggleMobileMenu}>Docs</a>
+                <a className="contentNav" href="/docs?navigator=help" onClick={toggleMobileMenu}>Help</a>
                 <a className="LoginBtn" href="/Login" onClick={toggleMobileMenu}>Login/SignUp</a>
             </div>
         </>
@@ -110,13 +108,13 @@ export function FooterBar() {
                         Learn Python through interactive gaming experiences designed for all skill levels.
                     </p>
                 </div>
-                
+{/*                 
                 <div className="innerCont">
                     <p className="text-title">Company Details</p>
                     <a className="text-cont" href="/about">About Us</a>
                     <a className="text-cont" href="/why-choose-us">Why Choose Us?</a>
                     <a className="text-cont" href="/contact">Contact</a>
-                </div>
+                </div> */}
                 
                 <div className="innerCont">
                     <p className="text-title">How to Play</p>
@@ -128,8 +126,8 @@ export function FooterBar() {
                 <div className="innerCont">
                     <p className="text-title">Resources</p>
                     <a className="text-cont" href="/Docs">Documentation</a>
-                    <a className="text-cont" href="/examples">Code Examples</a>
-                    <a className="text-cont" href="/community">Community</a>
+                    {/* <a className="text-cont" href="/examples">Code Examples</a>
+                    <a className="text-cont" href="/community">Community</a> */}
                 </div>
             </div>
             

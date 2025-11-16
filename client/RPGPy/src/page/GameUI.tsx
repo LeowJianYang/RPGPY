@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
-import type { MapJSON, TileType, LootTypes, SkillsType } from '../GameTypes'
+import type { MapJSON, TileType, LootTypes, SkillsType, inventoryType } from '../GameTypes'
 import PythonRunner from '../PythonRunner';
 import axios from 'axios';
 import Editor from '@monaco-editor/react';
@@ -33,7 +33,7 @@ export default function Game({Mode}: {Mode:string}) {
   const [map, setMap] = useState<MapJSON | null>(null);
   const [position, setPosition] = useState<string|number>(1);
   const [hp, setHp] = useState<number>(0);
-  const [inventory, setInventory] = useState<string[]>([]);
+  const [inventory, setInventory] = useState<inventoryType[]>([]);
   const [dice, setDice] = useState<number | null | string>(null);
   const [quiz, setQuiz] = useState<QuizState>({ kind: 'none' });
   const [codeInput, setCodeInput] = useState<string>('');
@@ -68,6 +68,7 @@ export default function Game({Mode}: {Mode:string}) {
   const {ssid} = useSessionStore();
   const started= useRef(false);
   const coinRef = useRef<number>(10);
+  const enemyRef = useRef<number>(0);
   
   const [isScanning, setIsScanning] = useState<boolean>(false);
   const scanResultRef = useRef<string>("");
@@ -549,6 +550,7 @@ export default function Game({Mode}: {Mode:string}) {
         // Enemy 
         const pool= map.quizPools[currentTile.quizPool||""]|| [];
         setEnemyHp(enemy.hp);
+        enemyRef.current = enemy.hp;
          // 0 succed >0 not succeed
              setisSucced(1);
             const pick = pool[Math.floor(Math.random()*pool.length)];
@@ -566,7 +568,11 @@ export default function Game({Mode}: {Mode:string}) {
         bgm.play('/Music/Chest001.ogg', true);
         const table = map.lootTables[currentTile.lootTable!];
         const drop = table[Math.floor(Math.random() * table.length)];
-        setInventory(items => [...items, drop]);
+        setInventory(items => [...items, {
+          items:drop,
+          itemType: 'Loot'
+        }]);
+
         setQuiz({ kind: 'none' });
         break;
       }
@@ -577,6 +583,7 @@ export default function Game({Mode}: {Mode:string}) {
         const enemy= map.enemies[currentTile.enemyId!];
         const pick = pool[Math.floor(Math.random() * pool.length)];
         setEnemyHp(enemy.hp);
+        enemyRef.current = enemy.hp;
         console.log("BOSS HERE !");
         setisSucced(0);
         setQuiz({ kind: 'code', prompt: pick.q, starter: 'print("...")' , expected: pick.expectedResult?? ""});
@@ -631,6 +638,15 @@ export default function Game({Mode}: {Mode:string}) {
         }
         break;
        }
+      
+      case "U": {
+        const pick = map.EquipCard[Math.floor(Math.random()* map.EquipCard.length)];
+        setInventory(items => [...items, {
+          items: pick.name,
+          itemType: pick.type
+        }]);
+        break;
+      };
 
       default:
         setQuiz({ kind: 'none' });
@@ -872,14 +888,15 @@ export default function Game({Mode}: {Mode:string}) {
     const correct = idx === quiz.correct;
     if (correct) {
       notify('success',"Correct Answer !", "You answered correctly and dealt damage to the enemy.", 'top');
-
       setScore(prev => prev + 20);
+      setisSucced(0);  
       if(currentTile?.type==="E")
       {
+        enemyRef.current = Math.max(0,enemyRef.current - Atk);
         setEnemyHp(h=>{
           const newHp= Math.max(0,h-Atk);
           if (newHp===0){
-            setisSucced(0);      
+                
             bgm.stop();
             bgm.play('/Music/Main-flow.ogg', true);
             setQuiz({ kind: 'none' });
@@ -891,7 +908,6 @@ export default function Game({Mode}: {Mode:string}) {
       } 
       else{
         setisSucced(0);
-
       }
     } else {
       switch (isSucced ===0 ? 0:1){
@@ -936,7 +952,7 @@ export default function Game({Mode}: {Mode:string}) {
   const InventoryOk = async (items:string)=>{
     setInventory(prev=> {
       const newInv =[...prev];
-      const idx = newInv.indexOf(items);
+      const idx = newInv.findIndex(entry=> entry.items === items);
       if(idx >-1){
         newInv.splice(idx,1);
       }
@@ -1149,9 +1165,9 @@ export default function Game({Mode}: {Mode:string}) {
       return true; // Must complete quiz before moving
     }
 
-    if ((currentTile?.type === "E" || currentTile?.type === "B") && enemyHp > 0) {
-      return true; // Must defeat enemy before moving
-    }
+    if ((currentTile?.type === "E" || currentTile?.type === "B") && enemyRef.current <=0) {
+      return false; // Must defeat enemy before moving
+    } 
 
     // Check if position reached the end of the map
     if (position as unknown as number >= (map?.LastIndex ?? 0)) return true;
@@ -1333,7 +1349,7 @@ export default function Game({Mode}: {Mode:string}) {
 
         await handleAddCoins();
 
-        if(data.winner === user){
+        if(data.winner === user?.user){
 
           setModalCont({title:"Congratulation! You Win", content:`Player ${data.winner} has won the game!\n Leaderboard: \n ${data.results3.map((item:LeaderboardData,idx:number)=>`${idx+1}. ${item.username} - ${item.Score} Pts`).join('\n')}`, buttonContent:[{buttonContent:"Back To Homepage",buttonType:'primary', onClick:()=>{window.location.href="/dashboard"}}]});
         } else {
@@ -1419,7 +1435,8 @@ const handleAuthInv= async (items:string)=>{
          setisSucced(0);
           setScore(prev => prev + 25);
           if(currentTile?.type==="E" || currentTile?.type==="B"){
-             setEnemyHp(h=>{
+            enemyRef.current = Math.max(0,enemyRef.current - Atk); 
+            setEnemyHp(h=>{
                 const newHp= Math.max(0,h-Atk);
                 
                 if(newHp===0){
@@ -1739,18 +1756,36 @@ const handleAuthInv= async (items:string)=>{
           <div className='backInner'>
             <ul className='inv-warp'>
               {inventory.map((it, i) => <li key={i}>
-                
-                <div className='Inner-InvBack'>
-                  <details>
-                    <summary>
-                      {it}
-                    </summary>
-                    <p>{map.lootEffects[it]?.description}</p>
-                  </details>
-                  <p className={`badge-inv ${map.lootEffects[it]?.type}`} >{map.lootEffects[it]?.type}</p>
-                  <a className="useBack"onClick={()=>{handleInventoryClick(it);}}>Use</a>
+                  {it.itemType === "Loot" ? (
+                    <div className='Inner-InvBack'>
+                    <details>
+                      <summary>
+                        {it.items}
+                      </summary>
+                      <p>{map.lootEffects[it.items]?.description}</p>
+                    </details>
+                    <p className={`badge-inv ${map.lootEffects[it.items]?.type}`} >{map.lootEffects[it.items]?.type}</p>
+                    <a className="useBack"onClick={()=>{handleInventoryClick(it.items);}}>Use</a>
                 </div>
-                
+                  ):
+                  ( <div>
+                       <h5>CARDS AVAILABLE</h5>
+
+                       <div className='Inner-InvBack-Cards'>
+                          <details>
+                            <summary>
+                              {it.items}
+                            </summary>
+                            <p>{map.EquipCard.find(card=> card.name === it.items)?.description ?? "NAN"}</p>
+                          </details>
+                          <p className={`badge-inv ${map.EquipCard.find(card=> card.name === it.items)?.type ?? ""}`} >{map.EquipCard.find(card=> card.name === it.items)?.type ?? ""}</p>
+                          <a className="useBack"onClick={()=>{handleInventoryClick(it.items);}}>Use</a>
+
+
+                       </div>
+                  </div>)
+                  
+                }
                 </li>)}
                 
             </ul>
@@ -1770,15 +1805,27 @@ const handleAuthInv= async (items:string)=>{
             >
               <ModalForm.Page>
                 <div>
-                   <p>Scan QR Code to use <b>{useInv}</b> </p>
-                   <SelfButton onClick={()=> setIsScanning(true)} disabled={isScanning}>Start Scanning</SelfButton>
-                    {isScanning && <Scanner onScan={async (result)=>{
-                        scanResultRef.current = result[0].rawValue;
-                        console.log("[DEBUG] SCAN RESULT", scanResultRef.current);
-                        setIsScanning(false);
-                        handleAuthInv(scanResultRef.current);
-                    }}>
-                      </Scanner>}
+                  {inventory.find(inv => (inv.itemType === "Card" || inv.items === "Gold") && inv.items === useInv) ? (
+                    <div>
+                    <p>Are you sure to use <b>{useInv}</b> ? <br/> Please Pick a {useInv} Card !</p>
+                    <SelfButton type="primary" onClick={() =>{InventoryOk(useInv)}} >Confirm</SelfButton>
+                  </div>
+
+                  ): (
+
+                    <>
+                      <p>Scan QR Code to use <b>{useInv}</b> </p>
+                      <SelfButton onClick={()=> setIsScanning(true)} disabled={isScanning}>Start Scanning</SelfButton>
+                      {isScanning && <Scanner onScan={async (result)=>{
+                          scanResultRef.current = result[0].rawValue;
+                          console.log("[DEBUG] SCAN RESULT", scanResultRef.current);
+                          setIsScanning(false);
+                          handleAuthInv(scanResultRef.current);
+                      }}>
+                        </Scanner>}
+                    </>
+                  )}
+                 
                     
                 </div>
                   

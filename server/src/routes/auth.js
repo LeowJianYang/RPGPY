@@ -4,6 +4,7 @@ const {connection:db} = require('../config/db');
 const encrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require('crypto');
+const {IdecryptUsername} = require('../utils/dec');
 
 const router = express.Router();
 //AES Encryption Key
@@ -132,14 +133,6 @@ router.post("/logout", async (req,res)=>{
 
     return res.status(200).json({success:true, message:"Successfully Logged Out !"})
 })
-
-function IdecryptUsername(encryptedUsername){
-    const decipher = crypto.createDecipheriv(Algorithm, AES_KEY, IV);
-    let decrypted = decipher.update(encryptedUsername, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-}
-
 
 
 

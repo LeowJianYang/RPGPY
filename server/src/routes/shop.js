@@ -36,7 +36,7 @@ shopRoutes.post('/v1/purchase/:productCat/:userId/:productId', async (req, res) 
   }
 
   // Validate product
-  const validCategories = ["Decoration", "Skills", "Weapon", "Special", "Amour"];
+  const validCategories = ["Decoration", "Skills", "Weapon", "Special", "Amour", "nametag", "background"];
   if (!validCategories.includes(productCat.trim())) {
     return res.status(400).json({ 
       error: "Invalid product category",
@@ -100,7 +100,7 @@ shopRoutes.post('/v1/purchase/:productCat/:userId/:productId', async (req, res) 
     }
 
     // Check the counts of decoration items
-    if (productCat === "Decoration") {
+    if (productCat === "Decoration" || productCat === "nametag" || productCat === "background") {
       const [invRows] = await connection.query(
         "SELECT counts FROM inventory WHERE userId = ? AND prod_id = ?",
         [parseInt(userId), parseInt(productId)]

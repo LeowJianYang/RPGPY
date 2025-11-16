@@ -1,8 +1,12 @@
 const express = require('express');
 const userRoutes = express.Router();
 const {connection}= require("../config/db");
+const encrypt = require("bcryptjs");
 const path = require('path');
 const fs = require('fs');
+
+
+
 
 // Fetch user coins
 userRoutes.get('/v1/coins/:userId', async (req,res)=>{
@@ -144,7 +148,86 @@ userRoutes.post('/v1/inventory/deductItems/:userId/:items', async (req,res)=>{
     });
 });
 
+userRoutes.patch("/v1/:userId/settings/password", async(req,res)=>{
+    const {currentPassword, newPassword} = req.body;
+    const {userId} = req.params;
 
+    connection.query(`Select Passwords from userdata where UserId =?`, [userId], async(error,result)=>{
+        if(error){
+            console.log(error);
+            return res.status(500).json({error: "Database error", sqlState: error.sqlState});
+        };
+        if(result.length ===0){
+            return res.status(404).json({error: "User not found"});
+        };
+        const oldHashedPassword = result[0].Passwords;
 
+        const isMatch = await encrypt.compare(currentPassword,oldHashedPassword);
+        if(!isMatch){
+            return res.status(401).json({error: "Password incorrect!"});
+        }
+        const salt = await encrypt.genSalt(10);
+        const newHashedPassword =  await encrypt.hash(newPassword, salt);
+
+        connection.query(`Update userdata set Passwords = ? where UserId = ?`, [newHashedPassword, userId], async(error,result)=>{
+            if(error){
+                console.log(error);
+                return res.status(500).json({error: "Database error", sqlState: error.sqlState});
+            };
+            return res.status(200).json({success: "Password updated successfully"});
+        })
+
+    })
+});
+
+userRoutes.patch("/v1/:userId/settings/email", async(req,res)=>{
+    const {newEmail} =req.body;
+    const {userId} = req.params;
+    connection.query(`Update userdata set Email = ? where UserId = ?`, [newEmail, userId], async(error,result)=>{
+        if(error){
+            console.log(error);
+            return res.status(500).json({error: "Database error", sqlState: error.sqlState});
+        };
+        if (result.affectedRows ===0){
+            return res.status(404).json({error: "User not found"});
+        }
+
+        return res.status(200).json({success: "Email updated successfully"});
+    });
+})
+
+userRoutes.delete("/v1/:userId/settings/account", async(req,res)=>{
+
+    const {userId} = req.params;
+    const {password} = req.body;
+
+    connection.query('Select Passwords from userdata where UserId = ?', [userId], async(error,result)=>{
+        if(error){
+            console.log(error);
+            return res.status(500).json({error: "Database error", sqlState: error.sqlState});
+        };
+
+        if(result.length ===0){
+            return res.status(404).json({error: "User not found"});
+        };
+        const hashedPassword = result[0].Passwords;
+        const isMatch = await encrypt.compare(password,hashedPassword);
+        if(!isMatch){
+            return res.status(401).json({error: "Password incorrect!"});
+        };
+            connection.query(`Delete from userdata where UserId = ?`, [userId], async(error,result)=>{
+            
+                if(error){
+                    console.log(error);
+                    return res.status(500).json({error: "Database error", sqlState: error.sqlState});
+                };
+                if (result.affectedRows ===0){
+                    return res.status(404).json({error: "User not found"});
+                }
+                
+                return res.status(200).json({success: "Account deleted successfully"});
+            });
+    })
+});
 
 module.exports = userRoutes;

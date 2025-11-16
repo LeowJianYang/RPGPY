@@ -115,8 +115,10 @@ gameRoutes.post('/complete-map', async (req,res)=>{
                         return res.status(500).json({error: "Database error"});
                     };
                     console.log("RESULTS3", JSON.stringify(results3));
-                    req.io.to(roomCode).emit('game-over',{results3, winner: username})
-                    return res.status(200).json({message: "Map completed", results: results3});
+
+                    console.log("RESULTS3", JSON.stringify({winner: results3[0].username}));
+                    req.io.to(roomCode).emit('game-over',{results3, winner: results3[0].username});
+                    return res.status(200).json({message: "Map completed", results: results3, winner: results3[0].username} );
                 }
                 )
 

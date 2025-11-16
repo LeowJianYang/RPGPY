@@ -104,7 +104,7 @@ export default function Backpack({ onSelectItem, onAddToInventory }: BackpackPro
     return (
         <div className="backpack-container">
             <div className="backpack-header">
-                <h2>🎒 Backpack Items</h2>
+                <h2>Backpack Items</h2>
                 <Button 
                     type="primary" 
                     onClick={fetchBackpackItems}

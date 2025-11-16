@@ -11,28 +11,29 @@
     "M": "MCQ (was Lock)",
     "R": "Branch",
     "B": "Boss",
-    "X": "Empty"
+    "X": "Empty",
+    "U": "Unlock"
   },
 
   "tiles": {
     "01": { "type": "X", "description": "START" },
-    "02": { "type": "C", "lootTable": "treasure_mid" },
+    "02": { "type": "C", "lootTable": "treasure_skill"},
     "03": { "type": "Q", "quizPool": "python_code_questions" },
-    "04": { "type": "E", "enemyId": "slime_001", "quizPool": "python_basics" },
-    "05": { "type": "M", "quizPool": "python_control_flow" },
-    "06": { "type": "C", "lootTable": "treasure_mid" },
-    "07": { "type": "E", "enemyId": "bat_002", "quizPool": "python_control_flow" },
-    "08": { "type": "Q", "quizPool": "python_code_questions" },
-    "09": { "type": "C", "lootTable": "treasure_skill" },
+    "04": { "type": "U", "description": "Get a Equipment Card", "card": "EquipCard" },
+    "05": { "type": "C", "lootTable": "treasure_skill"},
+    "06": { "type": "E", "enemyId": "mage_007", "quizPool": "python_control_flow" },
+    "07": { "type": "Q", "quizPool": "python_code_questions" },
+    "08": { "type": "X"},
+    "09": { "type": "U", "description": "Get a Equipment Card", "card": "EquipCard" },
     "10": { "type": "R", "branchExpected": "L10" },
-    "11": { "type": "E", "enemyId": "goblin_003", "quizPool": "python_control_flow" },
-    "12": { "type": "C", "lootTable": "treasure_rare" },
-    "13": { "type": "Q", "quizPool": "python_code_questions" },
-    "14": { "type": "E", "enemyId": "wolf_006", "quizPool": "python_control_flow" },
-    "15": { "type": "C", "lootTable": "treasure_mid" },
-    "16": { "type": "E", "enemyId": "mage_007", "quizPool": "python_code_questions" },
+    "11": { "type": "X"},
+    "12": { "type": "X"},
+    "13": { "type": "U", "description": "Get a Equipment Card", "card": "EquipCard" },
+    "14":  { "type": "C", "lootTable": "treasure_rare" },
+    "15": { "type": "X"},
+    "16":  { "type": "C", "lootTable": "treasure_skill" },
     "17": { "type": "M", "quizPool": "python_control_flow" },
-    "18": { "type": "Q", "quizPool": "python_code_questions" },
+    "18": { "type": "E", "enemyId": "bandit_008", "quizPool": "python_control_flow" },
     "19": { "type": "C", "lootTable": "treasure_skill" },
     "20": { "type": "B", "enemyId": "dragon_001", "quizPool": "python_code_questions", "description": "END - Boss Fight" },
 
@@ -40,7 +41,7 @@
     "L11": { "type": "C", "lootTable": "treasure_mid", "isBranch": true },
     "L12": { "type": "Q", "quizPool": "python_code_questions", "isBranch": true },
     "L13": { "type": "E", "enemyId": "knight_009", "quizPool": "python_control_flow", "isBranch": true },
-    "L14": { "type": "X", "branchQuit": "20" }
+    "L14": { "type": "U", "description": "Get a Equipment Card", "card": "EquipCard", "branchQuit": "20"}
   },
 
   "quizPools": {
@@ -66,6 +67,13 @@
     "treasure_rare": ["Special Bow", "Potion Lvl 2", "Iron Sword Lvl 3"],
     "treasure_skill":["Fireball Lvl 2","Laser Beam Lvl 3", "Heal Lvl 3", "Laser Beam","Heal Lvl 2"]
   },
+
+    "EquipCard": [
+    {"name":"Iron Sword", "type":"Card", "description": "A card for unlock iron sword"},
+    {"name":"Skills", "type":"Card", "description":"A card for unlock any skills"},
+    {"name":"Armor", "type":"Card","description":"A card for unlock any armor"},
+    {"name":"Potion", "type":"Card","description":"A card for unlock potion"}
+  ],
 
   "RolesSet": {
     "Warrior": {"description":"A strong melee fighter", "ATK":3, "HP":20, "Skills":["Warrior Strike"]},

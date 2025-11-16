@@ -17,6 +17,7 @@ const achievements = require("./routes/achievements");
 const shopRoutes = require("./routes/shop");
 const userRoutes = require("./routes/user");
 const { roomState } = require('./config/roomState');
+const utilsRoute = require('./routes/utils');
 
 
 
@@ -51,7 +52,7 @@ const corsOptions={
 app.use(cors({
     origin:allowedOrigin,
     credentials:true,
-    methods:["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods:["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders:["Content-Type", "Authorization", "Cookie"],
 }))
 
@@ -62,6 +63,7 @@ app.use('/game', gameRoutes);
 app.use('/achievements', achievements);
 app.use('/shop', authMiddleWare ,shopRoutes);
 app.use('/user', authMiddleWare, userRoutes);
+app.use('/utils', utilsRoute);
 
 io.on('connection', (socket)=>{
     console.log(`Socket connected: ${socket.id}`);

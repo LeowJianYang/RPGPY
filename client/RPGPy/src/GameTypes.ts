@@ -1,7 +1,7 @@
 
 
 
-export type TileType = 'S' | 'E' | 'C' | 'Q' | 'B' | 'X' | 'M' | 'R';
+export type TileType = 'S' | 'E' | 'C' | 'Q' | 'B' | 'X' | 'M' | 'R'| 'U';
 export type SkillType = 'Attack' | 'Defense' | 'Heal'| 'Skills';
 
 export type BaseLoot =  | { type: "Restock"; description: string; HP: number }
@@ -26,6 +26,17 @@ export interface Enemy {
   styleImg?:string;
 }
 
+type Card ={
+  name:string;
+  type:string;
+  description:string;
+}
+
+export type inventoryType = {
+   items: string;
+   itemType: string;
+}
+
 export type LootTypes = BaseLoot | SkillsType;
 
 export interface MapJSON {
@@ -40,6 +51,7 @@ export interface MapJSON {
   enemies: Record<string, Enemy>;
   SkillsSet: Record<string, {type: string, description: string, damage?:number, heal?:number, HP?:number, duration?:number, Cooldown:number}>;
   RolesSet: Record<string, {description:string, ATK:number, HP:number, Skills:string[]}>;
+  EquipCard: Card[];
   LastIndex:number;
 }
 

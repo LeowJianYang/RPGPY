@@ -19,5 +19,14 @@ export default tseslint.config([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+
+    // rules:{
+    //   "no-unused-vars":"off",
+    //   "react-hooks/rules-of-hooks":"error",
+    //   "react-hooks/exhaustive-deps":"warn",
+    //   "@typescript-eslint/no-unused-vars":"warn",
+    //   "@typescript-eslint/ban-ts-comment":"warn",
+    //   "@typescript-eslint/no-explicit-any":"off"
+    // }
   },
 ])

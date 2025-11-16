@@ -1,4 +1,4 @@
-/*game.css with Theme Support*/
+
 
 :root {
     /* Light Theme Colors */
@@ -434,6 +434,16 @@
     flex-shrink: 0;
 }
 
+
+.Inner-InvBack-Cards{
+    display: flex;
+    flex-direction: row;
+    gap:0.5rem;
+    align-items: center;    
+    white-space: nowrap;
+    justify-content: space-between;
+}
+
 .badge-inv{
     border-radius: 10px;
     padding: 0.5rem;
@@ -442,6 +452,11 @@
     height: 30px;
     justify-content: center;
 
+}
+
+.badge-inv.Card {
+    background-color: #20c997;
+    color:#000000;
 }
 
 .badge-inv.Weapon{

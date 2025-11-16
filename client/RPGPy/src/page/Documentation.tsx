@@ -1,3 +1,4 @@
+//@deprecated
 import { SelfButton } from '../components/Modal';
 import DocsNavBar, { FooterBar } from '../components/navigation';
 import './../css/Documentation.css';

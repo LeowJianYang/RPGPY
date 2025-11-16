@@ -79,23 +79,27 @@ const Docs: React.FC = () => {
     </div>
   );
 
-  
-  const handleDownloadMap = async (MapId: string)=>{
+  /**
+   * Downloads the specified map file from the server.
+   * @param items - The API Route
+   * @param name - The name of the file to download
+   */
+  const handleDownload = async (items: string, name:string)=>{
     try{
-    const res= await axios.get(`${URL}/map/v1/download/${MapId}`, {responseType: 'blob', withCredentials:true});  
+    const res= await axios.get(`${URL}/${items}/v1/download/${name}`, {responseType: 'blob', withCredentials:true});  
     const url= window.URL.createObjectURL(new Blob([res.data]));
     
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${MapId}.pdf`);
+    link.setAttribute('download', `${name}.pdf`);
     document.body.appendChild(link);
     link.click();
-    notify("success", "Download Started", "Your map download has started.", "bottomRight");
+    notify("success", "Download Started", "File download has started.", "bottomRight");
     window.URL.revokeObjectURL(url);
     document.body.removeChild(link);
   } catch(err){
-    console.error("Error downloading map:", err);
-    notify("error", "Download Failed", "Could not download the map. Please try again later.", "top");
+    console.error("Error downloading file:", err);
+    notify("error", "Download Failed", "Could not download the file. Please try again later.", "top");
   } };
 
 
@@ -313,12 +317,12 @@ yarn dev</code></pre>
             <h2>Latest Release</h2>
             <div className="download-section">
               <div className="download-card">
-                <h3>RPGPy v1.0.0- MAP001</h3>
+                <h3>RPGPy v1.0.2- MAP001</h3>
                 <p>Latest Version of MAP 001</p>
                 <SelfButton 
-                  onClick={() => handleDownloadMap("MAP001")}
+                  onClick={() => handleDownload("map","MAP001")}
                 >
-                  Download v1.0.0- MAP001
+                  Download v1.0.2- MAP001
                 </SelfButton>
               </div>
             </div>
@@ -335,10 +339,18 @@ yarn dev</code></pre>
               </thead>
               <tbody>
                 <tr>
-                  <td>v1.0.0 Tutorial</td>
-                  <td>2025-10-15</td>
-                  <td>172 KB</td>
-                  <td><SelfButton onClick={() => handleDownloadMap("TutorialMap")}>Download</SelfButton></td>
+                  <td>v1.0.2 Tutorial</td>
+                  <td>15-11-2025</td>
+                  <td>2.37 MB</td>
+                  <td><SelfButton onClick={() => handleDownload("map","TutorialMap")}>Download</SelfButton></td>
+                </tr>
+              </tbody>
+              <tbody>
+                <tr>
+                  <td>v1.0.1 Utils-Skills Cards</td>
+                  <td>15-11-2025</td>
+                  <td>2.74 MB</td>
+                  <td><SelfButton onClick={() => handleDownload("utils","EquipmentCard")}>Download</SelfButton></td>
                 </tr>
               </tbody>
             </table>

@@ -10,6 +10,13 @@ const URL= import.meta.env.VITE_API_URL;
 import { useToast } from "../components/Toast";
 import type { ModalFormProps } from "../utils/ButtonCompo";
 import { ModalForm, SelfButton } from "../components/Modal";
+import { changePassword, changeEmail, deleteAccount } from "../utils/settings-a";
+import type {setup, detailsType} from "../utils/settings-a";
+
+
+
+
+
 export default function Settings(){
     
     const { user,setUser } = useUserStore();
@@ -22,7 +29,21 @@ export default function Settings(){
     const [language, setLanguage] = useState('english');
     const [ModalOpen, setModalOpen] = useState(false);
     const [modalProps, setModalProps] = useState<ModalFormProps>();
-    
+    const [actions, setActions] = useState<setup>(
+        {
+            type: 'password',
+            currentPassword: '',
+            newPassword: '',
+            userId: user?.uid?? ""
+        }
+    );
+    const [isValidEmail, setIsValidEmail] = useState(false);
+
+
+    const validateEmail = (email: string) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    };
     useEffect(()=>{
 
         axios.get(`${URL}/authCookie`, {withCredentials:true}).then((res)=>{
@@ -122,8 +143,166 @@ export default function Settings(){
         catch(err){
             notify('error', 'Settings', 'Failed to retrieve account headers.', 'top');
             console.error(err);
+              setModalProps({
+                open:ModalOpen,
+                title:`Does not Have any ${decorationType.charAt(0).toUpperCase() + decorationType.slice(1)}`,
+                onCancel:()=>{setModalOpen(false)},
+                onClose:()=>{setModalOpen(false)},
+                footer:<>
+                    <SelfButton type="danger" onClick={()=>{setModalOpen(false)}}>Close</SelfButton>
+                </>,
+                children:
+                <>
+                    
+                    <div className="header-selection-container">
+                        <div className="header-options-list">
+                            <p>Try checking the store for available <a href="/shop" style={{ textDecoration: 'underline' , cursor: 'pointer', color: 'blue' }}>{decorationType}</a>!</p>
+                        </div>
+
+                    </div>
+                </>
+
+            });
         }
     };
+
+
+    const handleSettingsProd = async (details: setup ) =>{
+
+        try{
+            if (details.type === 'password'){
+               const result= await changePassword(details);
+               notify('success', 'Settings', (result), 'top');
+            } else if (details.type === 'email'){
+               const result= await changeEmail(details);
+               notify('success', 'Settings' ,(result), 'top');
+            } else if (details.type === 'delete'){
+               const result= await deleteAccount(details);
+               notify('success', 'Settings', (result), 'top');
+               setUser(null);
+               navigate('/login', {replace:true} );
+            }
+        } catch (err:any){
+            notify('error', 'Settings', 'Failed to update account settings. Reason:'+(err?.error || err?.message || "Unknown error"), 'top');
+            console.error(err);
+        }
+           
+    };
+
+    const settingsModalContent =async (details: detailsType)=>{
+        
+        let initalActions : setup;
+        switch(details){
+            case 'password':
+                initalActions = {
+                    currentPassword: '',
+                    newPassword: '',
+                    userId: user?.uid ?? "",
+                    type: 'password'
+                };
+                break;
+            case 'email':
+                initalActions = {
+                    newEmail: '',
+                    userId: user?.uid ?? "",
+                    type: 'email'
+                };
+                break;
+            case 'delete':
+                initalActions = {
+                    password: '',
+                    userId: user?.uid ?? "",
+                    type: 'delete'
+                };
+                break;
+        }
+       setActions(initalActions);
+
+        setModalProps({
+            open: true,
+            title:`Authentication Required`,
+            onCancel:()=>{setModalOpen(false)},
+            onClose:()=>{setModalOpen(false)},
+            footer:<>
+                <SelfButton type="secondary" onClick={()=>{setModalOpen(false)}}>Close</SelfButton>
+                <SelfButton type='danger' onClick={async () => {
+                    if (initalActions.type === 'email' && isValidEmail) {
+                        await handleSettingsProd(actions);
+                        setModalOpen(false);
+                    } else if (initalActions.type != "email") {setModalOpen(false);  await handleSettingsProd(actions);} else if (!isValidEmail && initalActions.type === 'email') {
+                        notify('error', 'Settings', 'Please enter a valid email address.', 'top');
+                    }
+            
+                }}>Submit</SelfButton>
+            </>,
+            children:
+            <>
+                <p className="modal-confirm-text">Please Confirm Your Action</p>
+                <div className="modal-form-container">
+                    <div className="modal-form-fields">
+                        {initalActions.type === 'password' && 
+        
+                        <div className="modal-field-group">
+                            <label className="modal-label">Current Password:</label>
+                            <input 
+                                type="password" 
+                                className="modal-input" 
+                                placeholder="Enter current password"
+                                defaultValue={initalActions.currentPassword} 
+                                onChange={(e) => setActions(prev => prev ? {...prev, currentPassword: e.target.value}:prev)} 
+                            />
+                            <label className="modal-label">New Password:</label>
+                            <input 
+                                type="password" 
+                                className="modal-input" 
+                                placeholder="Enter new password"
+                                defaultValue={initalActions.newPassword} 
+                                onChange={(e) => setActions(prev => prev ? {...prev, newPassword: e.target.value}:prev)} 
+                            />
+                        </div>}
+                        {initalActions.type === 'email' && 
+                        <div className="modal-field-group">
+                            <label className="modal-label">New Email:</label>
+                        <input
+                            type="email"
+                            className="modal-input"
+                            placeholder="Enter new email address"
+                            defaultValue={initalActions.newEmail}
+                            onChange={(e) => {
+                            const val = e.target.value;
+                            setActions(prev => prev ? { ...prev, newEmail: val } : prev);
+
+                            setIsValidEmail (validateEmail(val));
+
+                         
+                        }}
+                        />
+                            {!isValidEmail && (
+                            <p style={{ color: 'red', marginTop: '4px' }}>Please enter a valid email address.</p>
+                        )}
+                        </div>}
+                        {initalActions.type === 'delete' && 
+                        <div className="modal-field-group">
+                            <label className="modal-label">Password:</label>
+                            <input 
+                                type="password" 
+                                className="modal-input" 
+                                placeholder="Enter your password to confirm"
+                                defaultValue={initalActions.password} 
+                                onChange={(e) => setActions(prev => prev ? {...prev, password: e.target.value}:prev)} 
+                            />
+                        </div>}
+                    </div>
+                </div>
+            </>
+        });
+        
+        setModalOpen(true);
+    //END
+    }
+             
+                
+      
 
 
     return(
@@ -170,7 +349,7 @@ export default function Settings(){
                                     <div className="setting-value">{user?.email || 'No email set'}</div>
                                 </div>
                             </div>
-                            <button className="setting-button secondary">
+                            <button className="setting-button secondary" onClick={()=>{ settingsModalContent('email');}} >
                                 Change Email
                             </button>
                         </div>
@@ -183,7 +362,7 @@ export default function Settings(){
                                     <p className="setting-description">Update your password for better security</p>
                                 </div>
                             </div>
-                            <button className="setting-button danger">
+                            <button className="setting-button danger" onClick={()=>{ settingsModalContent('password');}} >
                                 Change Password
                             </button>
                         </div>
@@ -196,7 +375,7 @@ export default function Settings(){
                                     <p className="setting-description">Decorate with Account Header</p>
                                 </div>
                             </div>
-                            <button className="setting-button secondary" onClick={()=>{handleSelectDecoration('background'), setModalOpen(true)}}>
+                            <button className="setting-button secondary" onClick={async ()=>{ await handleSelectDecoration('background'); setModalOpen(true)}}>
                                 Change
                             </button>
                         </div>
@@ -340,7 +519,7 @@ export default function Settings(){
                                     <p className="setting-description">Permanently delete your account and all associated data</p>
                                 </div>
                             </div>
-                            <button className="setting-button danger-destructive">
+                            <button className="setting-button danger-destructive" onClick={()=>{ settingsModalContent('delete'); }} >
                                 Delete Account
                             </button>
                         </div>
