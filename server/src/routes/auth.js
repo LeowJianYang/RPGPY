@@ -4,7 +4,7 @@ const {connection:db} = require('../config/db');
 const encrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require('crypto');
-const {IdecryptUsername} = require('../utils/dec');
+
 
 const router = express.Router();
 //AES Encryption Key
@@ -13,6 +13,12 @@ const AES_KEY = Buffer.from(process.env.AES_KEY, 'hex');
 const IV = Buffer.from(process.env.IV, 'hex');
 
 //Login Authentication
+function IdecryptUsername(encryptedUsername){
+    const decipher = crypto.createDecipheriv(Algorithm, AES_KEY, IV);
+    let decrypted = decipher.update(encryptedUsername, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+}
 
 router.post("/login", async (req, res)=>{
 
@@ -91,6 +97,8 @@ router.get('/checkSession', async (req,res)=>{
         return res.status(200).json({ success: true, message: "Session valid" });
     })
 });
+
+
 
 
 
